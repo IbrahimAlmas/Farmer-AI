@@ -314,174 +314,154 @@ export default function Landing() {
 
   if (gateOpen) {
     return (
-      <div className="min-h-screen flex flex-col">
-        <section className="relative overflow-hidden">
-          <div className="absolute inset-0 -z-10">
-            <img
-              src="/logo_bg.svg"
-              alt="Background"
-              className="h-full w-full object-cover opacity-70"
-              loading="eager"
+      <div className="min-h-screen relative overflow-hidden bg-black">
+        {/* Edge-to-edge background sweep (amber->purple) */}
+        <div className="absolute inset-0 -z-20 bg-gradient-to-br from-amber-500/30 via-transparent to-primary/30" />
+
+        {/* Decorative flowing wave like reference */}
+        <div className="pointer-events-none absolute inset-0 -z-10 opacity-90">
+          <svg viewBox="0 0 1440 700" xmlns="http://www.w3.org/2000/svg" className="h-full w-full">
+            <defs>
+              <linearGradient id="gateSweep" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stopColor="oklch(0.78 0.22 80)" />
+                <stop offset="50%" stopColor="oklch(0.70 0.22 300)" />
+                <stop offset="100%" stopColor="oklch(0.66 0.16 260)" />
+              </linearGradient>
+            </defs>
+            <path
+              d="M0,520 C240,420 360,200 700,240 C1040,280 1160,140 1440,220 L1440,700 L0,700 Z"
+              fill="url(#gateSweep)"
+              opacity="0.25"
             />
-            {/* Dark gradient overlay with purple-blue sweep */}
-            <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/80 to-background" />
+            <path
+              d="M0,560 C220,560 420,360 720,380 C1020,400 1180,260 1440,320 L1440,700 L0,700 Z"
+              fill="url(#gateSweep)"
+              opacity="0.18"
+            />
+          </svg>
+        </div>
+
+        {/* Top bar (compact, mobile-first) */}
+        <div className="px-4 pt-6 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <img src="/logo.svg" alt="KrishiMitra" className="h-9 w-9 rounded-xl shadow" />
+            <span className="text-xs uppercase tracking-wide text-white/80">KrishiMitra</span>
           </div>
+          <div className="hidden sm:flex items-center gap-5 text-[11px] text-white/70">
+            <span className="hidden md:inline">Home</span>
+            <span className="hidden md:inline">About</span>
+            <span className="hidden md:inline">Help</span>
+          </div>
+        </div>
 
-          <div className="mx-auto w-full max-w-5xl px-4 pt-24 pb-16">
-            <div className="relative mx-auto w-full max-w-3xl rounded-3xl border bg-card/70 backdrop-blur-xl overflow-hidden shadow-2xl">
-              {/* Decorative wave background inside the card (reference style) */}
-              <div className="pointer-events-none absolute inset-0 -z-10 opacity-70">
-                <svg viewBox="0 0 1440 600" xmlns="http://www.w3.org/2000/svg" className="h-full w-full">
-                  <defs>
-                    <linearGradient id="gateGrad" x1="0" y1="0" x2="1" y2="1">
-                      <stop offset="0%" stopColor="oklch(0.80 0.20 80)" />
-                      <stop offset="50%" stopColor="oklch(0.70 0.22 300)" />
-                      <stop offset="100%" stopColor="oklch(0.70 0.12 260)" />
-                    </linearGradient>
-                  </defs>
-                  <path
-                    d="M0,500 C240,420 320,180 640,220 C960,260 1120,80 1440,160 L1440,600 L0,600 Z"
-                    fill="url(#gateGrad)"
-                    opacity="0.25"
-                  />
-                  <path
-                    d="M0,520 C220,520 380,360 640,380 C900,400 1120,260 1440,320 L1440,600 L0,600 Z"
-                    fill="url(#gateGrad)"
-                    opacity="0.18"
-                  />
-                </svg>
-              </div>
+        {/* Slides */}
+        <div className="mx-auto max-w-2xl px-5">
+          {gateSlide === 0 ? (
+            <motion.div
+              key="welcome-full"
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="pt-16"
+            >
+              <h1 className="text-[36px] sm:text-[44px] font-extrabold leading-tight tracking-tight">
+                <span className="bg-gradient-to-r from-amber-400 via-white to-cyan-300 bg-clip-text text-transparent">
+                  Welcome.
+                </span>
+              </h1>
+              <p className="mt-2 text-xl sm:text-2xl font-semibold text-white">Landing Page Design</p>
+              <p className="mt-3 text-sm sm:text-base text-white/70 max-w-xl">
+                Choose your preferred language to personalize a smooth, voice‑first experience.
+              </p>
 
-              {/* Top mini nav dots */}
-              <div className="flex items-center justify-center gap-2 py-3">
-                <button
-                  aria-label="Welcome slide"
-                  onClick={() => setGateSlide(0)}
-                  className={`h-2.5 w-2.5 rounded-full transition-all ${gateSlide === 0 ? "bg-primary w-6" : "bg-muted"}`}
-                />
-                <button
-                  aria-label="Language slide"
+              <div className="mt-8 flex items-center gap-3">
+                <Button
+                  className="rounded-2xl px-6 py-5 text-base bg-gradient-to-r from-amber-500 via-primary to-cyan-500 text-primary-foreground hover:opacity-90"
                   onClick={() => setGateSlide(1)}
-                  className={`h-2.5 w-2.5 rounded-full transition-all ${gateSlide === 1 ? "bg-primary w-6" : "bg-muted"}`}
-                />
+                >
+                  Next: Choose Language
+                </Button>
+                <Button
+                  variant="outline"
+                  className="rounded-2xl px-6 py-5 text-base border-white/30 text-white hover:bg-white/10"
+                  onClick={playIntro}
+                >
+                  Intro Voice
+                </Button>
               </div>
 
-              {/* Slides */}
-              {gateSlide === 0 ? (
-                <motion.div
-                  key="welcome"
-                  initial={{ opacity: 0, y: 14 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="px-6 pb-12 text-center"
+              {/* Privacy pill */}
+              <div className="mt-8 inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white/5 backdrop-blur px-3 py-2 text-sm text-white/90">
+                Private & secure. You control your data.
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="language-full"
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="pt-12"
+            >
+              <h2 className="text-2xl sm:text-3xl font-bold text-white">Choose your language</h2>
+              <p className="mt-2 text-sm sm:text-base text-white/70 max-w-xl">
+                Select your preferred language to personalize the experience.
+              </p>
+
+              <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {langOptions.map((opt) => (
+                  <button
+                    key={opt.value}
+                    onClick={() => setSelectedLang(opt.value)}
+                    className={`rounded-2xl border bg-white/5 backdrop-blur px-4 py-3 text-sm text-white transition ${
+                      selectedLang === opt.value
+                        ? "border-primary text-primary shadow-sm ring-1 ring-primary/40"
+                        : "border-white/15 hover:bg-white/10"
+                    }`}
+                    aria-pressed={selectedLang === opt.value}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+
+              <div className="mt-8 flex items-center gap-3">
+                <Button
+                  variant="outline"
+                  className="rounded-2xl px-6 py-5 text-base border-white/30 text-white hover:bg-white/10"
+                  onClick={() => setGateSlide(0)}
                 >
-                  <div className="flex justify-between items-start px-2">
-                    <div className="flex items-center gap-2">
-                      <img src="/logo.svg" alt="Farmers Hub" className="h-10 w-10 rounded-xl shadow" />
-                      <span className="text-xs uppercase tracking-wide text-muted-foreground/80">KrishiMitra</span>
-                    </div>
-                    <div className="hidden sm:flex items-center gap-4 text-[11px] text-muted-foreground/80">
-                      <span className="hidden md:inline">Home</span>
-                      <span className="hidden md:inline">About</span>
-                      <span className="hidden md:inline">Help</span>
-                    </div>
-                  </div>
-
-                  <h1 className="mt-8 text-[34px] md:text-[44px] font-extrabold tracking-tight leading-tight">
-                    <span className="bg-gradient-to-r from-amber-400 via-primary to-cyan-400 bg-clip-text text-transparent">
-                      Welcome.
-                    </span>
-                  </h1>
-                  <p className="mt-2 text-xl md:text-2xl font-semibold">
-                    Let's personalize your experience
-                  </p>
-                  <p className="mt-3 text-sm md:text-base text-muted-foreground max-w-xl mx-auto">
-                    Choose your preferred language to get a smooth, voice‑first app tailored to your region.
-                  </p>
-
-                  {/* Decorative wave bar */}
-                  <div className="mt-8 h-[6px] w-full rounded-full bg-gradient-to-r from-amber-400/50 via-primary/50 to-cyan-400/50" />
-
-                  <div className="mt-8 flex items-center justify-center gap-3">
-                    <Button
-                      className="rounded-2xl px-6 py-5 text-base bg-gradient-to-r from-amber-500 via-primary to-cyan-500 text-primary-foreground hover:opacity-90"
-                      onClick={() => setGateSlide(1)}
-                    >
-                      Next: Choose Language
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="rounded-2xl px-6 py-5 text-base border-primary/40 hover:bg-primary/10"
-                      onClick={playIntro}
-                    >
-                      Intro Voice
-                    </Button>
-                  </div>
-
-                  <div className="mt-8 inline-flex items-center gap-2 rounded-2xl border bg-card/70 backdrop-blur px-3 py-2 text-sm">
-                    Private & secure. You control your data.
-                  </div>
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="lang"
-                  initial={{ opacity: 0, y: 14 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="px-6 pb-12 text-center"
+                  Back
+                </Button>
+                <Button
+                  className="rounded-2xl px-6 py-5 text-base bg-gradient-to-r from-amber-500 via-primary to-cyan-500 text-primary-foreground hover:opacity-90"
+                  onClick={confirmLanguage}
                 >
-                  <div className="flex justify-center">
-                    <img src="/logo.svg" alt="Farmers Hub" className="h-10 w-10 rounded-xl shadow" />
-                  </div>
-                  <h2 className="mt-5 text-2xl md:text-3xl font-bold">
-                    Choose your language
-                  </h2>
-                  <p className="mt-2 text-sm md:text-base text-muted-foreground max-w-xl mx-auto">
-                    Select your preferred language to personalize the experience.
-                  </p>
+                  Continue
+                </Button>
+                <Button
+                  variant="outline"
+                  className="rounded-2xl px-6 py-5 text-base border-white/30 text-white hover:bg-white/10"
+                  onClick={playIntro}
+                >
+                  Preview Voice
+                </Button>
+              </div>
+            </motion.div>
+          )}
+        </div>
 
-                  <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 max-w-3xl mx-auto">
-                    {langOptions.map((opt) => (
-                      <button
-                        key={opt.value}
-                        onClick={() => setSelectedLang(opt.value)}
-                        className={`rounded-2xl border bg-card/70 backdrop-blur px-4 py-3 text-sm transition ${
-                          selectedLang === opt.value
-                            ? "border-primary text-primary shadow-sm ring-1 ring-primary/30"
-                            : "hover:bg-muted/50"
-                        }`}
-                        aria-pressed={selectedLang === opt.value}
-                      >
-                        {opt.label}
-                      </button>
-                    ))}
-                  </div>
-
-                  <div className="mt-8 flex items-center justify-center gap-3">
-                    <Button
-                      variant="outline"
-                      className="rounded-2xl px-6 py-5 text-base border-primary/40 hover:bg-primary/10"
-                      onClick={() => setGateSlide(0)}
-                    >
-                      Back
-                    </Button>
-                    <Button
-                      className="rounded-2xl px-6 py-5 text-base bg-gradient-to-r from-amber-500 via-primary to-cyan-500 text-primary-foreground hover:opacity-90"
-                      onClick={confirmLanguage}
-                    >
-                      Continue
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="rounded-2xl px-6 py-5 text-base border-primary/40 hover:bg-primary/10"
-                      onClick={playIntro}
-                    >
-                      Preview Voice
-                    </Button>
-                  </div>
-                </motion.div>
-              )}
-            </div>
-          </div>
-        </section>
+        {/* Slide dots centered near bottom */}
+        <div className="absolute inset-x-0 bottom-8 flex items-center justify-center gap-2">
+          <button
+            aria-label="Welcome slide"
+            onClick={() => setGateSlide(0)}
+            className={`h-2.5 rounded-full transition-all ${gateSlide === 0 ? "bg-amber-400 w-6" : "bg-white/40 w-2.5"}`}
+          />
+          <button
+            aria-label="Language slide"
+            onClick={() => setGateSlide(1)}
+            className={`h-2.5 rounded-full transition-all ${gateSlide === 1 ? "bg-cyan-400 w-6" : "bg-white/40 w-2.5"}`}
+          />
+        </div>
       </div>
     );
   }
