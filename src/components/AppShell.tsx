@@ -80,6 +80,25 @@ export function AppShell({ children, title }: AppShellProps) {
 
   const currentLang = (profile?.preferredLang as LangKey) || "en";
 
+  // Add: tiny translator for nav labels (extend as needed)
+  const tr = (s: string) => {
+    if (currentLang.startsWith("te")) {
+      const te: Record<string, string> = {
+        Home: "హోమ్",
+        Farm: "పంటభూమి",
+        Tasks: "పనులు",
+        Soil: "మట్టి",
+        Market: "మార్కెట్",
+        Learn: "నేర్చుకోండి",
+        Community: "సమాజం",
+        Settings: "సెట్టింగ్స్",
+        More: "మరిన్ని",
+      };
+      return te[s] ?? s;
+    }
+    return s;
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       {/* Top Bar */}
@@ -121,11 +140,11 @@ export function AppShell({ children, title }: AppShellProps) {
                       isActive ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"
                     }`}
                     onClick={() => navigate(item.path)}
-                    aria-label={item.label}
+                    aria-label={tr(item.label)}
                     aria-current={isActive ? "page" : undefined}
                   >
                     <Icon className="h-[22px] w-[22px]" />
-                    <span className="text-[11px] leading-none">{item.label}</span>
+                    <span className="text-[11px] leading-none">{tr(item.label)}</span>
                   </Button>
                 );
               })}
@@ -139,11 +158,11 @@ export function AppShell({ children, title }: AppShellProps) {
                     className={`flex flex-col items-center gap-1 h-auto py-2 px-3 min-w-16 rounded-xl ${
                       moreItems.some((m) => m.path === location.pathname) ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"
                     }`}
-                    aria-label="More"
+                    aria-label={tr("More")}
                     aria-haspopup="menu"
                   >
                     <MoreHorizontal className="h-[22px] w-[22px]" />
-                    <span className="text-[11px] leading-none">More</span>
+                    <span className="text-[11px] leading-none">{tr("More")}</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-44" align="end" side="top">
@@ -157,7 +176,7 @@ export function AppShell({ children, title }: AppShellProps) {
                         className={isActive ? "text-primary" : undefined}
                       >
                         <Icon className="mr-2 h-4 w-4" />
-                        {m.label}
+                        {tr(m.label)}
                       </DropdownMenuItem>
                     );
                   })}
