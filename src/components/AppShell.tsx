@@ -78,49 +78,62 @@ export function AppShell({ children, title }: AppShellProps) {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       {/* Top Bar */}
-      <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-40">
-        <div className="flex items-center justify-between px-4 py-3">
-          <LogoDropdown />
-          <h1 className="text-lg font-semibold truncate flex-1 text-center">
-            {title || "KrishiMitra"}
-          </h1>
-          <div className="w-10" /> {/* Spacer for centering */}
+      <header className="sticky top-0 z-40">
+        <div className="px-4 pt-[env(safe-area-inset-top)]" />
+        <div className="mx-auto w-full max-w-md">
+          <div className="rounded-b-2xl border-b bg-card/70 backdrop-blur supports-[backdrop-filter]:bg-card/60 shadow-sm">
+            <div className="flex items-center justify-between px-4 py-3">
+              <LogoDropdown />
+              <h1 className="text-base font-semibold truncate flex-1 text-center">
+                {title || "KrishiMitra"}
+              </h1>
+              <div className="w-10" />
+            </div>
+          </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 pb-20">
+      <main className="flex-1 pb-24">
         {children}
       </main>
 
-      {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-card border-t z-30">
-        <div className="flex items-center justify-around px-2 py-2">
-          {navItems.map((item) => {
-            const isActive = location.pathname === item.path;
-            const Icon = item.icon;
-            
-            return (
-              <Button
-                key={item.path}
-                variant="ghost"
-                size="sm"
-                className={`flex flex-col items-center gap-1 h-auto py-2 px-3 ${
-                  isActive ? "text-primary" : "text-muted-foreground"
-                }`}
-                onClick={() => navigate(item.path)}
-              >
-                <Icon className="h-4 w-4" />
-                <span className="text-xs">{item.label}</span>
-              </Button>
-            );
-          })}
+      {/* Bottom Navigation (mobile-first) */}
+      <nav className="fixed bottom-0 left-0 right-0 z-30">
+        <div className="pb-[calc(env(safe-area-inset-bottom))]" />
+        <div className="mx-auto w-full max-w-md px-3">
+          <div className="rounded-2xl border bg-card/80 backdrop-blur supports-[backdrop-filter]:bg-card/70 shadow-lg">
+            <div className="flex items-center justify-between px-2 py-2">
+              {navItems.map((item) => {
+                const isActive = location.pathname === item.path;
+                const Icon = item.icon;
+                return (
+                  <Button
+                    key={item.path}
+                    variant="ghost"
+                    size="sm"
+                    className={`flex flex-col items-center gap-1 h-auto py-2 px-2 min-w-14 rounded-xl transition-colors ${
+                      isActive
+                        ? "text-primary bg-primary/10"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                    onClick={() => navigate(item.path)}
+                    aria-label={item.label}
+                    aria-current={isActive ? "page" : undefined}
+                  >
+                    <Icon className="h-[22px] w-[22px]" />
+                    <span className="text-[11px] leading-none">{item.label}</span>
+                  </Button>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </nav>
 
-      {/* Voice Button */}
+      {/* Voice Button (floats above nav safely) */}
       <VoiceButton
-        className="z-50"
+        className="z-50 !bottom-[92px] sm:!bottom-[92px]" // keeps above the nav; safe for most phones
         onTranscript={handleVoiceCommand}
         transcribe={({ audio, language }) =>
           transcribe({ audio, language: language ?? localeFromLang(currentLang) })
