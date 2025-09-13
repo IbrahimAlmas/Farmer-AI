@@ -1,21 +1,22 @@
 import { query } from "./_generated/server";
-import { getAuthUserId } from "@convex-dev/auth/server";
+import { api } from "./_generated/api";
 
-// Return 15-20 most bought vegetables with region-adjusted indicative prices (₹/kg)
+// Define as a public query returning region-adjusted prices
 export const getVegetablePrices = query({
   args: {},
-  handler: async (ctx) => {
-    const userId = await getAuthUserId(ctx);
-    const profile = userId
-      ? await ctx.db
-          .query("profiles")
-          .withIndex("by_userId", (q) => q.eq("userId", userId))
-          .unique()
-          .catch(() => null)
-      : null;
+  handler: async (ctx): Promise<
+    Array<{
+      name: string;
+      price: number;
+      unit: string;
+      source: string;
+      region: string;
+      updatedAt: number;
+    }>
+  > => {
+    const profile = await ctx.runQuery(api.profiles.get, {});
     const region = profile?.location?.state?.toLowerCase() || "delhi";
 
-    // Baseline indicative retail prices (₹/kg), conservative and stable
     const base: Record<string, number> = {
       potato: 25,
       onion: 35,
@@ -31,15 +32,14 @@ export const getVegetablePrices = query({
       bottle_gourd: 35,
       bitter_gourd: 60,
       ridge_gourd: 55,
-      spinach: 30, // leaf veg priced per bunch, normalized to kg proxy
-      coriander: 120, // per kg proxy
+      spinach: 30,
+      coriander: 120,
       ginger: 200,
       garlic: 180,
       green_chilli: 120,
       pumpkin: 30,
     };
 
-    // Region factor to reflect typical variance across states/metros
     const regionFactors: Record<string, number> = {
       "delhi": 1.0,
       "nct of delhi": 1.0,
@@ -94,7 +94,14 @@ export const getVegetablePrices = query({
       "garlic",
     ];
 
-    const items: PriceItem[] = order.slice(0, 18).map((key) => {
+    const items = order.slice(0, 18).map<{
+      name: string;
+      price: number;
+      unit: string;
+      source: string;
+      region: string;
+      updatedAt: number;
+    }>((key) => {
       const p = round(base[key] * factor);
       return {
         name: key.replace(/_/g, " "),
@@ -109,12 +116,3 @@ export const getVegetablePrices = query({
     return items;
   },
 });
-
-type PriceItem = {
-  name: string;
-  price: number;
-  unit: "kg";
-  source: string;
-  region: string;
-  updatedAt: number;
-};

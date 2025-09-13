@@ -36,7 +36,7 @@ export default function Market() {
 
             {!loading && items && (
               <div className="divide-y">
-                {items.map((it) => (
+                {items.map((it: any) => (
                   <div key={it.name} className="py-3 flex items-center justify-between">
                     <div>
                       <div className="font-medium capitalize">{it.name}</div>
