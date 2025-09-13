@@ -63,7 +63,7 @@ export default function Market() {
         <div className="relative">
           <div className="h-36 sm:h-44 w-full overflow-hidden rounded-b-3xl">
             <img
-              src="https://harmless-tapir-303.convex.cloud/api/storage/780dfc84-c9c5-4e98-af67-ca01ac5a3d12"
+              src="/logo_bg.svg"
               alt="Market"
               className="w-full h-full object-cover"
               loading="eager"
@@ -143,8 +143,8 @@ export default function Market() {
                             loading="lazy"
                             onError={(e) => {
                               const target = e.currentTarget as HTMLImageElement;
-                              if (target.src !== "https://harmless-tapir-303.convex.cloud/api/storage/780dfc84-c9c5-4e98-af67-ca01ac5a3d12") {
-                                target.src = "https://harmless-tapir-303.convex.cloud/api/storage/780dfc84-c9c5-4e98-af67-ca01ac5a3d12";
+                              if (target.src !== "/logo_bg.svg") {
+                                target.src = "/logo_bg.svg";
                               }
                               target.onerror = null;
                             }}
