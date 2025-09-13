@@ -327,7 +327,7 @@ export default function Landing() {
           <div className="mx-auto w-full max-w-5xl px-4 pt-24 pb-16">
             <div className="text-center">
               <div className="flex justify-center">
-                <img src="/logo.svg" alt="KrishiMitra" className="h-14 w-14 rounded-xl shadow" />
+                <img src="https://harmless-tapir-303.convex.cloud/api/storage/780dfc84-c9c5-4e98-af67-ca01ac5a3d12" alt="Farmers Hub" className="h-14 w-14 rounded-xl shadow" />
               </div>
               <h1 className="mt-6 text-3xl md:text-4xl font-extrabold tracking-tight">
                 Choose your language
@@ -405,7 +405,7 @@ export default function Landing() {
             className="text-center"
           >
             <div className="flex justify-center">
-              <img src="/logo.svg" alt="KrishiMitra" className="h-14 w-14 rounded-xl shadow" />
+              <img src="https://harmless-tapir-303.convex.cloud/api/storage/780dfc84-c9c5-4e98-af67-ca01ac5a3d12" alt="Farmers Hub" className="h-14 w-14 rounded-xl shadow" />
             </div>
             <h1 className="mt-6 text-4xl md:text-5xl font-extrabold tracking-tight leading-[1.1]">
               {tr("KrishiMitra — Your Voice‑First Farming Companion")}
