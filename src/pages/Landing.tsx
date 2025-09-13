@@ -320,11 +320,17 @@ export default function Landing() {
           <img
             src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1600&auto=format&fit=crop"
             alt="Farm fields at dusk"
-            className="h-full w-full object-cover"
+            className="h-full w-full object-cover object-center"
             loading="eager"
+            onError={(e) => {
+              const t = e.currentTarget as HTMLImageElement;
+              if (t.src !== "/logo_bg.svg") t.src = "/logo_bg.svg";
+              t.onerror = null;
+            }}
           />
         </div>
-        <div className="absolute inset-0 -z-25 bg-gradient-to-b from-black/70 via-black/60 to-black/80" />
+        {/* Lighten overlay so the image is visible on mobile too */}
+        <div className="absolute inset-0 -z-25 bg-gradient-to-b from-black/50 via-black/40 to-black/60" />
 
         {/* Edge-to-edge background sweep (amber->purple) */}
         <div className="absolute inset-0 -z-20 bg-gradient-to-br from-amber-500/30 via-transparent to-primary/30" />
@@ -371,7 +377,7 @@ export default function Landing() {
               key="welcome-full"
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
-              className="pt-12"
+              className="pt-12 text-center"
             >
               <h1 className="text-[34px] sm:text-[44px] font-extrabold leading-tight tracking-tight">
                 <span className="bg-gradient-to-r from-amber-400 via-white to-cyan-300 bg-clip-text text-transparent">
@@ -383,7 +389,7 @@ export default function Landing() {
                 Choose your preferred language to personalize a smooth, voice‑first experience.
               </p>
 
-              <div className="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+              <div className="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 justify-center">
                 <Button
                   className="rounded-2xl px-6 py-5 text-base bg-gradient-to-r from-amber-500 via-primary to-cyan-500 text-primary-foreground hover:opacity-90 w-full sm:w-auto"
                   onClick={() => setGateSlide(1)}
@@ -400,7 +406,7 @@ export default function Landing() {
               </div>
 
               {/* Privacy pill */}
-              <div className="mt-6 inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white/5 backdrop-blur px-3 py-2 text-sm text-white/90">
+              <div className="mt-6 inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white/5 backdrop-blur px-3 py-2 text-sm text-white/90 mx-auto">
                 Private & secure. You control your data.
               </div>
             </motion.div>
@@ -409,19 +415,19 @@ export default function Landing() {
               key="language-full"
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
-              className="pt-10 pb-6"
+              className="pt-10 pb-6 text-center"
             >
               <h2 className="text-2xl sm:text-3xl font-bold text-white">Choose your language</h2>
               <p className="mt-2 text-sm sm:text-base text-white/70 max-w-xl">
                 Select your preferred language to personalize the experience.
               </p>
 
-              <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 gap-3">
+              <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 gap-3 justify-items-center">
                 {langOptions.map((opt) => (
                   <button
                     key={opt.value}
                     onClick={() => setSelectedLang(opt.value)}
-                    className={`rounded-2xl border bg-white/5 backdrop-blur px-4 py-4 text-sm text-white transition active:scale-[0.99] ${
+                    className={`w-full rounded-2xl border bg-white/5 backdrop-blur px-4 py-4 text-sm text-white transition active:scale-[0.99] ${
                       selectedLang === opt.value
                         ? "border-primary text-primary shadow-sm ring-1 ring-primary/40"
                         : "border-white/15 hover:bg-white/10"
@@ -434,7 +440,7 @@ export default function Landing() {
                 ))}
               </div>
 
-              <div className="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+              <div className="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 justify-center">
                 <Button
                   variant="outline"
                   className="rounded-2xl px-6 py-5 text-base border-white/30 text-white hover:bg-white/10 w-full sm:w-auto"
