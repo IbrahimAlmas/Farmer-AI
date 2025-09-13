@@ -211,19 +211,19 @@ export default function Landing() {
 
   // Localized voice intro strings
   const greetings: Record<string, string> = {
-    ta: "வணக்கம்! நான் கிருஷிமித்ரா, உங்கள் விவசாய உதவியாளர்!",
-    te: "నమస్కారం! నేను కృషిమిత్ర, మీ వ్యవసాయ సహాయకుడు!",
-    ml: "നമസ്കാരं! ഞാൻ കൃഷിമിത്ര, നിങ്ങളുടെ കൃഷി സഹായി!",
-    kn: "ನಮಸ್ಕಾರ! ನಾನು ಕೃಷಿಮಿತ್ರ, ನಿಮ್ಮ ಕೃಷಿ ಸಹಾಯಕ!",
-    hi: "नमस्कार! मैं कृषिमित्र, आपका कृषि सहायक हूँ!",
-    bn: "নমস্কার! আমি কৃষিমিত্র, আপনার কৃষি সহকারী!",
-    mr: "नमस्कार! मी कृषीमित्र, तुमचा शेती सहाय्यक!",
-    gu: "નમસ્કાર! હું કૃષિમિત્ર, તમારો કૃષિ સહાયક!",
-    pa: "ਸਤ ਸ੍ਰੀ ਅਕਾਲ! ਮੈਂ ਕ੍ਰਿਸ਼ੀਮਿਤ੍ਰ, ਤੁਹਾਡਾ ਖੇਤੀ ਸਹਾਇਕ!",
-    or: "ନମସ୍କାର! ମୁଁ କୃଷିମିତ୍ର, ଆପଣଙ୍କ କୃଷି ସହାୟକ!",
-    as: "নমস্কাৰ! মই কৃষিমিত্ৰ, আপোনাৰ কৃষি সহায়ক!",
-    bho: "प्रणाम! हम कृषिमित्र, तोहार खेती सहायक बानी!",
-    en: "Hello! I am KrishiMitra, your farming assistant!",
+    ta: "வணக்கம்! நான் Root AI, உங்கள் விவசாய உதவியாளர்!",
+    te: "నమస్కారం! నేను Root AI, మీ వ్యవసాయ సహాయకుడు!",
+    ml: "നമസ്കാരം! ഞാൻ Root AI, നിങ്ങളുടെ കൃഷി സഹായി!",
+    kn: "ನಮಸ್ಕಾರ! ನಾನು Root AI, ನಿಮ್ಮ ಕೃಷಿ ಸಹಾಯಕ!",
+    hi: "नमस्कार! मैं Root AI, आपका कृषि सहायक हूँ!",
+    bn: "নমস্কার! আমি Root AI, আপনার কৃষি সহকারী!",
+    mr: "नमस्कार! मी Root AI, तुमचा शेती सहाय्यक!",
+    gu: "નમસ્કાર! હું Root AI, તમારો કૃષિ સહાયક!",
+    pa: "ਸਤ ਸ੍ਰੀ ਅਕਾਲ! ਮੈਂ Root AI, ਤੁਹਾਡਾ ਖੇਤੀ ਸਹਾਇਕ!",
+    or: "ନମସ୍କାର! ମୁଁ Root AI, ଆପଣଙ୍କ କୃଷି ସହାୟକ!",
+    as: "নমস্কাৰ! মই Root AI, আপোনাৰ কৃষি সহায়ক!",
+    bho: "प्रणाम! हम Root AI, तोहार खेती सहायक बानी!",
+    en: "Hello! I am Root AI, your farming assistant!",
   };
 
   const langToBCP47: Record<string, string> = {
@@ -259,7 +259,7 @@ export default function Landing() {
   const tr = (s: string) => {
     if (currentLang.startsWith("te")) {
       const te: Record<string, string> = {
-        "KrishiMitra — Your Voice‑First Farming Companion": "కృషిమిత్ర — మీ వాయిస్‑ఫస్ట్ వ్యవసాయ సహాయకుడు",
+        "Root AI — Intelligent Agriculture Companion": "Root AI — మేధావి వ్యవసాయ సహాయకుడు",
         "Speak in your language, manage farms, test soil with camera, and track market prices — all in a simple, mobile‑first app.":
           "మీ భాషలో మాట్లాడండి, ఫార్మ్‌లను నిర్వహించండి, కెమెరాతో మట్టి పరీక్ష చేయండి, మరియు మార్కెట్ ధరలు ట్రాక్ చేయండి — ఇవన్నీ ఒక సాధారణ, మొబైల్‑ఫస్ట్ యాప్‌లో.",
         "Open App": "యాప్ ఓపెన్ చేయండి",
@@ -381,8 +381,8 @@ export default function Landing() {
         {/* Top bar (compact, mobile-first) */}
         <div className="relative z-30 px-4 pt-[env(safe-area-inset-top)] pb-2 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <img src="/logo.svg" alt="KrishiMitra" className="h-9 w-9 rounded-xl shadow" />
-            <span className="text-xs uppercase tracking-wide text-white/80">KrishiMitra</span>
+            <img src="https://harmless-tapir-303.convex.cloud/api/storage/6ec3840c-aa68-4954-a82d-0f4642599b44" alt="Root AI" className="h-9 w-9 rounded-xl shadow" />
+            <span className="text-xs uppercase tracking-wide text-white/80">Root AI</span>
           </div>
           <div className="hidden sm:flex items-center gap-5 text-[11px] text-white/70">
             <span className="hidden md:inline">Home</span>
@@ -587,10 +587,10 @@ export default function Landing() {
             className="text-center"
           >
             <div className="flex justify-center">
-              <img src="/logo.svg" alt="Farmers Hub" className="h-14 w-14 rounded-xl shadow" />
+              <img src="https://harmless-tapir-303.convex.cloud/api/storage/6ec3840c-aa68-4954-a82d-0f4642599b44" alt="Root AI" className="h-14 w-14 rounded-xl shadow" />
             </div>
             <h1 className="mt-6 text-4xl md:text-5xl font-extrabold tracking-tight leading-[1.1]">
-              {tr("KrishiMitra — Your Voice‑First Farming Companion")}
+              {tr("Root AI — Intelligent Agriculture Companion")}
             </h1>
             <p className="mt-4 text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
               {tr("Speak in your language, manage farms, test soil with camera, and track market prices — all in a simple, mobile‑first app.")}

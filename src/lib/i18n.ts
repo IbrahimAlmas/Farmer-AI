@@ -77,8 +77,8 @@ export const t = (lang: LangKey) => {
         ? "வணக்கம்! நான் உங்கள் விவசாய உதவியாளர். பேசிக்கொண்டு வழிநடத்துவேன்."
         : lang === "hi"
         ? "नमस्ते! मैं आपका खेती सहायक हूँ। बात करके मार्गदर्शन करूंगा।"
-        : "Hello! I’m your farming assistant. I can guide you by talking.",
-    "prompt.name": lang === "ta" ? "என் பெயர் கிருஷிமித்ரா!" : lang === "hi" ? "मेरा नाम कृषिमित्रा है!" : "My name is KrishiMitra!",
+        : "Hello! I'm your farming assistant. I can guide you by talking.",
+    "prompt.name": lang === "ta" ? "என் பெயர் Root AI!" : lang === "hi" ? "मेरा नाम Root AI है!" : "My name is Root AI!",
     "prompt.tutorial":
       lang === "ta"
         ? "இந்த செயலியை எப்படி பயன்படுத்துவது பற்றி குறும் பாடக்குறிப்பு பார்க்க விரும்புகிறீர்களா?"
