@@ -105,7 +105,8 @@ export function AppShell({ children, title }: AppShellProps) {
       <header className="sticky top-0 z-40">
         <div className="px-4 pt-[env(safe-area-inset-top)]" />
         <div className="mx-auto w-full max-w-md">
-          <div className="rounded-b-2xl border-b bg-card/70 backdrop-blur supports-[backdrop-filter]:bg-card/60 shadow-sm">
+          {/* Updated glass header */}
+          <div className="rounded-b-3xl border-b bg-card/70 backdrop-blur-xl supports-[backdrop-filter]:bg-card/60 shadow-[0_6px_30px_-10px_rgba(0,0,0,0.25)]">
             <div className="flex items-center justify-between px-4 py-3">
               <LogoDropdown />
               <h1 className="text-base font-semibold truncate flex-1 text-center">
@@ -113,6 +114,8 @@ export function AppShell({ children, title }: AppShellProps) {
               </h1>
               <div className="w-10" />
             </div>
+            {/* subtle gradient bar */}
+            <div className="h-1 w-full bg-gradient-to-r from-primary/30 via-cyan-400/30 to-primary/30" />
           </div>
         </div>
       </header>
@@ -126,7 +129,8 @@ export function AppShell({ children, title }: AppShellProps) {
       <nav className="fixed bottom-0 left-0 right-0 z-30">
         <div className="pb-[calc(env(safe-area-inset-bottom))]" />
         <div className="mx-auto w-full max-w-md px-3">
-          <div className="rounded-2xl border bg-card/80 backdrop-blur supports-[backdrop-filter]:bg-card/70 shadow-lg">
+          {/* Updated glass nav */}
+          <div className="rounded-3xl border bg-card/80 backdrop-blur-xl supports-[backdrop-filter]:bg-card/70 shadow-[0_-10px_35px_-15px_rgba(0,0,0,0.4)]">
             <div className="flex items-center justify-between px-2 py-2">
               {navItems.map((item) => {
                 const isActive = location.pathname === item.path;
@@ -136,9 +140,9 @@ export function AppShell({ children, title }: AppShellProps) {
                     key={item.path}
                     variant="ghost"
                     size="sm"
-                    className={`flex flex-col items-center gap-1 h-auto py-2 px-3 min-w-16 rounded-xl transition-colors ${
-                      isActive ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"
-                    }`}
+                    className={`flex flex-col items-center gap-1 h-auto py-2 px-3 min-w-16 rounded-2xl transition-[background,transform,color] ${
+                      isActive ? "text-primary bg-primary/10 shadow-sm" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    } hover:scale-[1.02]`}
                     onClick={() => navigate(item.path)}
                     aria-label={tr(item.label)}
                     aria-current={isActive ? "page" : undefined}
@@ -149,15 +153,17 @@ export function AppShell({ children, title }: AppShellProps) {
                 );
               })}
 
-              {/* More menu to reduce congestion */}
+              {/* More menu */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="ghost"
                     size="sm"
-                    className={`flex flex-col items-center gap-1 h-auto py-2 px-3 min-w-16 rounded-xl ${
-                      moreItems.some((m) => m.path === location.pathname) ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"
-                    }`}
+                    className={`flex flex-col items-center gap-1 h-auto py-2 px-3 min-w-16 rounded-2xl ${
+                      moreItems.some((m) => m.path === location.pathname)
+                        ? "text-primary bg-primary/10 shadow-sm"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    } hover:scale-[1.02]`}
                     aria-label={tr("More")}
                     aria-haspopup="menu"
                   >
