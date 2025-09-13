@@ -17,6 +17,8 @@ import { useLocation, useNavigate } from "react-router";
 import { motion } from "framer-motion";
 import { localeFromLang, type LangKey } from "@/lib/i18n";
 import { toast } from "sonner";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { MoreHorizontal } from "lucide-react";
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -27,10 +29,13 @@ const navItems = [
   { path: "/dashboard", icon: Home, label: "Home" },
   { path: "/my-farm", icon: Sprout, label: "Farm" },
   { path: "/tasks", icon: CheckSquare, label: "Tasks" },
+  { path: "/soil-test", icon: Camera, label: "Soil" },
+];
+
+const moreItems = [
   { path: "/market", icon: ShoppingCart, label: "Market" },
   { path: "/learn", icon: BookOpen, label: "Learn" },
   { path: "/community", icon: Users, label: "Community" },
-  { path: "/soil-test", icon: Camera, label: "Soil" },
   { path: "/settings", icon: Settings, label: "Settings" },
 ];
 
@@ -112,10 +117,8 @@ export function AppShell({ children, title }: AppShellProps) {
                     key={item.path}
                     variant="ghost"
                     size="sm"
-                    className={`flex flex-col items-center gap-1 h-auto py-2 px-2 min-w-14 rounded-xl transition-colors ${
-                      isActive
-                        ? "text-primary bg-primary/10"
-                        : "text-muted-foreground hover:text-foreground"
+                    className={`flex flex-col items-center gap-1 h-auto py-2 px-3 min-w-16 rounded-xl transition-colors ${
+                      isActive ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"
                     }`}
                     onClick={() => navigate(item.path)}
                     aria-label={item.label}
@@ -126,6 +129,40 @@ export function AppShell({ children, title }: AppShellProps) {
                   </Button>
                 );
               })}
+
+              {/* More menu to reduce congestion */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className={`flex flex-col items-center gap-1 h-auto py-2 px-3 min-w-16 rounded-xl ${
+                      moreItems.some((m) => m.path === location.pathname) ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"
+                    }`}
+                    aria-label="More"
+                    aria-haspopup="menu"
+                  >
+                    <MoreHorizontal className="h-[22px] w-[22px]" />
+                    <span className="text-[11px] leading-none">More</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-44" align="end" side="top">
+                  {moreItems.map((m) => {
+                    const Icon = m.icon;
+                    const isActive = location.pathname === m.path;
+                    return (
+                      <DropdownMenuItem
+                        key={m.path}
+                        onClick={() => navigate(m.path)}
+                        className={isActive ? "text-primary" : undefined}
+                      >
+                        <Icon className="mr-2 h-4 w-4" />
+                        {m.label}
+                      </DropdownMenuItem>
+                    );
+                  })}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </div>

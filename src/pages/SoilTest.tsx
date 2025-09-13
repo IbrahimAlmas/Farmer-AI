@@ -37,38 +37,8 @@ export default function SoilTest() {
   const streamRef = useRef<MediaStream | null>(null);
   const [step, setStep] = useState<"capture" | "review" | "results">("capture");
 
-  // Start camera automatically on mount
   useEffect(() => {
     let didCancel = false;
-    (async () => {
-      try {
-        if (!navigator.mediaDevices?.getUserMedia) {
-          setCameraError("Camera not supported on this device/browser.");
-          return;
-        }
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: { ideal: "environment" } },
-          audio: false,
-        });
-        if (didCancel) {
-          // If component unmounted early, stop tracks
-          stream.getTracks().forEach((t) => t.stop());
-          return;
-        }
-        streamRef.current = stream;
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          await videoRef.current.play().catch(() => {});
-        }
-        setCameraOn(true);
-        setCameraReady(true);
-        setCameraError(null);
-      } catch (e: any) {
-        setCameraError(e?.message ?? "Unable to access camera.");
-        setCameraOn(false);
-        setCameraReady(false);
-      }
-    })();
     return () => {
       didCancel = true;
       if (streamRef.current) {
@@ -96,8 +66,20 @@ export default function SoilTest() {
 
   const startCamera = async () => {
     try {
+      if (!navigator.mediaDevices?.getUserMedia) {
+        setCameraError("Live camera isn't supported by this browser. Use 'Upload Photo' instead.");
+        setCameraOn(false);
+        setCameraReady(false);
+        return;
+      }
+      // Request permission on user gesture
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: "environment" } },
+        video: {
+          facingMode: { ideal: "environment" },
+          // Broader compatibility across devices
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+        },
         audio: false,
       });
       streamRef.current = stream;
@@ -109,7 +91,14 @@ export default function SoilTest() {
       setCameraReady(true);
       setCameraError(null);
     } catch (e: any) {
-      setCameraError(e?.message ?? "Unable to access camera.");
+      // Give actionable hint
+      const msg =
+        e?.name === "NotAllowedError"
+          ? "Camera permission denied. Enable camera access in browser settings or use 'Upload Photo'."
+          : e?.name === "NotFoundError"
+          ? "No camera found. Use 'Upload Photo' instead."
+          : e?.message ?? "Unable to access camera.";
+      setCameraError(msg);
       setCameraOn(false);
       setCameraReady(false);
     }
