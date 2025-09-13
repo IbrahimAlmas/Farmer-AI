@@ -1,12 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { useAction } from "convex/react";
+import { useAction, useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { motion } from "framer-motion";
 import { useEffect, useMemo, useRef, useState } from "react";
 import VoiceButton from "@/components/VoiceButton";
 import { SupportedLanguages, langFromGeolocation, langFromNavigator, localeFromLang, t, type LangKey } from "@/lib/i18n";
-import { Loader2, MapPin } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
+import { useNavigate } from "react-router";
 
 type Phase = "detect" | "intro" | "ask_tutorial" | "tutorial" | "done";
 
@@ -17,12 +19,26 @@ export default function Onboarding() {
   const [playing, setPlaying] = useState(false);
   const [userResponse, setUserResponse] = useState<string | null>(null);
 
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const profile = useQuery(api.profiles.get);
+  const createProfile = useMutation(api.profiles.create);
+  const updateProfile = useMutation(api.profiles.update);
   const transcribe = useAction(api.voice.stt);
   const speak = useAction(api.voice.tts);
 
   const translate = useMemo(() => t(lang), [lang]);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Check if user already has completed profile
+  useEffect(() => {
+    if (isAuthenticated && profile !== undefined) {
+      if (profile?.tutorialCompleted) {
+        navigate("/dashboard");
+      }
+    }
+  }, [isAuthenticated, profile, navigate]);
 
   // Detect language on first mount
   useEffect(() => {
@@ -75,7 +91,7 @@ export default function Onboarding() {
     const saidNo = [...noWords].some((w) => tLower.includes(w));
     if (phase === "ask_tutorial") {
       if (saidYes) startTutorial();
-      else if (saidNo) setPhase("done");
+      else if (saidNo) completeOnboarding();
     }
   }
 
@@ -93,6 +109,33 @@ export default function Onboarding() {
         console.error(e);
       }
     })();
+  }
+
+  async function completeOnboarding() {
+    try {
+      if (isAuthenticated) {
+        if (profile) {
+          await updateProfile({
+            preferredLang: lang,
+            tutorialCompleted: true,
+          });
+        } else {
+          await createProfile({
+            preferredLang: lang,
+            tutorialCompleted: true,
+          });
+        }
+      }
+      setPhase("done");
+      // Navigate to dashboard after a short delay
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 1500);
+    } catch (error) {
+      console.error("Failed to save profile:", error);
+      // Still navigate even if profile save fails
+      navigate("/dashboard");
+    }
   }
 
   const languagePicker = (
@@ -155,27 +198,12 @@ export default function Onboarding() {
                   <div className="text-center">
                     <div className="text-sm mb-2">{translate("ui.pickLanguage")}</div>
                     {languagePicker}
-                    <div className="flex justify-center mt-3">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={async () => {
-                          setDetecting(true);
-                          const guess = (await langFromGeolocation()) ?? langFromNavigator();
-                          setLang(guess);
-                          setDetecting(false);
-                        }}
-                      >
-                        <MapPin className="h-4 w-4 mr-2" />
-                        {detecting ? "..." : "Detect from GPS"}
-                      </Button>
-                    </div>
                   </div>
 
                   {phase === "ask_tutorial" && (
                     <div className="flex items-center justify-center gap-3">
                       <Button onClick={startTutorial}>{translate("choice.yes")}</Button>
-                      <Button variant="outline" onClick={() => setPhase("done")}>
+                      <Button variant="outline" onClick={completeOnboarding}>
                         {translate("choice.no")}
                       </Button>
                     </div>
@@ -202,14 +230,20 @@ export default function Onboarding() {
                         </motion.div>
                       </motion.div>
                       <div className="flex justify-center">
-                        <Button onClick={() => setPhase("done")}>Finish</Button>
+                        <Button onClick={completeOnboarding}>Finish</Button>
                       </div>
                     </div>
                   )}
 
                   {phase === "done" && (
                     <div className="text-center text-sm">
-                      Onboarding complete. Use the mic to talk to your assistant anytime.
+                      <motion.div
+                        initial={{ scale: 0.8 }}
+                        animate={{ scale: 1 }}
+                        className="text-green-600 font-medium"
+                      >
+                        ✓ Setup complete! Redirecting to dashboard...
+                      </motion.div>
                     </div>
                   )}
                 </CardContent>

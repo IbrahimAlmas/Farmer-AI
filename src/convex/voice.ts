@@ -3,18 +3,20 @@
 import { action } from "./_generated/server";
 import { v } from "convex/values";
 
-const SARVAM_API_KEY = process.env.SARVAM_API_KEY || process.env.SARVAMAI_KEY;
-
-if (!SARVAM_API_KEY) {
-  // Throwing here ensures we notice missing env at deploy/runtime rather than silent failures
-  throw new Error("Missing SARVAM_API_KEY environment variable for Sarvam AI.");
+function getSarvamApiKey() {
+  const key = process.env.SARVAM_API_KEY || process.env.SARVAMAI_KEY;
+  if (!key) {
+    throw new Error("Missing SARVAM_API_KEY environment variable for Sarvam AI.");
+  }
+  return key;
 }
 
 // Helper: fetch wrapper with Sarvam auth
 async function sarvamFetch(path: string, init: RequestInit) {
   const url = `https://api.sarvam.ai${path}`;
+  const apiKey = getSarvamApiKey();
   const headers: Record<string, string> = {
-    Authorization: `Bearer ${SARVAM_API_KEY}`,
+    Authorization: `Bearer ${apiKey}`,
     ...(init.headers as Record<string, string> | undefined),
   };
   const res = await fetch(url, { ...init, headers });
