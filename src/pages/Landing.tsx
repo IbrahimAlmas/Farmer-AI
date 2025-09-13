@@ -406,7 +406,6 @@ export default function Landing() {
                   Welcome.
                 </span>
               </h1>
-              <p className="mt-2 text-lg sm:text-2xl font-semibold text-white">Landing Page Design</p>
               <p className="mt-3 text-sm sm:text-base text-white/70 max-w-xl">
                 Choose your preferred language to personalize a smooth, voice‑first experience.
               </p>
