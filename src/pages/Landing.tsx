@@ -4,7 +4,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ArrowRight, Mic, Sprout, Camera, ShoppingCart, Languages, ShieldCheck, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router";
 import { useMemo, useEffect, useState } from "react";
- // removed duplicate import of useQuery
 import { api } from "@/convex/_generated/api";
 import LanguageSelect from "@/components/LanguageSelect";
 import { useAction, useMutation, useQuery } from "convex/react";
@@ -15,8 +14,14 @@ export default function Landing() {
   const updateProfile = useMutation(api.profiles.update);
   const tts = useAction(api.voice.tts);
   const reverseGeocode = useAction(api.location.reverseGeocode);
+
   // Setup progress UI
   const [setupLoading, setSetupLoading] = useState(false);
+
+  // Add: Language gate state for first screen selection
+  const [gateOpen, setGateOpen] = useState<boolean>(false);
+  const [selectedLang, setSelectedLang] = useState<string>("en");
+  const [guestLang, setGuestLang] = useState<string | null>(null);
 
   // Map Indian states to regional language codes (fallbacks to Hindi for some)
   const stateToLang = (state?: string): string | null => {
@@ -63,6 +68,33 @@ export default function Landing() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const profile = useQuery(api.profiles.get);
   const currentLang = String(profile?.preferredLang || "en");
+
+  // Initialize language gate for guests and set selected language source
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("km.lang");
+      if (stored) {
+        setGuestLang(stored);
+        setSelectedLang(stored);
+        setGateOpen(false);
+      } else {
+        // If user not authenticated or profile prefers en, prompt selection once
+        if (!profile) {
+          setGateOpen(true);
+        }
+      }
+    } catch {
+      // ignore storage errors
+    }
+  }, [profile]);
+
+  // When profile is available, prefer its language
+  useEffect(() => {
+    if (profile?.preferredLang) {
+      setSelectedLang(String(profile.preferredLang));
+      setGateOpen(false);
+    }
+  }, [profile?.preferredLang]);
 
   // Auto-set preferred language once based on profile state or browser locale
   // Only if profile exists (authenticated) and currently "en"
@@ -158,7 +190,7 @@ export default function Landing() {
   const greetings: Record<string, string> = {
     ta: "வணக்கம்! நான் கிருஷிமித்ரா, உங்கள் விவசாய உதவியாளர்!",
     te: "నమస్కారం! నేను కృషిమిత్ర, మీ వ్యవసాయ సహాయకుడు!",
-    ml: "നമസ്കാരം! ഞാൻ കൃഷിമിത്ര, നിങ്ങളുടെ കൃഷി സഹായി!",
+    ml: "നമസ്കാരं! ഞാൻ കൃഷിമിത്ര, നിങ്ങളുടെ കൃഷി സഹായി!",
     kn: "ನಮಸ್ಕಾರ! ನಾನು ಕೃಷಿಮಿತ್ರ, ನಿಮ್ಮ ಕೃಷಿ ಸಹಾಯಕ!",
     hi: "नमस्कार! मैं कृषिमित्र, आपका कृषि सहायक हूँ!",
     bn: "নমস্কার! আমি কৃষিমিত্র, আপনার কৃষি সহকারী!",
@@ -236,6 +268,108 @@ export default function Landing() {
     }
     return s;
   };
+
+  // Add: simple language map for the gate
+  const langOptions: Array<{ label: string; value: string }> = [
+    { label: "English", value: "en" },
+    { label: "தமிழ்", value: "ta" },
+    { label: "తెలుగు", value: "te" },
+    { label: "മലയാളം", value: "ml" },
+    { label: "ಕನ್ನಡ", value: "kn" },
+    { label: "हिन्दी", value: "hi" },
+    { label: "বাংলা", value: "bn" },
+    { label: "मराठी", value: "mr" },
+    { label: "ગુજરાતી", value: "gu" },
+    { label: "ਪੰਜਾਬੀ", value: "pa" },
+    { label: "ଓଡ଼ିଆ", value: "or" },
+    { label: "অসমীয়া", value: "as" },
+    { label: "भोजपुरी", value: "bho" },
+  ];
+
+  // Confirm selected language: save to profile if signed in, else to localStorage
+  const confirmLanguage = async () => {
+    const lang = selectedLang || "en";
+    try {
+      if (profile?._id) {
+        await updateProfile({ preferredLang: lang });
+      } else {
+        localStorage.setItem("km.lang", lang);
+      }
+      setGateOpen(false);
+      toast.success("Language set");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed to set language");
+    }
+  };
+
+  if (gateOpen) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <section className="relative overflow-hidden">
+          <div className="absolute inset-0 -z-10">
+            <img
+              src="/logo_bg.png"
+              alt="Background"
+              className="h-full w-full object-cover opacity-70"
+              loading="eager"
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-background/70 to-background" />
+          </div>
+
+          <div className="mx-auto w-full max-w-5xl px-4 pt-24 pb-16">
+            <div className="text-center">
+              <div className="flex justify-center">
+                <img src="/logo.svg" alt="KrishiMitra" className="h-14 w-14 rounded-xl shadow" />
+              </div>
+              <h1 className="mt-6 text-3xl md:text-4xl font-extrabold tracking-tight">
+                Choose your language
+              </h1>
+              <p className="mt-3 text-sm md:text-base text-muted-foreground max-w-xl mx-auto">
+                Select your preferred language to personalize the experience.
+              </p>
+
+              <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 max-w-3xl mx-auto">
+                {langOptions.map((opt) => (
+                  <button
+                    key={opt.value}
+                    onClick={() => setSelectedLang(opt.value)}
+                    className={`rounded-2xl border bg-card/70 backdrop-blur px-4 py-3 text-sm transition ${
+                      selectedLang === opt.value
+                        ? "border-primary text-primary shadow-sm"
+                        : "hover:bg-muted/50"
+                    }`}
+                    aria-pressed={selectedLang === opt.value}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+
+              <div className="mt-6 flex items-center justify-center gap-3">
+                <Button
+                  className="rounded-2xl px-5 py-5 text-base"
+                  onClick={confirmLanguage}
+                >
+                  Continue
+                </Button>
+                <Button
+                  variant="outline"
+                  className="rounded-2xl px-5 py-5 text-base"
+                  onClick={playIntro}
+                >
+                  Preview Voice
+                </Button>
+              </div>
+
+              <div className="mt-8 inline-flex items-center gap-2 rounded-2xl border bg-card/70 backdrop-blur px-3 py-2 text-sm">
+                Private & secure. You control your data.
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
