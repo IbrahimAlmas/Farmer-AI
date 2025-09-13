@@ -3,20 +3,21 @@
 import { action } from "./_generated/server";
 import { v } from "convex/values";
 
-function getSarvamApiKey() {
-  const key = process.env.SARVAM_API_KEY || process.env.SARVAMAI_KEY;
-  if (!key) {
+const SARVAM_API_KEY = process.env.SARVAM_API_KEY || process.env.SARVAMAI_KEY;
+
+// Don't throw at module load to avoid blocking other functions
+function ensureApiKey() {
+  if (!SARVAM_API_KEY) {
     throw new Error("Missing SARVAM_API_KEY environment variable for Sarvam AI.");
   }
-  return key;
 }
 
 // Helper: fetch wrapper with Sarvam auth
 async function sarvamFetch(path: string, init: RequestInit) {
+  ensureApiKey();
   const url = `https://api.sarvam.ai${path}`;
-  const apiKey = getSarvamApiKey();
   const headers: Record<string, string> = {
-    Authorization: `Bearer ${apiKey}`,
+    Authorization: `Bearer ${SARVAM_API_KEY as string}`,
     ...(init.headers as Record<string, string> | undefined),
   };
   const res = await fetch(url, { ...init, headers });

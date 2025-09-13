@@ -4,10 +4,9 @@ import { Button } from "@/components/ui/button";
 import { useQuery, useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { motion } from "framer-motion";
-import { Sprout, CheckSquare, Calendar, TrendingUp } from "lucide-react";
+import { Sprout, CheckSquare, Calendar, TrendingUp, Camera, Users } from "lucide-react";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
-import { Camera, Users } from "lucide-react";
 
 export default function Dashboard() {
   const navigate = useNavigate();
