@@ -55,7 +55,7 @@ createRoot(document.getElementById("root")!).render(
         <BrowserRouter>
           <RouteSyncer />
           <Routes>
-            <Route path="/" element={<Onboarding />} />
+            <Route path="/" element={<Landing />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/auth" element={<AuthPage redirectAfterAuth="/dashboard" />} />
             <Route path="/my-farm" element={<MyFarm />} />

@@ -63,9 +63,10 @@ export default function Market() {
         <div className="relative">
           <div className="h-36 sm:h-44 w-full overflow-hidden rounded-b-3xl">
             <img
-              src="https://images.unsplash.com/photo-1556912998-6a321d926c83?q=80&w=1600&auto=format&fit=crop"
+              src="/logo_bg.png"
               alt="Market"
               className="w-full h-full object-cover"
+              loading="eager"
             />
           </div>
           <div className="absolute inset-x-0 top-0 h-36 sm:h-44 bg-gradient-to-b from-black/30 to-transparent rounded-b-3xl" />
@@ -139,6 +140,14 @@ export default function Market() {
                             src={img}
                             alt={it.name}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            loading="lazy"
+                            onError={(e) => {
+                              const target = e.currentTarget as HTMLImageElement;
+                              if (target.src !== "/logo_bg.png") {
+                                target.src = "/logo_bg.png";
+                              }
+                              target.onerror = null;
+                            }}
                           />
                         </div>
                         <div className="p-3 flex items-start justify-between gap-2">
