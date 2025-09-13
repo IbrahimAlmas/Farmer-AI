@@ -19,6 +19,7 @@ import { localeFromLang, type LangKey } from "@/lib/i18n";
 import { toast } from "sonner";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal } from "lucide-react";
+import LanguageSelect from "@/components/LanguageSelect";
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -112,7 +113,9 @@ export function AppShell({ children, title }: AppShellProps) {
               <h1 className="text-base font-semibold truncate flex-1 text-center">
                 {title || "KrishiMitra"}
               </h1>
-              <div className="w-10" />
+              <div className="w-auto">
+                <LanguageSelect size="sm" />
+              </div>
             </div>
             {/* subtle gradient bar */}
             <div className="h-1 w-full bg-gradient-to-r from-primary/30 via-cyan-400/30 to-primary/30" />

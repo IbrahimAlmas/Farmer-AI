@@ -5,6 +5,7 @@ import { ArrowRight, Mic, Sprout, Camera, ShoppingCart, Languages, ShieldCheck }
 import { useNavigate } from "react-router";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import LanguageSelect from "@/components/LanguageSelect";
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -38,8 +39,8 @@ export default function Landing() {
           "సెట్టింగ్స్‌లో మీకు నచ్చిన భాషను ఎంచుకోండి. యాప్ ఆటోమేటిక్‌గా నావిగేషన్ మరియు ముఖ్య స్క్రీన్‌లను మార్చుతుంది.",
         "Set Language": "భాష సెట్ చేయండి",
         "Start with your voice": "మీ వాయిస్‌తో ప్రారంభించండి",
-        "Say “Open Market”, “Add Task”, or “Test Soil” — it's that simple.":
-          "“మార్కెట్ ఓపెన్ చేయి”, “టాస్క్ జోడించు”, లేదా “మట్టి పరీక్ష” అని చెప్పండి — అంతే చాలు.",
+        "Say \"Open Market\", \"Add Task\", or \"Test Soil\" — it's that simple.":
+          "\"మార్కెట్ ఓపెన్ చేయి\", \"టాస్క్ జోడించు\", లేదా \"మట్టి పరీక్ష\" అని చెప్పండి — అంతే చాలు.",
         "Get Started": "ప్రారంభించండి",
         "Try Soil Test": "మట్టి పరీక్ష ప్రయత్నించండి",
       };
@@ -63,6 +64,10 @@ export default function Landing() {
         </div>
 
         <div className="mx-auto w-full max-w-5xl px-4 pt-24 pb-16">
+          {/* Top-right language selector for landing */}
+          <div className="flex justify-end">
+            <LanguageSelect size="sm" />
+          </div>
           <motion.div
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
