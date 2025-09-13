@@ -22,6 +22,8 @@ export default function Landing() {
   const [gateOpen, setGateOpen] = useState<boolean>(false);
   const [selectedLang, setSelectedLang] = useState<string>("en");
   const [guestLang, setGuestLang] = useState<string | null>(null);
+  // Add: show minimal CTA page right after language selection
+  const [postGate, setPostGate] = useState<boolean>(false);
 
   // Map Indian states to regional language codes (fallbacks to Hindi for some)
   const stateToLang = (state?: string): string | null => {
@@ -296,6 +298,7 @@ export default function Landing() {
         localStorage.setItem("km.lang", lang);
       }
       setGateOpen(false);
+      setPostGate(true); // show the second landing with minimal buttons
       toast.success("Language set");
     } catch (e: any) {
       toast.error(e?.message ?? "Failed to set language");
@@ -373,19 +376,6 @@ export default function Landing() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {setupLoading && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/70 backdrop-blur">
-          <div className="rounded-2xl border bg-card/80 px-6 py-5 text-center shadow-lg">
-            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Setting up your experience...
-            </div>
-            <div className="mt-2 text-xs text-muted-foreground">
-              Detecting your location and language preferences
-            </div>
-          </div>
-        </div>
-      )}
       {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 -z-10">
@@ -419,15 +409,35 @@ export default function Landing() {
               {tr("Speak in your language, manage farms, test soil with camera, and track market prices — all in a simple, mobile‑first app.")}
             </p>
             <div className="mt-6 flex items-center justify-center gap-3">
-              <Button className="rounded-2xl px-5 py-5 text-base" onClick={() => navigate("/dashboard")}>
-                {tr("Open App")} <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-              <Button variant="secondary" className="rounded-2xl px-5 py-5 text-base" onClick={() => navigate("/market")}>
-                {tr("See Market Prices")}
-              </Button>
-              <Button variant="outline" className="rounded-2xl px-5 py-5 text-base" onClick={playIntro}>
-                Intro Voice
-              </Button>
+              {postGate ? (
+                <>
+                  <Button
+                    variant="outline"
+                    className="rounded-2xl px-5 py-5 text-base"
+                    onClick={() => navigate(-1)}
+                  >
+                    Back
+                  </Button>
+                  <Button
+                    className="rounded-2xl px-5 py-5 text-base"
+                    onClick={() => navigate("/dashboard")}
+                  >
+                    Continue to App <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button className="rounded-2xl px-5 py-5 text-base" onClick={() => navigate("/dashboard")}>
+                    {tr("Open App")} <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                  <Button variant="secondary" className="rounded-2xl px-5 py-5 text-base" onClick={() => navigate("/market")}>
+                    {tr("See Market Prices")}
+                  </Button>
+                  <Button variant="outline" className="rounded-2xl px-5 py-5 text-base" onClick={playIntro}>
+                    Intro Voice
+                  </Button>
+                </>
+              )}
             </div>
             <div className="mt-8 inline-flex items-center gap-2 rounded-2xl border bg-card/70 backdrop-blur px-3 py-2 text-sm">
               <ShieldCheck className="h-4 w-4 text-primary" />
@@ -492,11 +502,13 @@ export default function Landing() {
               <p className="text-sm text-muted-foreground mt-2">
                 {tr("Add farms, capture 3D context (corner photos + GPS walk), and run simple per‑farm simulations: plant, water, advance, harvest.")}
               </p>
-              <div className="mt-4">
-                <Button variant="outline" className="rounded-2xl" onClick={() => navigate("/my-farm")}>
-                  {tr("Go to My Farm")}
-                </Button>
-              </div>
+              {!postGate && (
+                <div className="mt-4">
+                  <Button variant="outline" className="rounded-2xl" onClick={() => navigate("/my-farm")}>
+                    {tr("Go to My Farm")}
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -511,11 +523,13 @@ export default function Landing() {
               <p className="text-sm text-muted-foreground mt-2">
                 {tr("Choose your preferred language from Settings. The app adapts navigation and key screens automatically.")}
               </p>
-              <div className="mt-4">
-                <Button variant="outline" className="rounded-2xl" onClick={() => navigate("/settings")}>
-                  {tr("Set Language")}
-                </Button>
-              </div>
+              {!postGate && (
+                <div className="mt-4">
+                  <Button variant="outline" className="rounded-2xl" onClick={() => navigate("/settings")}>
+                    {tr("Set Language")}
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -534,14 +548,16 @@ export default function Landing() {
           <p className="text-muted-foreground mt-2">
             {tr("Say \"Open Market\", \"Add Task\", or \"Test Soil\" — it's that simple.")}
           </p>
-          <div className="mt-6 flex items-center justify-center gap-3">
-            <Button className="rounded-2xl px-5 py-5 text-base" onClick={() => navigate("/dashboard")}>
-              {tr("Get Started")} <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-            <Button variant="secondary" className="rounded-2xl px-5 py-5 text-base" onClick={() => navigate("/soil-test")}>
-              {tr("Try Soil Test")}
-            </Button>
-          </div>
+          {!postGate && (
+            <div className="mt-6 flex items-center justify-center gap-3">
+              <Button className="rounded-2xl px-5 py-5 text-base" onClick={() => navigate("/dashboard")}>
+                {tr("Get Started")} <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+              <Button variant="secondary" className="rounded-2xl px-5 py-5 text-base" onClick={() => navigate("/soil-test")}>
+                {tr("Try Soil Test")}
+              </Button>
+            </div>
+          )}
         </motion.div>
       </section>
     </div>
