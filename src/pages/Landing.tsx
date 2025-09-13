@@ -331,7 +331,7 @@ export default function Landing() {
     return (
       <div className="min-h-screen relative overflow-hidden bg-black">
         {/* Live rotating background images + vignette */}
-        <div className="absolute inset-0 -z-30">
+        <div className="absolute inset-0 z-0">
           {/* Cross-fade stack */}
           <div className="absolute inset-0">
             {bgImages.map((src, i) => (
@@ -351,12 +351,12 @@ export default function Landing() {
           </div>
         </div>
         {/* Lighten overlay so the image is visible on mobile too */}
-        <div className="absolute inset-0 -z-25 bg-gradient-to-b from-black/40 via-black/35 to-black/55" />
+        <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/40 via-black/35 to-black/55" />
 
         {/* Edge-to-edge background sweep (amber->purple) */}
-        <div className="absolute inset-0 -z-20 bg-gradient-to-br from-amber-500/30 via-transparent to-primary/30" />
+        <div className="absolute inset-0 z-20 bg-gradient-to-br from-amber-500/30 via-transparent to-primary/30" />
         {/* Decorative flowing wave like reference */}
-        <div className="pointer-events-none absolute inset-0 -z-10 opacity-90">
+        <div className="pointer-events-none absolute inset-0 z-20 opacity-90">
           <svg viewBox="0 0 1440 700" xmlns="http://www.w3.org/2000/svg" className="h-full w-full">
             <defs>
               <linearGradient id="gateSweep" x1="0" y1="0" x2="1" y2="1">
@@ -379,7 +379,7 @@ export default function Landing() {
         </div>
 
         {/* Top bar (compact, mobile-first) */}
-        <div className="px-4 pt-[env(safe-area-inset-top)] pb-2 flex items-center justify-between">
+        <div className="relative z-30 px-4 pt-[env(safe-area-inset-top)] pb-2 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <img src="/logo.svg" alt="KrishiMitra" className="h-9 w-9 rounded-xl shadow" />
             <span className="text-xs uppercase tracking-wide text-white/80">KrishiMitra</span>
@@ -392,7 +392,7 @@ export default function Landing() {
         </div>
 
         {/* Slides */}
-        <div className="mx-auto max-w-md px-4">
+        <div className="relative z-30 mx-auto max-w-md px-4">
           {gateSlide === 0 ? (
             <motion.div
               key="welcome-full"
@@ -488,7 +488,7 @@ export default function Landing() {
         </div>
 
         {/* Slide dots centered near bottom */}
-        <div className="absolute inset-x-0 bottom-8 mb-[env(safe-area-inset-bottom)] flex items-center justify-center gap-2">
+        <div className="relative z-30 absolute inset-x-0 bottom-8 mb-[env(safe-area-inset-bottom)] flex items-center justify-center gap-2">
           <button
             aria-label="Welcome slide"
             onClick={() => setGateSlide(0)}
@@ -509,7 +509,7 @@ export default function Landing() {
       {/* Hero */}
       <section className="relative overflow-hidden">
         {/* REPLACED: static background image with rotating live background */}
-        <div className="absolute inset-0 -z-10">
+        <div className="absolute inset-0 z-0">
           {/* Cross-fade rotating images */}
           <div className="absolute inset-0">
             {bgImages.map((src, i) => (
@@ -528,10 +528,10 @@ export default function Landing() {
             ))}
           </div>
           {/* Vignette + gradient overlays */}
-          <div className="absolute inset-0 bg-black/40" />
-          <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-background/70 to-background" />
+          <div className="absolute inset-0 z-10 bg-black/40" />
+          <div className="absolute inset-0 z-20 bg-gradient-to-b from-background/50 via-background/70 to-background" />
         </div>
-        <div className="mx-auto w-full max-w-5xl px-4 pt-24 pb-16">
+        <div className="relative z-30 mx-auto w-full max-w-5xl px-4 pt-24 pb-16">
           {/* Top-right language selector for landing */}
           <div className="flex justify-end">
             <LanguageSelect size="sm" />
