@@ -27,6 +27,21 @@ export default function Landing() {
   // New: simple two-step slider for gate (0 = welcome, 1 = language select)
   const [gateSlide, setGateSlide] = useState<number>(0);
 
+  // Live background images for the gate (rotating, mobile-first)
+  const bgImages: Array<string> = [
+    "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1600&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?q=80&w=1600&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1499529112087-3cb3b73cec95?q=80&w=1600&auto=format&fit=crop",
+  ];
+  const [bgIndex, setBgIndex] = useState<number>(0);
+  useEffect(() => {
+    if (!gateOpen) return;
+    const id = setInterval(() => {
+      setBgIndex((i) => (i + 1) % bgImages.length);
+    }, 5000);
+    return () => clearInterval(id);
+  }, [gateOpen]);
+
   // Map Indian states to regional language codes (fallbacks to Hindi for some)
   const stateToLang = (state?: string): string | null => {
     if (!state) return null;
@@ -255,7 +270,7 @@ export default function Landing() {
           "తెలుగు, హిందీ, ఇంగ్లీష్ తదితర భాషల్లో మీ వాయిస్‌తో నావిగేట్ చేయండి, టాస్క్‌లు జోడించండి, సమాధానాలు పొందండి.",
         "Camera‑Powered Soil Test": "కెమెరా ఆధారిత మట్టి పరీక్ష",
         "Click or upload soil photos for instant AI insights and actionable recommendations.":
-          "తక్షణ AI విశ్లేషణలు మరియు సూచనల కోసం మట్టి ఫోటోలు క్లిక్ చేయండి లేదా అప్‌లోడ్ చేయండి.",
+          "తక్షణ AI విశ్లేషణలు మరియు సూచనల కోసం మట్టి ఫోటోలు క్యాప్చర్ చేయండి లేదా అప్‌లోడ్ చేయండి.",
         "Region‑Aware Market Prices": "ప్రాంతానికి అనుగుణమైన మార్కెట్ ధరలు",
         "See indicative local retail prices (₹/kg) for vegetables in your state.":
           "మీ రాష్ట్రంలో కూరగాయల సూచకీయ స్థానిక రిటైల్ ధరలు (₹/kg) చూడండి.",
@@ -315,22 +330,28 @@ export default function Landing() {
   if (gateOpen) {
     return (
       <div className="min-h-screen relative overflow-hidden bg-black">
-        {/* New: impact background image + vignette */}
+        {/* Live rotating background images + vignette */}
         <div className="absolute inset-0 -z-30">
-          <img
-            src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1600&auto=format&fit=crop"
-            alt="Farm fields at dusk"
-            className="h-full w-full object-cover object-center"
-            loading="eager"
-            onError={(e) => {
-              const t = e.currentTarget as HTMLImageElement;
-              if (t.src !== "/logo_bg.svg") t.src = "/logo_bg.svg";
-              t.onerror = null;
-            }}
-          />
+          {/* Cross-fade stack */}
+          <div className="absolute inset-0">
+            {bgImages.map((src, i) => (
+              <img
+                key={src}
+                src={src}
+                alt="Farm fields"
+                className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-700 ${bgIndex === i ? "opacity-100" : "opacity-0"}`}
+                loading={i === 0 ? "eager" : "lazy"}
+                onError={(e) => {
+                  const t = e.currentTarget as HTMLImageElement;
+                  if (t.src !== "/logo_bg.svg") t.src = "/logo_bg.svg";
+                  t.onerror = null;
+                }}
+              />
+            ))}
+          </div>
         </div>
         {/* Lighten overlay so the image is visible on mobile too */}
-        <div className="absolute inset-0 -z-25 bg-gradient-to-b from-black/50 via-black/40 to-black/60" />
+        <div className="absolute inset-0 -z-25 bg-gradient-to-b from-black/40 via-black/35 to-black/55" />
 
         {/* Edge-to-edge background sweep (amber->purple) */}
         <div className="absolute inset-0 -z-20 bg-gradient-to-br from-amber-500/30 via-transparent to-primary/30" />
