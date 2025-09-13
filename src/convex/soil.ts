@@ -10,21 +10,20 @@ export const analyzeImage = action({
     imageId: v.id("_storage"),
   },
   handler: async (ctx, args) => {
-    // Get the image from storage
     const imageUrl = await ctx.storage.getUrl(args.imageId);
     if (!imageUrl) {
       throw new Error("Image not found");
     }
 
-    // Helper: mock fallback generator
+    // Helper: mock fallback generator (used only when NO API key is configured)
     function mock() {
       return {
-        ph: Math.round((6.0 + Math.random() * 2.5) * 10) / 10, // 6.0-8.5
-        nitrogen: Math.round((10 + Math.random() * 40) * 10) / 10, // 10-50 mg/kg
-        phosphorus: Math.round((5 + Math.random() * 25) * 10) / 10, // 5-30 mg/kg
-        potassium: Math.round((50 + Math.random() * 150) * 10) / 10, // 50-200 mg/kg
-        moisture: Math.round((15 + Math.random() * 35) * 10) / 10, // 15-50%
-        organicMatter: Math.round((1 + Math.random() * 4) * 10) / 10, // 1-5%
+        ph: Math.round((6.0 + Math.random() * 2.5) * 10) / 10,
+        nitrogen: Math.round((10 + Math.random() * 40) * 10) / 10,
+        phosphorus: Math.round((5 + Math.random() * 25) * 10) / 10,
+        potassium: Math.round((50 + Math.random() * 150) * 10) / 10,
+        moisture: Math.round((15 + Math.random() * 35) * 10) / 10,
+        organicMatter: Math.round((1 + Math.random() * 4) * 10) / 10,
         recommendations: [
           "Consider adding organic compost to improve soil structure",
           "Monitor moisture levels regularly during growing season",
@@ -33,24 +32,24 @@ export const analyzeImage = action({
       };
     }
 
-    // If no key, return mock
+    // If no key, return mock as before
     if (!OPENROUTER_API_KEY) {
       return mock();
     }
 
     try {
-      // Prepare OpenRouter request for vision analysis
+      // Strengthened system prompt + strict JSON response
       const systemPrompt =
         "You are an agronomy expert. Analyze the provided soil photo and estimate key soil metrics. " +
-        "Return ONLY a compact JSON object with numeric fields and a 'recommendations' array. " +
-        "No extra text. If unsure, provide reasonable estimates.\n\n" +
-        `JSON schema:\n{\n` +
-        `  "ph": number, // 4.0 - 9.0\n` +
-        `  "nitrogen": number, // mg/kg\n` +
-        `  "phosphorus": number, // mg/kg\n` +
-        `  "potassium": number, // mg/kg\n` +
-        `  "moisture": number, // percentage 0-100\n` +
-        `  "organicMatter": number, // percentage 0-100\n` +
+        "Return ONLY a compact JSON object with the exact fields and types, no explanations, no markdown. " +
+        "If unsure, provide conservative estimates typical for healthy agricultural soil.\n\n" +
+        `Required JSON schema (no additional keys):\n{\n` +
+        `  "ph": number,\n` +
+        `  "nitrogen": number,\n` +
+        `  "phosphorus": number,\n` +
+        `  "potassium": number,\n` +
+        `  "moisture": number,\n` +
+        `  "organicMatter": number,\n` +
         `  "recommendations": string[]\n` +
         `}`;
 
@@ -59,7 +58,7 @@ export const analyzeImage = action({
           type: "text",
           text:
             "Analyze this soil image and output the JSON exactly per the schema. " +
-            "If information is visually ambiguous, provide reasonable estimates typical for healthy agricultural soil.",
+            "No prose, only JSON. Ensure numeric values are reasonable for agricultural soil.",
         },
         {
           type: "image_url",
@@ -68,13 +67,13 @@ export const analyzeImage = action({
       ];
 
       const body = {
-        model: "openai/gpt-4o-mini", // Vision-capable via OpenRouter
+        model: "openai/gpt-4o-mini",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userContent as any },
         ],
-        temperature: 0.2,
-        response_format: { type: "text" },
+        temperature: 0.1,
+        response_format: { type: "json_object" }, // enforce JSON
       };
 
       const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -87,30 +86,32 @@ export const analyzeImage = action({
       });
 
       if (!res.ok) {
-        // Fallback to mock on API error
-        return mock();
+        // With API key set, fail loudly to avoid returning dummy data
+        const text = await res.text().catch(() => "");
+        throw new Error(`AI request failed: ${res.status} ${text}`);
       }
 
       const json = (await res.json()) as any;
       const content = json?.choices?.[0]?.message?.content ?? "";
 
-      // Extract JSON block robustly (strip possible code fences)
-      const match =
-        typeof content === "string"
-          ? content.match(/\{[\s\S]*\}/)
-          : null;
-
+      // Parse JSON content directly (response_format enforces JSON string)
       let parsed: any = null;
-      if (match) {
+      if (typeof content === "string") {
         try {
-          parsed = JSON.parse(match[0]);
+          parsed = JSON.parse(content);
         } catch {
-          // continue to fallback
+          // try fallback regex in case providers wrap it unexpectedly
+          const match = content.match(/\{[\s\S]*\}/);
+          if (match) {
+            parsed = JSON.parse(match[0]);
+          }
         }
+      } else if (typeof content === "object" && content !== null) {
+        parsed = content;
       }
 
       if (!parsed) {
-        return mock();
+        throw new Error("AI returned an invalid JSON payload");
       }
 
       // Coerce and clamp values to expected ranges
@@ -133,9 +134,9 @@ export const analyzeImage = action({
       };
 
       return result;
-    } catch {
-      // Any unexpected failure: fallback to mock
-      return mock();
+    } catch (err) {
+      // With an API key configured, surface errors so the UI can inform the user.
+      throw err instanceof Error ? err : new Error("AI analysis failed");
     }
   },
 });

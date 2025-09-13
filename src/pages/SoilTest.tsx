@@ -5,10 +5,11 @@ import { api } from "@/convex/_generated/api";
 import { useAction, useMutation } from "convex/react";
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { Camera as CameraIcon, Image as ImageIcon, RefreshCw, Play, Upload, Wand2, Sparkles } from "lucide-react";
+import { Camera as CameraIcon, Image as ImageIcon, RefreshCw, Play, Upload, Wand2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { toast } from "sonner";
 
 type Analysis = {
   ph: number;
@@ -21,7 +22,6 @@ type Analysis = {
 };
 
 export default function SoilTest() {
-  const analyzeMock = useAction(api.soil.analyzeMock);
   const getUploadUrl = useMutation(api.soil_upload.getUploadUrl);
   const analyzeImage = useAction(api.soil.analyzeImage);
 
@@ -168,22 +168,10 @@ export default function SoilTest() {
       const json = (await res.json()) as { storageId: string };
       const analysis = await analyzeImage({ imageId: json.storageId as any });
       setResult(analysis as any);
-      setStep("results"); // move to results
-    } catch {
-      setResult(null);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const run = async () => {
-    setLoading(true);
-    try {
-      const res = await analyzeMock({});
-      setResult(res as any);
       setStep("results");
-    } catch {
+    } catch (e: any) {
       setResult(null);
+      toast.error(e?.message ?? "AI analysis failed. Please retake or try again.");
     } finally {
       setLoading(false);
     }
@@ -367,23 +355,6 @@ export default function SoilTest() {
                         <div className="text-sm text-muted-foreground">No image selected</div>
                       </div>
                     )}
-                  </div>
-
-                  {/* Optional: mock analysis */}
-                  <div className="flex justify-center">
-                    <Button variant="ghost" onClick={run} disabled={loading} className="gap-2">
-                      {loading ? (
-                        <>
-                          <RefreshCw className="h-4 w-4 animate-spin" />
-                          Mock…
-                        </>
-                      ) : (
-                        <>
-                          <Sparkles className="h-4 w-4" />
-                          Run Mock Analysis
-                        </>
-                      )}
-                    </Button>
                   </div>
                 </CardContent>
               </Card>
