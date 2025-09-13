@@ -328,7 +328,30 @@ export default function Landing() {
           </div>
 
           <div className="mx-auto w-full max-w-5xl px-4 pt-24 pb-16">
-            <div className="mx-auto w-full max-w-3xl rounded-3xl border bg-card/70 backdrop-blur-xl overflow-hidden shadow-2xl">
+            <div className="relative mx-auto w-full max-w-3xl rounded-3xl border bg-card/70 backdrop-blur-xl overflow-hidden shadow-2xl">
+              {/* Decorative wave background inside the card (reference style) */}
+              <div className="pointer-events-none absolute inset-0 -z-10 opacity-70">
+                <svg viewBox="0 0 1440 600" xmlns="http://www.w3.org/2000/svg" className="h-full w-full">
+                  <defs>
+                    <linearGradient id="gateGrad" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0%" stopColor="oklch(0.80 0.20 80)" />
+                      <stop offset="50%" stopColor="oklch(0.70 0.22 300)" />
+                      <stop offset="100%" stopColor="oklch(0.70 0.12 260)" />
+                    </linearGradient>
+                  </defs>
+                  <path
+                    d="M0,500 C240,420 320,180 640,220 C960,260 1120,80 1440,160 L1440,600 L0,600 Z"
+                    fill="url(#gateGrad)"
+                    opacity="0.25"
+                  />
+                  <path
+                    d="M0,520 C220,520 380,360 640,380 C900,400 1120,260 1440,320 L1440,600 L0,600 Z"
+                    fill="url(#gateGrad)"
+                    opacity="0.18"
+                  />
+                </svg>
+              </div>
+
               {/* Top mini nav dots */}
               <div className="flex items-center justify-center gap-2 py-3">
                 <button
@@ -349,31 +372,45 @@ export default function Landing() {
                   key="welcome"
                   initial={{ opacity: 0, y: 14 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="px-6 pb-10 text-center"
+                  className="px-6 pb-12 text-center"
                 >
-                  <div className="flex justify-center">
-                    <img src="/logo.svg" alt="Farmers Hub" className="h-14 w-14 rounded-xl shadow" />
+                  <div className="flex justify-between items-start px-2">
+                    <div className="flex items-center gap-2">
+                      <img src="/logo.svg" alt="Farmers Hub" className="h-10 w-10 rounded-xl shadow" />
+                      <span className="text-xs uppercase tracking-wide text-muted-foreground/80">KrishiMitra</span>
+                    </div>
+                    <div className="hidden sm:flex items-center gap-4 text-[11px] text-muted-foreground/80">
+                      <span className="hidden md:inline">Home</span>
+                      <span className="hidden md:inline">About</span>
+                      <span className="hidden md:inline">Help</span>
+                    </div>
                   </div>
-                  <h1 className="mt-6 text-3xl md:text-4xl font-extrabold tracking-tight">
-                    Welcome to KrishiMitra
+
+                  <h1 className="mt-8 text-[34px] md:text-[44px] font-extrabold tracking-tight leading-tight">
+                    <span className="bg-gradient-to-r from-amber-400 via-primary to-cyan-400 bg-clip-text text-transparent">
+                      Welcome.
+                    </span>
                   </h1>
+                  <p className="mt-2 text-xl md:text-2xl font-semibold">
+                    Let's personalize your experience
+                  </p>
                   <p className="mt-3 text-sm md:text-base text-muted-foreground max-w-xl mx-auto">
-                    Your voice‑first farming companion. Let's personalize your experience.
+                    Choose your preferred language to get a smooth, voice‑first app tailored to your region.
                   </p>
 
                   {/* Decorative wave bar */}
-                  <div className="mt-6 h-1 w-full bg-gradient-to-r from-primary/40 via-cyan-400/40 to-primary/40 rounded-full" />
+                  <div className="mt-8 h-[6px] w-full rounded-full bg-gradient-to-r from-amber-400/50 via-primary/50 to-cyan-400/50" />
 
                   <div className="mt-8 flex items-center justify-center gap-3">
                     <Button
-                      className="rounded-2xl px-5 py-5 text-base"
+                      className="rounded-2xl px-6 py-5 text-base bg-gradient-to-r from-amber-500 via-primary to-cyan-500 text-primary-foreground hover:opacity-90"
                       onClick={() => setGateSlide(1)}
                     >
                       Next: Choose Language
                     </Button>
                     <Button
                       variant="outline"
-                      className="rounded-2xl px-5 py-5 text-base"
+                      className="rounded-2xl px-6 py-5 text-base border-primary/40 hover:bg-primary/10"
                       onClick={playIntro}
                     >
                       Intro Voice
@@ -389,12 +426,14 @@ export default function Landing() {
                   key="lang"
                   initial={{ opacity: 0, y: 14 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="px-6 pb-10 text-center"
+                  className="px-6 pb-12 text-center"
                 >
                   <div className="flex justify-center">
                     <img src="/logo.svg" alt="Farmers Hub" className="h-10 w-10 rounded-xl shadow" />
                   </div>
-                  <h2 className="mt-5 text-2xl md:text-3xl font-bold">Choose your language</h2>
+                  <h2 className="mt-5 text-2xl md:text-3xl font-bold">
+                    Choose your language
+                  </h2>
                   <p className="mt-2 text-sm md:text-base text-muted-foreground max-w-xl mx-auto">
                     Select your preferred language to personalize the experience.
                   </p>
@@ -406,7 +445,7 @@ export default function Landing() {
                         onClick={() => setSelectedLang(opt.value)}
                         className={`rounded-2xl border bg-card/70 backdrop-blur px-4 py-3 text-sm transition ${
                           selectedLang === opt.value
-                            ? "border-primary text-primary shadow-sm"
+                            ? "border-primary text-primary shadow-sm ring-1 ring-primary/30"
                             : "hover:bg-muted/50"
                         }`}
                         aria-pressed={selectedLang === opt.value}
@@ -416,23 +455,23 @@ export default function Landing() {
                     ))}
                   </div>
 
-                  <div className="mt-6 flex items-center justify-center gap-3">
+                  <div className="mt-8 flex items-center justify-center gap-3">
                     <Button
                       variant="outline"
-                      className="rounded-2xl px-5 py-5 text-base"
+                      className="rounded-2xl px-6 py-5 text-base border-primary/40 hover:bg-primary/10"
                       onClick={() => setGateSlide(0)}
                     >
                       Back
                     </Button>
                     <Button
-                      className="rounded-2xl px-5 py-5 text-base"
+                      className="rounded-2xl px-6 py-5 text-base bg-gradient-to-r from-amber-500 via-primary to-cyan-500 text-primary-foreground hover:opacity-90"
                       onClick={confirmLanguage}
                     >
                       Continue
                     </Button>
                     <Button
                       variant="outline"
-                      className="rounded-2xl px-5 py-5 text-base"
+                      className="rounded-2xl px-6 py-5 text-base border-primary/40 hover:bg-primary/10"
                       onClick={playIntro}
                     >
                       Preview Voice
