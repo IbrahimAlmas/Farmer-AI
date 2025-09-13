@@ -24,6 +24,8 @@ export default function Landing() {
   const [guestLang, setGuestLang] = useState<string | null>(null);
   // Add: show minimal CTA page right after language selection
   const [postGate, setPostGate] = useState<boolean>(false);
+  // New: simple two-step slider for gate (0 = welcome, 1 = language select)
+  const [gateSlide, setGateSlide] = useState<number>(0);
 
   // Map Indian states to regional language codes (fallbacks to Hindi for some)
   const stateToLang = (state?: string): string | null => {
@@ -321,57 +323,123 @@ export default function Landing() {
               className="h-full w-full object-cover opacity-70"
               loading="eager"
             />
-            <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-background/70 to-background" />
+            {/* Dark gradient overlay with purple-blue sweep */}
+            <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/80 to-background" />
           </div>
 
           <div className="mx-auto w-full max-w-5xl px-4 pt-24 pb-16">
-            <div className="text-center">
-              <div className="flex justify-center">
-                <img src="/logo.svg" alt="Farmers Hub" className="h-14 w-14 rounded-xl shadow" />
-              </div>
-              <h1 className="mt-6 text-3xl md:text-4xl font-extrabold tracking-tight">
-                Choose your language
-              </h1>
-              <p className="mt-3 text-sm md:text-base text-muted-foreground max-w-xl mx-auto">
-                Select your preferred language to personalize the experience.
-              </p>
-
-              <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 max-w-3xl mx-auto">
-                {langOptions.map((opt) => (
-                  <button
-                    key={opt.value}
-                    onClick={() => setSelectedLang(opt.value)}
-                    className={`rounded-2xl border bg-card/70 backdrop-blur px-4 py-3 text-sm transition ${
-                      selectedLang === opt.value
-                        ? "border-primary text-primary shadow-sm"
-                        : "hover:bg-muted/50"
-                    }`}
-                    aria-pressed={selectedLang === opt.value}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
+            <div className="mx-auto w-full max-w-3xl rounded-3xl border bg-card/70 backdrop-blur-xl overflow-hidden shadow-2xl">
+              {/* Top mini nav dots */}
+              <div className="flex items-center justify-center gap-2 py-3">
+                <button
+                  aria-label="Welcome slide"
+                  onClick={() => setGateSlide(0)}
+                  className={`h-2.5 w-2.5 rounded-full transition-all ${gateSlide === 0 ? "bg-primary w-6" : "bg-muted"}`}
+                />
+                <button
+                  aria-label="Language slide"
+                  onClick={() => setGateSlide(1)}
+                  className={`h-2.5 w-2.5 rounded-full transition-all ${gateSlide === 1 ? "bg-primary w-6" : "bg-muted"}`}
+                />
               </div>
 
-              <div className="mt-6 flex items-center justify-center gap-3">
-                <Button
-                  className="rounded-2xl px-5 py-5 text-base"
-                  onClick={confirmLanguage}
+              {/* Slides */}
+              {gateSlide === 0 ? (
+                <motion.div
+                  key="welcome"
+                  initial={{ opacity: 0, y: 14 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="px-6 pb-10 text-center"
                 >
-                  Continue
-                </Button>
-                <Button
-                  variant="outline"
-                  className="rounded-2xl px-5 py-5 text-base"
-                  onClick={playIntro}
-                >
-                  Preview Voice
-                </Button>
-              </div>
+                  <div className="flex justify-center">
+                    <img src="/logo.svg" alt="Farmers Hub" className="h-14 w-14 rounded-xl shadow" />
+                  </div>
+                  <h1 className="mt-6 text-3xl md:text-4xl font-extrabold tracking-tight">
+                    Welcome to KrishiMitra
+                  </h1>
+                  <p className="mt-3 text-sm md:text-base text-muted-foreground max-w-xl mx-auto">
+                    Your voice‑first farming companion. Let's personalize your experience.
+                  </p>
 
-              <div className="mt-8 inline-flex items-center gap-2 rounded-2xl border bg-card/70 backdrop-blur px-3 py-2 text-sm">
-                Private & secure. You control your data.
-              </div>
+                  {/* Decorative wave bar */}
+                  <div className="mt-6 h-1 w-full bg-gradient-to-r from-primary/40 via-cyan-400/40 to-primary/40 rounded-full" />
+
+                  <div className="mt-8 flex items-center justify-center gap-3">
+                    <Button
+                      className="rounded-2xl px-5 py-5 text-base"
+                      onClick={() => setGateSlide(1)}
+                    >
+                      Next: Choose Language
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="rounded-2xl px-5 py-5 text-base"
+                      onClick={playIntro}
+                    >
+                      Intro Voice
+                    </Button>
+                  </div>
+
+                  <div className="mt-8 inline-flex items-center gap-2 rounded-2xl border bg-card/70 backdrop-blur px-3 py-2 text-sm">
+                    Private & secure. You control your data.
+                  </div>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="lang"
+                  initial={{ opacity: 0, y: 14 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="px-6 pb-10 text-center"
+                >
+                  <div className="flex justify-center">
+                    <img src="/logo.svg" alt="Farmers Hub" className="h-10 w-10 rounded-xl shadow" />
+                  </div>
+                  <h2 className="mt-5 text-2xl md:text-3xl font-bold">Choose your language</h2>
+                  <p className="mt-2 text-sm md:text-base text-muted-foreground max-w-xl mx-auto">
+                    Select your preferred language to personalize the experience.
+                  </p>
+
+                  <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 max-w-3xl mx-auto">
+                    {langOptions.map((opt) => (
+                      <button
+                        key={opt.value}
+                        onClick={() => setSelectedLang(opt.value)}
+                        className={`rounded-2xl border bg-card/70 backdrop-blur px-4 py-3 text-sm transition ${
+                          selectedLang === opt.value
+                            ? "border-primary text-primary shadow-sm"
+                            : "hover:bg-muted/50"
+                        }`}
+                        aria-pressed={selectedLang === opt.value}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="mt-6 flex items-center justify-center gap-3">
+                    <Button
+                      variant="outline"
+                      className="rounded-2xl px-5 py-5 text-base"
+                      onClick={() => setGateSlide(0)}
+                    >
+                      Back
+                    </Button>
+                    <Button
+                      className="rounded-2xl px-5 py-5 text-base"
+                      onClick={confirmLanguage}
+                    >
+                      Continue
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="rounded-2xl px-5 py-5 text-base"
+                      onClick={playIntro}
+                    >
+                      Preview Voice
+                    </Button>
+                  </div>
+                </motion.div>
+              )}
             </div>
           </div>
         </section>
