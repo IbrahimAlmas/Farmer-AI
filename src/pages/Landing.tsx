@@ -352,7 +352,7 @@ export default function Landing() {
         </div>
 
         {/* Top bar (compact, mobile-first) */}
-        <div className="px-4 pt-6 flex items-center justify-between">
+        <div className="px-4 pt-[env(safe-area-inset-top)] pb-2 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <img src="/logo.svg" alt="KrishiMitra" className="h-9 w-9 rounded-xl shadow" />
             <span className="text-xs uppercase tracking-wide text-white/80">KrishiMitra</span>
@@ -365,34 +365,34 @@ export default function Landing() {
         </div>
 
         {/* Slides */}
-        <div className="mx-auto max-w-2xl px-5">
+        <div className="mx-auto max-w-md px-4">
           {gateSlide === 0 ? (
             <motion.div
               key="welcome-full"
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
-              className="pt-16"
+              className="pt-12"
             >
-              <h1 className="text-[36px] sm:text-[44px] font-extrabold leading-tight tracking-tight">
+              <h1 className="text-[34px] sm:text-[44px] font-extrabold leading-tight tracking-tight">
                 <span className="bg-gradient-to-r from-amber-400 via-white to-cyan-300 bg-clip-text text-transparent">
                   Welcome.
                 </span>
               </h1>
-              <p className="mt-2 text-xl sm:text-2xl font-semibold text-white">Landing Page Design</p>
+              <p className="mt-2 text-lg sm:text-2xl font-semibold text-white">Landing Page Design</p>
               <p className="mt-3 text-sm sm:text-base text-white/70 max-w-xl">
                 Choose your preferred language to personalize a smooth, voice‑first experience.
               </p>
 
-              <div className="mt-8 flex items-center gap-3">
+              <div className="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                 <Button
-                  className="rounded-2xl px-6 py-5 text-base bg-gradient-to-r from-amber-500 via-primary to-cyan-500 text-primary-foreground hover:opacity-90"
+                  className="rounded-2xl px-6 py-5 text-base bg-gradient-to-r from-amber-500 via-primary to-cyan-500 text-primary-foreground hover:opacity-90 w-full sm:w-auto"
                   onClick={() => setGateSlide(1)}
                 >
                   Next: Choose Language
                 </Button>
                 <Button
                   variant="outline"
-                  className="rounded-2xl px-6 py-5 text-base border-white/30 text-white hover:bg-white/10"
+                  className="rounded-2xl px-6 py-5 text-base border-white/30 text-white hover:bg-white/10 w-full sm:w-auto"
                   onClick={playIntro}
                 >
                   Intro Voice
@@ -400,7 +400,7 @@ export default function Landing() {
               </div>
 
               {/* Privacy pill */}
-              <div className="mt-8 inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white/5 backdrop-blur px-3 py-2 text-sm text-white/90">
+              <div className="mt-6 inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white/5 backdrop-blur px-3 py-2 text-sm text-white/90">
                 Private & secure. You control your data.
               </div>
             </motion.div>
@@ -409,7 +409,7 @@ export default function Landing() {
               key="language-full"
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
-              className="pt-12"
+              className="pt-10 pb-6"
             >
               <h2 className="text-2xl sm:text-3xl font-bold text-white">Choose your language</h2>
               <p className="mt-2 text-sm sm:text-base text-white/70 max-w-xl">
@@ -421,35 +421,36 @@ export default function Landing() {
                   <button
                     key={opt.value}
                     onClick={() => setSelectedLang(opt.value)}
-                    className={`rounded-2xl border bg-white/5 backdrop-blur px-4 py-3 text-sm text-white transition ${
+                    className={`rounded-2xl border bg-white/5 backdrop-blur px-4 py-4 text-sm text-white transition active:scale-[0.99] ${
                       selectedLang === opt.value
                         ? "border-primary text-primary shadow-sm ring-1 ring-primary/40"
                         : "border-white/15 hover:bg-white/10"
                     }`}
                     aria-pressed={selectedLang === opt.value}
+                    aria-label={`Select ${opt.label}`}
                   >
                     {opt.label}
                   </button>
                 ))}
               </div>
 
-              <div className="mt-8 flex items-center gap-3">
+              <div className="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                 <Button
                   variant="outline"
-                  className="rounded-2xl px-6 py-5 text-base border-white/30 text-white hover:bg-white/10"
+                  className="rounded-2xl px-6 py-5 text-base border-white/30 text-white hover:bg-white/10 w-full sm:w-auto"
                   onClick={() => setGateSlide(0)}
                 >
                   Back
                 </Button>
                 <Button
-                  className="rounded-2xl px-6 py-5 text-base bg-gradient-to-r from-amber-500 via-primary to-cyan-500 text-primary-foreground hover:opacity-90"
+                  className="rounded-2xl px-6 py-5 text-base bg-gradient-to-r from-amber-500 via-primary to-cyan-500 text-primary-foreground hover:opacity-90 w-full sm:w-auto"
                   onClick={confirmLanguage}
                 >
                   Continue
                 </Button>
                 <Button
                   variant="outline"
-                  className="rounded-2xl px-6 py-5 text-base border-white/30 text-white hover:bg-white/10"
+                  className="rounded-2xl px-6 py-5 text-base border-white/30 text-white hover:bg-white/10 w-full sm:w-auto"
                   onClick={playIntro}
                 >
                   Preview Voice
@@ -460,7 +461,7 @@ export default function Landing() {
         </div>
 
         {/* Slide dots centered near bottom */}
-        <div className="absolute inset-x-0 bottom-8 flex items-center justify-center gap-2">
+        <div className="absolute inset-x-0 bottom-8 mb-[env(safe-area-inset-bottom)] flex items-center justify-center gap-2">
           <button
             aria-label="Welcome slide"
             onClick={() => setGateSlide(0)}
