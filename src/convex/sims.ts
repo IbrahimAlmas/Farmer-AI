@@ -3,38 +3,56 @@ import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 
 export const get = query({
-  args: {},
-  handler: async (ctx) => {
+  args: { farmId: v.optional(v.id("farms")) },
+  handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
+
+    if (args.farmId) {
+      const existing = await ctx.db
+        .query("sims")
+        .withIndex("by_userId_and_farmId", (q) =>
+          q.eq("userId", userId).eq("farmId", args.farmId),
+        )
+        .unique()
+        .catch(() => null);
+      return existing ?? null;
+    }
 
     const existing = await ctx.db
       .query("sims")
       .withIndex("by_userId", (q) => q.eq("userId", userId))
       .unique()
       .catch(() => null);
-
-    // Only read here; don't insert in a query
     return existing ?? null;
   },
 });
 
 export const ensure = mutation({
-  args: {},
-  handler: async (ctx) => {
+  args: { farmId: v.optional(v.id("farms")) },
+  handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
 
-    const existing = await ctx.db
-      .query("sims")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .unique()
-      .catch(() => null);
+    const existing = args.farmId
+      ? await ctx.db
+          .query("sims")
+          .withIndex("by_userId_and_farmId", (q) =>
+            q.eq("userId", userId).eq("farmId", args.farmId),
+          )
+          .unique()
+          .catch(() => null)
+      : await ctx.db
+          .query("sims")
+          .withIndex("by_userId", (q) => q.eq("userId", userId))
+          .unique()
+          .catch(() => null);
 
     if (existing) return existing;
 
     const _id = await ctx.db.insert("sims", {
       userId,
+      farmId: args.farmId,
       season: "monsoon",
       weather: "rainy",
       soilMoisture: 70,
@@ -50,34 +68,40 @@ export const ensure = mutation({
 });
 
 export const advanceTick = mutation({
-  args: {},
-  handler: async (ctx) => {
+  args: { farmId: v.optional(v.id("farms")) },
+  handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
 
-    const sim = await ctx.db
-      .query("sims")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .unique()
-      .catch(() => null);
+    const sim = args.farmId
+      ? await ctx.db
+          .query("sims")
+          .withIndex("by_userId_and_farmId", (q) =>
+            q.eq("userId", userId).eq("farmId", args.farmId),
+          )
+          .unique()
+          .catch(() => null)
+      : await ctx.db
+          .query("sims")
+          .withIndex("by_userId", (q) => q.eq("userId", userId))
+          .unique()
+          .catch(() => null);
 
-    if (!sim) {
-      throw new Error("Simulation not initialized");
-    }
+    if (!sim) throw new Error("Simulation not initialized");
 
-    // Very simple deterministic updates for a "day"
     const stages = ["seedling", "vegetative", "flowering", "maturity"] as const;
     const nextStage =
       stages[Math.min(stages.indexOf(sim.stage as any) + 1, stages.length - 1)];
 
-    const deltaMoisture = Math.round((Math.random() * 10 - 5) * 10) / 10; // -5..+5
+    const deltaMoisture = Math.round((Math.random() * 10 - 5) * 10) / 10;
     const soilMoisture = Math.max(10, Math.min(95, sim.soilMoisture + deltaMoisture));
 
     const weatherCycle = ["sunny", "cloudy", "rainy"] as const;
     const nextWeather =
       weatherCycle[(weatherCycle.indexOf(sim.weather as any) + 1) % weatherCycle.length];
 
-    const yieldBonus = nextStage === "maturity" ? 500 + Math.floor(Math.random() * 500) : 0;
+    const yieldBonus =
+      nextStage === "maturity" ? 500 + Math.floor(Math.random() * 500) : 0;
     const balance = sim.balance + yieldBonus;
 
     await ctx.db.patch(sim._id, {
@@ -93,24 +117,28 @@ export const advanceTick = mutation({
 });
 
 export const plantCrop = mutation({
-  args: { crop: v.string() },
+  args: { crop: v.string(), farmId: v.optional(v.id("farms")) },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
 
-    const sim = await ctx.db
-      .query("sims")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .unique()
-      .catch(() => null);
+    const sim = args.farmId
+      ? await ctx.db
+          .query("sims")
+          .withIndex("by_userId_and_farmId", (q) =>
+            q.eq("userId", userId).eq("farmId", args.farmId),
+          )
+          .unique()
+          .catch(() => null)
+      : await ctx.db
+          .query("sims")
+          .withIndex("by_userId", (q) => q.eq("userId", userId))
+          .unique()
+          .catch(() => null);
     if (!sim) throw new Error("Simulation not initialized");
 
-    // Basic economics
     const seedCost = 200;
-
-    if (sim.balance < seedCost) {
-      throw new Error("Insufficient balance to plant");
-    }
+    if (sim.balance < seedCost) throw new Error("Insufficient balance to plant");
 
     await ctx.db.patch(sim._id, {
       crop: args.crop,
@@ -123,18 +151,25 @@ export const plantCrop = mutation({
   },
 });
 
-// Watering increases soil moisture at a small cost
 export const water = mutation({
-  args: {},
-  handler: async (ctx) => {
+  args: { farmId: v.optional(v.id("farms")) },
+  handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
 
-    const sim = await ctx.db
-      .query("sims")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .unique()
-      .catch(() => null);
+    const sim = args.farmId
+      ? await ctx.db
+          .query("sims")
+          .withIndex("by_userId_and_farmId", (q) =>
+            q.eq("userId", userId).eq("farmId", args.farmId),
+          )
+          .unique()
+          .catch(() => null)
+      : await ctx.db
+          .query("sims")
+          .withIndex("by_userId", (q) => q.eq("userId", userId))
+          .unique()
+          .catch(() => null);
     if (!sim) throw new Error("Simulation not initialized");
 
     const waterCost = 20;
@@ -152,27 +187,33 @@ export const water = mutation({
   },
 });
 
-// Harvest only at maturity; resets crop and grants income
 export const harvest = mutation({
-  args: {},
-  handler: async (ctx) => {
+  args: { farmId: v.optional(v.id("farms")) },
+  handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
 
-    const sim = await ctx.db
-      .query("sims")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .unique()
-      .catch(() => null);
+    const sim = args.farmId
+      ? await ctx.db
+          .query("sims")
+          .withIndex("by_userId_and_farmId", (q) =>
+            q.eq("userId", userId).eq("farmId", args.farmId),
+          )
+          .unique()
+          .catch(() => null)
+      : await ctx.db
+          .query("sims")
+          .withIndex("by_userId", (q) => q.eq("userId", userId))
+          .unique()
+          .catch(() => null);
     if (!sim) throw new Error("Simulation not initialized");
 
     if (!sim.crop) throw new Error("No crop to harvest");
     if (sim.stage !== "maturity") throw new Error("Crop not ready for harvest");
 
-    // Simple randomized yield
     const base = 1500;
-    const variance = Math.floor(Math.random() * 1000); // 0..999
-    const moistureBonus = Math.round((sim.soilMoisture - 50) * 5); // +/- around moisture
+    const variance = Math.floor(Math.random() * 1000);
+    const moistureBonus = Math.round((sim.soilMoisture - 50) * 5);
     const payout = Math.max(500, base + variance + moistureBonus);
 
     await ctx.db.patch(sim._id, {

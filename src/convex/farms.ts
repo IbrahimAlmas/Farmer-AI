@@ -77,3 +77,57 @@ export const remove = mutation({
     return await ctx.db.delete(args.id);
   },
 });
+
+export const setCornerPhotos = mutation({
+  args: {
+    id: v.id("farms"),
+    photoIds: v.array(v.id("_storage")),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const farm = await ctx.db.get(args.id);
+    if (!farm || farm.userId !== userId) throw new Error("Farm not found or access denied");
+
+    await ctx.db.patch(args.id, { cornerPhotos: args.photoIds.slice(0, 4) });
+    return { success: true };
+  },
+});
+
+export const setWalkPath = mutation({
+  args: {
+    id: v.id("farms"),
+    path: v.array(v.object({
+      lat: v.number(),
+      lng: v.number(),
+      ts: v.number(),
+    })),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const farm = await ctx.db.get(args.id);
+    if (!farm || farm.userId !== userId) throw new Error("Farm not found or access denied");
+
+    await ctx.db.patch(args.id, { walkPath: args.path.slice(0, 2048) });
+    return { success: true };
+  },
+});
+
+export const finalizeModel = mutation({
+  args: { id: v.id("farms") },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const farm = await ctx.db.get(args.id);
+    if (!farm || farm.userId !== userId) throw new Error("Farm not found or access denied");
+    if (!farm.cornerPhotos || farm.cornerPhotos.length < 4) {
+      throw new Error("Please add 4 corner photos first");
+    }
+    if (!farm.walkPath || farm.walkPath.length < 10) {
+      throw new Error("Please record a short GPS walk around the field");
+    }
+    await ctx.db.patch(args.id, { modelReady: true });
+    return { success: true };
+  },
+});

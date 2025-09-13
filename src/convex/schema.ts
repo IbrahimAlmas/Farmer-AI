@@ -71,6 +71,14 @@ const schema = defineSchema(
         address: v.optional(v.string()),
       })),
       crops: v.array(v.string()),
+      // Add 3D capture fields
+      cornerPhotos: v.optional(v.array(v.id("_storage"))),
+      walkPath: v.optional(v.array(v.object({
+        lat: v.number(),
+        lng: v.number(),
+        ts: v.number(),
+      }))),
+      modelReady: v.optional(v.boolean()),
     }).index("by_userId", ["userId"]),
 
     // Tasks for users
@@ -132,6 +140,8 @@ const schema = defineSchema(
     // Simulation game state
     sims: defineTable({
       userId: v.id("users"),
+      // Associate sim with a specific farm if provided
+      farmId: v.optional(v.id("farms")),
       season: v.string(),
       weather: v.string(),
       soilMoisture: v.number(),
@@ -139,7 +149,8 @@ const schema = defineSchema(
       stage: v.string(),
       balance: v.number(),
       lastTick: v.number(),
-    }).index("by_userId", ["userId"]),
+    }).index("by_userId", ["userId"])
+     .index("by_userId_and_farmId", ["userId", "farmId"]),
   },
   {
     schemaValidation: false,

@@ -1,150 +1,35 @@
 import { AppShell } from "@/components/AppShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useQuery, useAction, useMutation } from "convex/react";
+import { useQuery, useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { motion } from "framer-motion";
-import { Sprout, CheckSquare, Calendar, TrendingUp, Camera, Users } from "lucide-react";
+import { Sprout, CheckSquare, TrendingUp, Camera, Users, Calendar } from "lucide-react";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
-import { useEffect } from "react";
-import { Separator } from "@/components/ui/separator";
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const profile = useQuery(api.profiles.get);
   const farms = useQuery(api.farms.list);
   const pendingTasks = useQuery(api.tasks.listPending);
   const seedData = useAction(api.seed.seedUserData);
-  const sim = useQuery(api.sims.get);
-  const advance = useMutation(api.sims.advanceTick);
-  const plant = useMutation(api.sims.plantCrop);
-  const water = useMutation(api.sims.water);
-  const harvest = useMutation(api.sims.harvest);
-
-  // Ensure a simulation exists on first load
-  const ensureSim = useMutation(api.sims.ensure);
-  useEffect(() => {
-    if (sim === null) {
-      ensureSim({}).catch(() => {});
-    }
-  }, [sim, ensureSim]);
+  const nextTask = pendingTasks && pendingTasks.length > 0 ? pendingTasks[0] : null;
 
   const handleSeedData = async () => {
     try {
       await seedData();
       toast.success("Sample data created successfully!");
-    } catch (error) {
+    } catch {
       toast.error("Failed to create sample data");
     }
   };
 
-  const advanceDay = async () => {
-    try {
-      await advance({});
-      toast.success("Advanced one day");
-    } catch {
-      toast.error("Failed to advance day");
-    }
-  };
-
-  const plantCrop = async (crop: string) => {
-    try {
-      await plant({ crop });
-      toast.success(`Planted ${crop}`);
-    } catch (e: any) {
-      toast.error(e?.message ?? "Failed to plant");
-    }
-  };
-
-  const waterField = async () => {
-    try {
-      await water({});
-      toast.success("Field watered");
-    } catch (e: any) {
-      toast.error(e?.message ?? "Failed to water");
-    }
-  };
-
-  const doHarvest = async () => {
-    try {
-      const res = await harvest({});
-      const gained = (res as any)?.payout ?? 0;
-      toast.success(`Harvested! Earned ₹${gained}`);
-    } catch (e: any) {
-      toast.error(e?.message ?? "Failed to harvest");
-    }
-  };
-
-  const nextTask = pendingTasks?.[0];
   const farmCount = farms?.length || 0;
   const taskCount = pendingTasks?.length || 0;
 
   return (
     <AppShell title="Dashboard">
       <div className="p-4 space-y-6">
-        {/* Simulation/Game Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Sprout className="h-5 w-5" />
-                Farm Simulation
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {!sim ? (
-                <div className="text-sm text-muted-foreground">Preparing your simulation...</div>
-              ) : (
-                <>
-                  <div className="grid grid-cols-2 gap-2 text-sm">
-                    <div><span className="text-muted-foreground">Season:</span> {sim.season}</div>
-                    <div><span className="text-muted-foreground">Weather:</span> {sim.weather}</div>
-                    <div><span className="text-muted-foreground">Soil Moisture:</span> {sim.soilMoisture}%</div>
-                    <div><span className="text-muted-foreground">Stage:</span> {sim.stage}</div>
-                    <div><span className="text-muted-foreground">Crop:</span> {sim.crop ?? "—"}</div>
-                    <div><span className="text-muted-foreground">Balance:</span> ₹{sim.balance}</div>
-                  </div>
-
-                  <Separator className="my-2" />
-
-                  {/* Game Controls */}
-                  <div className="grid grid-cols-2 gap-2">
-                    {/* Advance Day is always available */}
-                    <Button onClick={advanceDay}>Advance Day</Button>
-
-                    {/* Water is always available (costs small amount) */}
-                    <Button variant="outline" onClick={waterField}>
-                      Water Field
-                    </Button>
-
-                    {/* Plant options when empty */}
-                    {!sim.crop && (
-                      <>
-                        <Button variant="secondary" onClick={() => plantCrop("rice")}>
-                          Plant Rice (₹200)
-                        </Button>
-                        <Button variant="secondary" onClick={() => plantCrop("wheat")}>
-                          Plant Wheat (₹200)
-                        </Button>
-                      </>
-                    )}
-
-                    {/* Harvest when ready */}
-                    {sim.crop && sim.stage === "maturity" && (
-                      <Button className="col-span-2" onClick={doHarvest}>
-                        Harvest
-                      </Button>
-                    )}
-                  </div>
-                </>
-              )}
-            </CardContent>
-          </Card>
-        </motion.div>
 
         {/* Greeting */}
         <motion.div

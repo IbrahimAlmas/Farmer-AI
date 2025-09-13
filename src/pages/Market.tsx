@@ -6,7 +6,7 @@ import { useMemo } from "react";
 
 export default function Market() {
   const profile = useQuery(api.profiles.get);
-  const items = useQuery(api.market_prices.getVegetablePrices, {}); // realtime query
+  const items = useQuery(api.market_prices.getVegetablePrices);
   const loading = items === undefined;
 
   const regionLabel = useMemo(() => profile?.location?.state ?? "Delhi", [profile]);
@@ -36,7 +36,7 @@ export default function Market() {
 
             {!loading && items && (
               <div className="divide-y">
-                {items.map((it: any) => (
+                {items.map((it) => (
                   <div key={it.name} className="py-3 flex items-center justify-between">
                     <div>
                       <div className="font-medium capitalize">{it.name}</div>

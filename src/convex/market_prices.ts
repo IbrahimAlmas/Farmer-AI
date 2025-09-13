@@ -1,22 +1,36 @@
 import { query } from "./_generated/server";
-import { api } from "./_generated/api";
+import { getAuthUserId } from "@convex-dev/auth/server";
 
-// Define as a public query returning region-adjusted prices
+type Item = {
+  name: string;
+  price: number;
+  unit: "kg";
+  source: string;
+  region: string;
+  updatedAt: number;
+};
+
+// Return 15-20 most bought vegetables with region-adjusted indicative prices (₹/kg)
 export const getVegetablePrices = query({
   args: {},
-  handler: async (ctx): Promise<
-    Array<{
-      name: string;
-      price: number;
-      unit: string;
-      source: string;
-      region: string;
-      updatedAt: number;
-    }>
-  > => {
-    const profile = await ctx.runQuery(api.profiles.get, {});
-    const region = profile?.location?.state?.toLowerCase() || "delhi";
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
 
+    let stateLower = "delhi";
+    let stateLabel = "Delhi";
+
+    if (userId) {
+      const profile = await ctx.db
+        .query("profiles")
+        .withIndex("by_userId", (q) => q.eq("userId", userId))
+        .unique()
+        .catch(() => null);
+
+      stateLower = profile?.location?.state?.toLowerCase() ?? stateLower;
+      stateLabel = profile?.location?.state ?? stateLabel;
+    }
+
+    // Baseline indicative retail prices (₹/kg), conservative and stable
     const base: Record<string, number> = {
       potato: 25,
       onion: 35,
@@ -32,14 +46,15 @@ export const getVegetablePrices = query({
       bottle_gourd: 35,
       bitter_gourd: 60,
       ridge_gourd: 55,
-      spinach: 30,
-      coriander: 120,
+      spinach: 30, // leaf veg priced per bunch, normalized to kg proxy
+      coriander: 120, // per kg proxy
       ginger: 200,
       garlic: 180,
       green_chilli: 120,
       pumpkin: 30,
     };
 
+    // Region factor to reflect typical variance across states/metros
     const regionFactors: Record<string, number> = {
       "delhi": 1.0,
       "nct of delhi": 1.0,
@@ -70,9 +85,12 @@ export const getVegetablePrices = query({
       "goa": 1.1,
     };
 
-    const factor = regionFactors[region] ?? 1.0;
+    const factor = regionFactors[stateLower] ?? 1.0;
+
+    // Round to nearest rupee and clamp to sensible bounds
     const round = (n: number) => Math.max(5, Math.round(n));
 
+    // Curate the top 18 items commonly bought PAN India
     const order: Array<keyof typeof base> = [
       "potato",
       "onion",
@@ -94,21 +112,14 @@ export const getVegetablePrices = query({
       "garlic",
     ];
 
-    const items = order.slice(0, 18).map<{
-      name: string;
-      price: number;
-      unit: string;
-      source: string;
-      region: string;
-      updatedAt: number;
-    }>((key) => {
+    const items: Array<Item> = order.slice(0, 18).map((key) => {
       const p = round(base[key] * factor);
       return {
         name: key.replace(/_/g, " "),
         price: p,
         unit: "kg",
         source: "Indicative local retail estimates",
-        region: profile?.location?.state || "Delhi",
+        region: stateLabel,
         updatedAt: Date.now(),
       };
     });
