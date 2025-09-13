@@ -381,7 +381,7 @@ export default function Landing() {
         {/* Top bar (compact, mobile-first) */}
         <div className="relative z-30 px-4 pt-[env(safe-area-inset-top)] pb-2 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <img src="https://harmless-tapir-303.convex.cloud/api/storage/6ec3840c-aa68-4954-a82d-0f4642599b44" alt="Root AI" className="h-9 w-9 rounded-xl shadow" />
+            <img src="/logo.svg" alt="Root AI" className="h-9 w-9 rounded-xl shadow" />
             <span className="text-xs uppercase tracking-wide text-white/80">Root AI</span>
           </div>
           <div className="hidden sm:flex items-center gap-5 text-[11px] text-white/70">
@@ -587,7 +587,7 @@ export default function Landing() {
             className="text-center"
           >
             <div className="flex justify-center">
-              <img src="https://harmless-tapir-303.convex.cloud/api/storage/6ec3840c-aa68-4954-a82d-0f4642599b44" alt="Root AI" className="h-14 w-14 rounded-xl shadow" />
+              <img src="/logo.svg" alt="Root AI" className="h-14 w-14 rounded-xl shadow" />
             </div>
             <h1 className="mt-6 text-4xl md:text-5xl font-extrabold tracking-tight leading-[1.1]">
               {tr("Root AI — Intelligent Agriculture Companion")}
