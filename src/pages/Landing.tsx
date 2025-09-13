@@ -1,9 +1,9 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowRight, Mic, Sprout, Camera, ShoppingCart, Languages, ShieldCheck } from "lucide-react";
+import { ArrowRight, Mic, Sprout, Camera, ShoppingCart, Languages, ShieldCheck, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router";
-import { useMemo } from "react";
+import { useMemo, useEffect, useState } from "react";
  // removed duplicate import of useQuery
 import { api } from "@/convex/_generated/api";
 import LanguageSelect from "@/components/LanguageSelect";
@@ -14,6 +14,9 @@ export default function Landing() {
   const navigate = useNavigate();
   const updateProfile = useMutation(api.profiles.update);
   const tts = useAction(api.voice.tts);
+  const reverseGeocode = useAction(api.location.reverseGeocode);
+  // Setup progress UI
+  const [setupLoading, setSetupLoading] = useState(false);
 
   // Map Indian states to regional language codes (fallbacks to Hindi for some)
   const stateToLang = (state?: string): string | null => {
@@ -84,6 +87,73 @@ export default function Landing() {
     })();
   }, [profile, updateProfile]);
 
+  // Detect location via GPS and set profile.location with state; auto-set language if still "en"
+  useEffect(() => {
+    (async () => {
+      // Only for authenticated users with no saved location state
+      if (!profile) return; // not authenticated
+      const hasState = !!profile.location?.state;
+      if (hasState) return;
+
+      // Avoid double-running if already in progress
+      if (setupLoading) return;
+      setSetupLoading(true);
+      try {
+        if (!navigator.geolocation) {
+          setSetupLoading(false);
+          return;
+        }
+        await new Promise<void>((resolve, reject) => {
+          const onSuccess = async (pos: GeolocationPosition) => {
+            try {
+              const lat = pos.coords.latitude;
+              const lng = pos.coords.longitude;
+              const result = await reverseGeocode({ lat, lng });
+              const detectedState = (result as any)?.state as string | null;
+
+              // Build location object for profile
+              const location = { lat, lng, state: detectedState || undefined };
+
+              // If current language is still "en", compute a regional one
+              const current = String(profile.preferredLang || "en");
+              let nextLang: string | null = null;
+              if (current === "en") {
+                nextLang = stateToLang(detectedState || undefined) || localeToLang(navigator.language);
+              }
+
+              // Update profile with location (and language if decided)
+              try {
+                await updateProfile(
+                  nextLang
+                    ? { location, preferredLang: nextLang }
+                    : { location }
+                );
+                if (nextLang) {
+                  toast.success("Language set based on your region");
+                } else {
+                  toast.success("Location saved");
+                }
+              } catch (e: any) {
+                // non-blocking
+              }
+              resolve();
+            } catch (e) {
+              reject(e);
+            }
+          };
+          const onError = () => resolve(); // Ignore errors silently for now
+          navigator.geolocation.getCurrentPosition(onSuccess, onError, {
+            enableHighAccuracy: true,
+            maximumAge: 0,
+            timeout: 15000,
+          });
+        });
+      } finally {
+        setSetupLoading(false);
+      }
+    })();
+  }, [profile, reverseGeocode, updateProfile, setupLoading]);
+
   // Localized voice intro strings
   const greetings: Record<string, string> = {
     ta: "வணக்கம்! நான் கிருஷிமித்ரா, உங்கள் விவசாய உதவியாளர்!",
@@ -135,7 +205,7 @@ export default function Landing() {
       const te: Record<string, string> = {
         "KrishiMitra — Your Voice‑First Farming Companion": "కృషిమిత్ర — మీ వాయిస్‑ఫస్ట్ వ్యవసాయ సహాయకుడు",
         "Speak in your language, manage farms, test soil with camera, and track market prices — all in a simple, mobile‑first app.":
-          "మీ భాషలో మాట్లాడండి, ఫార్మ్‌లను నిర్వహించండి, కెమెరాతో మట్టి పరీక్ష చేయండి, మరియు మార్కెట్ ధరలను ట్రాక్ చేయండి — ఇవన్నీ ఒక సాధారణ, మొబైల్‑ఫస్ట్ యాప్‌లో.",
+          "మీ భాషలో మాట్లాడండి, ఫార్మ్‌లను నిర్వహించండి, కెమెరాతో మట్టి పరీక్ష చేయండి, మరియు మార్కెట్ ధరలు ట్రాక్ చేయండి — ఇవన్నీ ఒక సాధారణ, మొబైల్‑ఫస్ట్ యాప్‌లో.",
         "Open App": "యాప్ ఓపెన్ చేయండి",
         "See Market Prices": "మార్కెట్ ధరలు చూడండి",
         "Private & secure. You control your data.": "గోప్యత & భద్రత. మీ డేటా మీదే నియంత్రణ.",
@@ -169,6 +239,19 @@ export default function Landing() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      {setupLoading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/70 backdrop-blur">
+          <div className="rounded-2xl border bg-card/80 px-6 py-5 text-center shadow-lg">
+            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Setting up your experience...
+            </div>
+            <div className="mt-2 text-xs text-muted-foreground">
+              Detecting your location and language preferences
+            </div>
+          </div>
+        </div>
+      )}
       {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 -z-10">
