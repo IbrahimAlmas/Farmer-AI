@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Farmers Hub Crest">
   <defs>
-    <!-- Emerald → Cyan core gradient -->
+    <!-- Core gradient: Deep purple -->
     <linearGradient id="core" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="oklch(0.78 0.15 170)"/>
-      <stop offset="100%" stop-color="oklch(0.62 0.15 170)"/>
+      <stop offset="0%" stop-color="oklch(0.78 0.22 300)"/>
+      <stop offset="100%" stop-color="oklch(0.62 0.22 300)"/>
     </linearGradient>
-    <!-- Glow ring -->
+    <!-- Glow ring tuned to purple -->
     <radialGradient id="glow" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="oklch(0.70 0.12 170)" stop-opacity="0.18"/>
-      <stop offset="100%" stop-color="oklch(0.70 0.12 170)" stop-opacity="0"/>
+      <stop offset="0%" stop-color="oklch(0.70 0.12 300)" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="oklch(0.70 0.12 300)" stop-opacity="0"/>
     </radialGradient>
     <filter id="soft" x="-25%" y="-25%" width="150%" height="150%">
       <feGaussianBlur stdDeviation="10"/>
@@ -23,24 +23,19 @@
   <path d="M256 76c74 0 160 28 160 112 0 138-96 214-160 240-64-26-160-102-160-240 0-84 86-112 160-112z"
         fill="url(#core)"/>
 
-  <!-- Central wheat bundle: minimalist, geometric -->
+  <!-- Central wheat bundle -->
   <g transform="translate(0,-6)" stroke="white" stroke-linecap="round" stroke-linejoin="round">
-    <!-- stem -->
     <path d="M256 148v208" stroke-width="12"/>
-    <!-- leaves left -->
     <g stroke-width="10">
       <path d="M256 188c-44-6-74-28-90-62" opacity="0.9"/>
       <path d="M256 220c-52-6-92-34-110-78" opacity="0.8"/>
       <path d="M256 252c-56-6-100-40-124-92" opacity="0.7"/>
     </g>
-    <!-- leaves right -->
     <g stroke-width="10">
       <path d="M256 188c44-6 74-28 90-62" opacity="0.9"/>
       <path d="M256 220c52-6 92-34 110-78" opacity="0.8"/>
       <path d="M256 252c56-6 100-40 124-92" opacity="0.7"/>
     </g>
-
-    <!-- grain kernels (stylized diamonds) -->
     <g fill="white" stroke="none" opacity="0.95">
       <path d="M256 168l10 10-10 10-10-10z"/>
       <path d="M256 200l9 9-9 9-9-9z" opacity="0.92"/>
@@ -54,7 +49,6 @@
   <g transform="translate(0,6)">
     <path d="M188 372c24 12 48 22 68 28 20-6 44-16 68-28l-20 38-48 18-48-18-20-38z"
           fill="white" opacity="0.9"/>
-    <!-- soft under-glow -->
-    <ellipse cx="256" cy="430" rx="92" ry="18" fill="oklch(0.16 0.03 200)" opacity="0.07" filter="url(#soft)"/>
+    <ellipse cx="256" cy="430" rx="92" ry="18" fill="oklch(0.16 0.03 260)" opacity="0.07" filter="url(#soft)"/>
   </g>
 </svg>
