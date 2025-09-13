@@ -316,7 +316,7 @@ export default function Landing() {
         <section className="relative overflow-hidden">
           <div className="absolute inset-0 -z-10">
             <img
-              src="/logo_bg.png"
+              src="https://harmless-tapir-303.convex.cloud/api/storage/780dfc84-c9c5-4e98-af67-ca01ac5a3d12"
               alt="Background"
               className="h-full w-full object-cover opacity-70"
               loading="eager"
@@ -385,7 +385,7 @@ export default function Landing() {
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 -z-10">
           <img
-            src="/logo_bg.png"
+            src="https://harmless-tapir-303.convex.cloud/api/storage/780dfc84-c9c5-4e98-af67-ca01ac5a3d12"
             alt="Hero background"
             className="h-full w-full object-cover opacity-70"
             loading="eager"
