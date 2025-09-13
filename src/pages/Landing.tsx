@@ -400,7 +400,8 @@ export default function Landing() {
               animate={{ opacity: 1, y: 0 }}
               className="min-h-[70vh] flex flex-col items-center justify-center text-center pt-8 pb-12"
             >
-              <h1 className="text-[34px] sm:text-[44px] font-extrabold leading-tight tracking-tight">
+              {/* Make headline larger for stronger impact */}
+              <h1 className="text-[40px] sm:text-[52px] font-extrabold leading-tight tracking-tight">
                 <span className="bg-gradient-to-r from-amber-400 via-white to-cyan-300 bg-clip-text text-transparent">
                   Welcome.
                 </span>
@@ -409,6 +410,7 @@ export default function Landing() {
               <p className="mt-3 text-sm sm:text-base text-white/70 max-w-xl">
                 Choose your preferred language to personalize a smooth, voice‑first experience.
               </p>
+
               {/* Compact feature chips to reduce empty space on mobile */}
               <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
                 <span className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-3 py-1.5 text-xs text-white/90">
@@ -421,6 +423,39 @@ export default function Landing() {
                   <ShoppingCart className="h-3.5 w-3.5" /> Market Prices
                 </span>
               </div>
+
+              {/* New: mini highlights grid to fill space and add visual interest */}
+              <div className="mt-6 grid grid-cols-2 gap-3 w-full max-w-md px-2">
+                <div className="rounded-2xl border border-white/15 bg-white/5 backdrop-blur p-3 text-left">
+                  <div className="flex items-center gap-2 text-white">
+                    <Mic className="h-4 w-4" />
+                    <div className="text-sm font-medium">Talk in your language</div>
+                  </div>
+                  <div className="text-[11px] text-white/70 mt-1">Telugu, Hindi, English and more</div>
+                </div>
+                <div className="rounded-2xl border border-white/15 bg-white/5 backdrop-blur p-3 text-left">
+                  <div className="flex items-center gap-2 text-white">
+                    <Camera className="h-4 w-4" />
+                    <div className="text-sm font-medium">Camera Soil Test</div>
+                  </div>
+                  <div className="text-[11px] text-white/70 mt-1">Snap photos for instant tips</div>
+                </div>
+                <div className="rounded-2xl border border-white/15 bg-white/5 backdrop-blur p-3 text-left">
+                  <div className="flex items-center gap-2 text-white">
+                    <ShoppingCart className="h-4 w-4" />
+                    <div className="text-sm font-medium">Local Market Prices</div>
+                  </div>
+                  <div className="text-[11px] text-white/70 mt-1">Indicative rates near you</div>
+                </div>
+                <div className="rounded-2xl border border-white/15 bg-white/5 backdrop-blur p-3 text-left">
+                  <div className="flex items-center gap-2 text-white">
+                    <Sprout className="h-4 w-4" />
+                    <div className="text-sm font-medium">Manage Your Farm</div>
+                  </div>
+                  <div className="text-[11px] text-white/70 mt-1">Simple actions, clear progress</div>
+                </div>
+              </div>
+
               <div className="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 justify-center">
                 <Button
                   className="rounded-2xl px-6 py-5 text-base bg-gradient-to-r from-amber-500 via-primary to-cyan-500 text-primary-foreground hover:opacity-90 w-full sm:w-auto"
