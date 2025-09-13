@@ -2,7 +2,7 @@ import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { api } from "@/convex/_generated/api";
-import { useAction } from "convex/react";
+import { useAction, useMutation } from "convex/react";
 import { useState } from "react";
 
 type Analysis = {
@@ -17,8 +17,42 @@ type Analysis = {
 
 export default function SoilTest() {
   const analyzeMock = useAction(api.soil.analyzeMock);
+  const getUploadUrl = useMutation(api.soil_upload.getUploadUrl);
+  const analyzeImage = useAction(api.soil.analyzeImage);
+
   const [result, setResult] = useState<Analysis | null>(null);
   const [loading, setLoading] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+
+  const onSelectFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    setFile(f);
+    const url = URL.createObjectURL(f);
+    setPreview(url);
+  };
+
+  const runCameraAnalysis = async () => {
+    if (!file) return;
+    setLoading(true);
+    setResult(null);
+    try {
+      const uploadUrl = await getUploadUrl({});
+      const res = await fetch(uploadUrl, {
+        method: "POST",
+        headers: { "Content-Type": file.type || "application/octet-stream" },
+        body: file,
+      });
+      const json = (await res.json()) as { storageId: string };
+      const analysis = await analyzeImage({ imageId: json.storageId as any });
+      setResult(analysis as any);
+    } catch {
+      setResult(null);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const run = async () => {
     setLoading(true);
@@ -35,6 +69,33 @@ export default function SoilTest() {
   return (
     <AppShell title="Soil Test">
       <div className="p-4 space-y-4">
+        <Card>
+          <CardHeader><CardTitle>Camera Analysis (AI)</CardTitle></CardHeader>
+          <CardContent className="space-y-3">
+            <input
+              type="file"
+              accept="image/*"
+              capture="environment"
+              onChange={onSelectFile}
+            />
+            {preview && (
+              <img
+                src={preview}
+                alt="Soil preview"
+                className="w-full rounded-md border"
+              />
+            )}
+            <div className="flex gap-2">
+              <Button onClick={runCameraAnalysis} disabled={loading || !file}>
+                {loading ? "Analyzing..." : "Analyze Photo"}
+              </Button>
+              <Button variant="outline" onClick={() => { setFile(null); setPreview(null); setResult(null); }}>
+                Clear
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
         <Card>
           <CardHeader><CardTitle>Quick Mock Analysis</CardTitle></CardHeader>
           <CardContent className="space-y-3">

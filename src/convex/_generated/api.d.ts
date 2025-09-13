@@ -24,6 +24,7 @@ import type * as resources from "../resources.js";
 import type * as seed from "../seed.js";
 import type * as sims from "../sims.js";
 import type * as soil from "../soil.js";
+import type * as soil_upload from "../soil_upload.js";
 import type * as tasks from "../tasks.js";
 import type * as users from "../users.js";
 import type * as voice from "../voice.js";
@@ -48,6 +49,7 @@ declare const fullApi: ApiFromModules<{
   seed: typeof seed;
   sims: typeof sims;
   soil: typeof soil;
+  soil_upload: typeof soil_upload;
   tasks: typeof tasks;
   users: typeof users;
   voice: typeof voice;
