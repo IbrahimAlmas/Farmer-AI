@@ -2,13 +2,14 @@ import { Button } from "@/components/ui/button";
 import { Mic, MicOff } from "lucide-react";
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 
 type Props = {
   onTranscript?: (text: string) => void;
   onRecordingChange?: (recording: boolean) => void;
   disabled?: boolean;
   className?: string;
-  transcribe: (args: { audio: ArrayBuffer; language?: string }) => Promise<string>;
+  transcribe: (args: { audio: ArrayBuffer; language?: string; contentType?: string; filename?: string }) => Promise<string>;
   language?: string;
 };
 
@@ -24,41 +25,86 @@ export default function VoiceButton({
   const [supported, setSupported] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<BlobPart[]>([]);
+  const mimeRef = useRef<string | null>(null);
 
   useEffect(() => {
-    setSupported(typeof MediaRecorder !== "undefined");
+    setSupported(typeof MediaRecorder !== "undefined" && !!navigator.mediaDevices?.getUserMedia);
   }, []);
 
-  async function start() {
-    if (!supported || disabled) return;
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    const mr = new MediaRecorder(stream, { mimeType: "audio/webm;codecs=opus" });
-    chunksRef.current = [];
-    mr.ondataavailable = (e) => {
-      if (e.data && e.data.size > 0) chunksRef.current.push(e.data);
-    };
-    mr.onstop = async () => {
-      const blob = new Blob(chunksRef.current, { type: "audio/webm" });
-      const buf = await blob.arrayBuffer();
-      try {
-        const text = await transcribe({ audio: buf, language });
-        onTranscript?.(text);
-      } catch (e) {
-        console.error("Transcription failed", e);
+  function getSupportedMime(): string | null {
+    const candidates: Array<string> = [
+      "audio/webm;codecs=opus",
+      "audio/ogg;codecs=opus",
+      "audio/mp4",
+      "audio/mpeg",
+      "audio/webm",
+      "audio/ogg",
+    ];
+    for (const c of candidates) {
+      if ((window as any).MediaRecorder && (MediaRecorder as any).isTypeSupported?.(c)) {
+        return c;
       }
-      (stream.getTracks() || []).forEach((t) => t.stop());
-    };
-    mediaRecorderRef.current = mr;
-    mr.start();
-    setRecording(true);
-    onRecordingChange?.(true);
+    }
+    return null;
+  }
+
+  async function start() {
+    if (!supported || disabled) {
+      toast.error("Voice recording is not supported on this device/browser.");
+      return;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const chosen = getSupportedMime();
+      mimeRef.current = chosen;
+      const mr = chosen ? new MediaRecorder(stream, { mimeType: chosen }) : new MediaRecorder(stream);
+      chunksRef.current = [];
+      mr.ondataavailable = (e) => {
+        if (e.data && e.data.size > 0) chunksRef.current.push(e.data);
+      };
+      mr.onstop = async () => {
+        const blobType = mimeRef.current ?? "audio/webm";
+        const blob = new Blob(chunksRef.current, { type: blobType });
+        const buf = await blob.arrayBuffer();
+        // derive filename extension
+        const ext =
+          blobType.includes("mp4") ? "mp4" :
+          blobType.includes("mpeg") ? "mp3" :
+          blobType.includes("ogg") ? "ogg" :
+          "webm";
+        try {
+          const text = await transcribe({ audio: buf, language, contentType: blobType, filename: `audio.${ext}` });
+          onTranscript?.(text);
+        } catch (e: any) {
+          toast.error(e?.message ?? "Transcription failed");
+          console.error("Transcription failed", e);
+        }
+        (stream.getTracks() || []).forEach((t) => t.stop());
+      };
+      mediaRecorderRef.current = mr;
+      mr.start();
+      setRecording(true);
+      onRecordingChange?.(true);
+    } catch (err: any) {
+      toast.error(err?.message ?? "Microphone permission denied");
+      console.error("Failed to start recording", err);
+    }
   }
 
   function stop() {
-    mediaRecorderRef.current?.stop();
+    try {
+      mediaRecorderRef.current?.stop();
+    } catch {
+      // ignore
+    }
     setRecording(false);
     onRecordingChange?.(false);
   }
+
+  const toggle = () => {
+    if (!recording) start();
+    else stop();
+  };
 
   return (
     <motion.div
@@ -81,6 +127,7 @@ export default function VoiceButton({
           e.preventDefault();
           stop();
         }}
+        onClick={toggle}
         disabled={disabled || !supported}
       >
         {recording ? <MicOff className="h-6 w-6" /> : <Mic className="h-6 w-6" />}

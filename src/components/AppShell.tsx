@@ -170,10 +170,10 @@ export function AppShell({ children, title }: AppShellProps) {
 
       {/* Voice Button (floats above nav safely) */}
       <VoiceButton
-        className="z-50 !bottom-[92px] sm:!bottom-[92px]" // keeps above the nav; safe for most phones
+        className="z-50 !bottom-[92px] sm:!bottom-[92px]"
         onTranscript={handleVoiceCommand}
-        transcribe={({ audio, language }) =>
-          transcribe({ audio, language: language ?? localeFromLang(currentLang) })
+        transcribe={({ audio, language, contentType, filename }) =>
+          transcribe({ audio, language: language ?? localeFromLang(currentLang), contentType, filename })
         }
         language={localeFromLang(currentLang)}
       />

@@ -84,9 +84,14 @@ export const stt = action({
   args: {
     audio: v.bytes(),
     language: v.optional(v.string()),
+    // Accept content type and filename from client to support Safari/OGG/MP4, etc.
+    contentType: v.optional(v.string()),
+    filename: v.optional(v.string()),
   },
   handler: async (_ctx, args) => {
     const language = args.language ?? "en-IN";
+    const contentType = args.contentType ?? "audio/webm";
+    const filename = args.filename ?? "audio.webm";
 
     // Using multipart/form-data for audio upload if required by provider
     const formDataBoundary = `----convexboundary${Math.random().toString(16).slice(2)}`;
@@ -119,7 +124,7 @@ export const stt = action({
     // Hypothetical model name; adjust to your Sarvam account/models
     pushTextField("model", "saarika:v2");
     pushTextField("language", language);
-    pushFileField("audio", "audio.webm", "audio/webm", args.audio);
+    pushFileField("audio", filename, contentType, args.audio);
 
     parts.push(Buffer.from(`${ending}\r\n`));
     const body = Buffer.concat(parts);
