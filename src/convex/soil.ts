@@ -38,6 +38,59 @@ export const analyzeImage = action({
     }
 
     try {
+      // Pre-check: Verify the image is a soil photo before analysis
+      const verifyPrompt =
+        "You are an image verifier. Determine if the provided image is primarily a photo of soil, farmland ground, a soil profile/sample, or soil surface close-up suitable for soil analysis. " +
+        "If it's anything else (people, animals, documents, sky, plants/leaves only, buildings, generic scenery, etc.), return isSoil=false. " +
+        "Return ONLY strict JSON with exactly these keys and types, no prose: { \"isSoil\": boolean, \"reason\": string }";
+
+      const verifyUserContent = [
+        { type: "text", text: "Is this a soil photo suitable for soil analysis? Respond only with JSON." },
+        { type: "image_url", image_url: { url: imageUrl } },
+      ];
+
+      const verifyBody = {
+        model: "openai/gpt-4o-mini",
+        messages: [
+          { role: "system", content: verifyPrompt },
+          { role: "user", content: verifyUserContent as any },
+        ],
+        temperature: 0.0,
+        response_format: { type: "json_object" },
+      };
+
+      const verifyRes = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+        },
+        body: JSON.stringify(verifyBody),
+      });
+
+      if (!verifyRes.ok) {
+        const t = await verifyRes.text().catch(() => "");
+        throw new Error(`AI verification failed: ${verifyRes.status} ${t}`);
+      }
+
+      const verifyJson = (await verifyRes.json()) as any;
+      const verifyContent = verifyJson?.choices?.[0]?.message?.content ?? "";
+      let verifyParsed: any = null;
+      if (typeof verifyContent === "string") {
+        try {
+          verifyParsed = JSON.parse(verifyContent);
+        } catch {
+          const m = verifyContent.match(/\{[\s\S]*\}/);
+          if (m) verifyParsed = JSON.parse(m[0]);
+        }
+      } else if (typeof verifyContent === "object" && verifyContent !== null) {
+        verifyParsed = verifyContent;
+      }
+
+      if (!verifyParsed || verifyParsed.isSoil !== true) {
+        throw new Error("Please add a photo of soil");
+      }
+
       // Strengthened system prompt + strict JSON response
       const systemPrompt =
         "You are an agronomy expert. Analyze the provided soil photo and estimate key soil metrics. " +
