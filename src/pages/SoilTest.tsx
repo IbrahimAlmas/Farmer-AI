@@ -35,6 +35,7 @@ export default function SoilTest() {
   const [cameraReady, setCameraReady] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const [step, setStep] = useState<"capture" | "review" | "results">("capture");
 
   // Start camera automatically on mount
   useEffect(() => {
@@ -90,6 +91,7 @@ export default function SoilTest() {
     }
     setCameraOn(false);
     setCameraReady(false);
+    setStep("capture"); // ensure step resets if camera is stopped
   };
 
   const startCamera = async () => {
@@ -134,6 +136,7 @@ export default function SoilTest() {
           setFile(photoFile);
           const previewUrl = URL.createObjectURL(photoFile);
           setPreview(previewUrl);
+          setStep("review"); // move to review after capture
           resolve();
         },
         "image/jpeg",
@@ -148,6 +151,7 @@ export default function SoilTest() {
     setFile(f);
     const url = URL.createObjectURL(f);
     setPreview(url);
+    setStep("review"); // move to review after selecting
   };
 
   const runCameraAnalysis = async () => {
@@ -164,6 +168,7 @@ export default function SoilTest() {
       const json = (await res.json()) as { storageId: string };
       const analysis = await analyzeImage({ imageId: json.storageId as any });
       setResult(analysis as any);
+      setStep("results"); // move to results
     } catch {
       setResult(null);
     } finally {
@@ -176,6 +181,7 @@ export default function SoilTest() {
     try {
       const res = await analyzeMock({});
       setResult(res as any);
+      setStep("results");
     } catch {
       setResult(null);
     } finally {
@@ -188,70 +194,29 @@ export default function SoilTest() {
       <div className="relative">
         {/* Decorative background */}
         <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-          <div className="absolute -top-20 -left-20 h-60 w-60 rounded-full bg-gradient-to-br from-emerald-400/20 to-teal-400/10 blur-3xl" />
+          <div className="absolute -top-24 -left-24 h-72 w-72 rounded-full bg-gradient-to-br from-emerald-400/20 to-teal-400/10 blur-3xl" />
           <div className="absolute -bottom-24 -right-16 h-72 w-72 rounded-full bg-gradient-to-br from-sky-400/20 to-indigo-400/10 blur-3xl" />
         </div>
 
-        <div className="p-4 space-y-6">
-          {/* Header band with subtle glass effect */}
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="grid gap-3 md:grid-cols-3"
-          >
-            <Card className="backdrop-blur supports-[backdrop-filter]:bg-card/70">
-              <CardContent className="p-3">
-                <div className="text-xs text-muted-foreground mb-1">Camera</div>
-                <div className="flex items-center justify-between">
-                  <div className="font-medium">{cameraOn ? "Enabled" : "Disabled"}</div>
-                  <Badge variant={cameraReady ? "default" : cameraOn ? "secondary" : "outline"}>
-                    {cameraReady ? "Ready" : cameraOn ? "Loading…" : "Off"}
-                  </Badge>
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="backdrop-blur supports-[backdrop-filter]:bg-card/70">
-              <CardContent className="p-3">
-                <div className="text-xs text-muted-foreground mb-1">Mode</div>
-                <div className="flex items-center justify-between">
-                  <div className="font-medium flex items-center gap-2">
-                    <Sparkles className="h-4 w-4 text-primary" />
-                    AI Photo Analysis
-                  </div>
-                  <Badge variant="outline">Beta</Badge>
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="backdrop-blur supports-[backdrop-filter]:bg-card/70">
-              <CardContent className="p-3">
-                <div className="text-xs text-muted-foreground mb-1">Status</div>
-                <div className="flex items-center justify-between">
-                  <div className="font-medium">
-                    {loading ? "Processing…" : result ? "Results Ready" : "Idle"}
-                  </div>
-                  <Badge variant={loading ? "secondary" : result ? "default" : "outline"}>
-                    {loading ? "Working" : result ? "Done" : "Waiting"}
-                  </Badge>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* Main workspace */}
-          <div className="grid gap-6 md:grid-cols-2">
-            {/* Live Camera */}
-            <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
-              <Card className="overflow-hidden">
+        <div className="p-4">
+          {/* Centered capture step */}
+          {step === "capture" && (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="max-w-2xl mx-auto"
+            >
+              <Card className="overflow-hidden backdrop-blur supports-[backdrop-filter]:bg-card/70">
                 <CardHeader className="pb-2">
                   <CardTitle className="flex items-center gap-2 text-base">
                     <CameraIcon className="h-4 w-4" />
-                    Live Camera
+                    Click Photo
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-3">
+                <CardContent className="space-y-4">
                   <div className="relative rounded-xl border overflow-hidden bg-muted">
                     <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/10 via-transparent to-transparent" />
-                    <div className="aspect-video w-full">
+                    <div className="aspect-[4/3] w-full">
                       <video
                         ref={videoRef}
                         className="h-full w-full object-cover"
@@ -262,78 +227,86 @@ export default function SoilTest() {
                     </div>
 
                     {/* Overlay controls */}
-                    <div className="absolute bottom-3 left-3 right-3 flex items-center gap-2">
-                      <TooltipProvider>
-                        <div className="flex gap-2">
-                          {!cameraOn ? (
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button variant="secondary" onClick={startCamera} className="gap-2">
-                                  <Play className="h-4 w-4" />
-                                  Enable
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>Start your device camera</TooltipContent>
-                            </Tooltip>
-                          ) : (
-                            <>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Button
-                                    onClick={capturePhoto}
-                                    disabled={!cameraReady || loading}
-                                    className="gap-2"
-                                  >
-                                    {loading ? (
-                                      <>
-                                        <RefreshCw className="h-4 w-4 animate-spin" />
-                                        Processing…
-                                      </>
-                                    ) : (
-                                      <>
-                                        <CameraIcon className="h-4 w-4" />
-                                        Capture
-                                      </>
-                                    )}
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>Capture a frame for analysis</TooltipContent>
-                              </Tooltip>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Button variant="outline" onClick={stopCamera} className="gap-2">
-                                    <RefreshCw className="h-4 w-4" />
-                                    Stop
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>Turn off camera</TooltipContent>
-                              </Tooltip>
-                            </>
-                          )}
-                        </div>
-                      </TooltipProvider>
+                    <div className="absolute bottom-3 left-3 right-3 flex items-center justify-center">
+                      <div className="flex flex-wrap gap-2">
+                        {!cameraOn ? (
+                          <Button variant="secondary" onClick={startCamera} className="gap-2">
+                            <Play className="h-4 w-4" />
+                            Enable Camera
+                          </Button>
+                        ) : (
+                          <>
+                            <Button
+                              onClick={capturePhoto}
+                              disabled={!cameraReady || loading}
+                              className="gap-2"
+                            >
+                              {loading ? (
+                                <>
+                                  <RefreshCw className="h-4 w-4 animate-spin" />
+                                  Processing…
+                                </>
+                              ) : (
+                                <>
+                                  <CameraIcon className="h-4 w-4" />
+                                  Click Photo
+                                </>
+                              )}
+                            </Button>
+                            <Button variant="outline" onClick={stopCamera} className="gap-2">
+                              <RefreshCw className="h-4 w-4" />
+                              Stop
+                            </Button>
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
 
                   {cameraError && !cameraReady && (
-                    <div className="text-xs text-red-600">
-                      {cameraError} — You can still upload a photo on the right.
+                    <div className="text-xs text-red-600 text-center">
+                      {cameraError} — You can still upload a photo.
                     </div>
                   )}
 
                   {/* Hidden canvas for capture */}
                   <canvas ref={canvasRef} className="hidden" />
+
+                  {/* Upload alternative */}
+                  <div className="text-center">
+                    <label className="inline-flex items-center gap-2">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        capture="environment"
+                        onChange={onSelectFile}
+                        className="hidden"
+                      />
+                      <Button variant="outline" className="gap-2" asChild>
+                        <span>
+                          <Upload className="h-4 w-4" />
+                          Upload Photo
+                        </span>
+                      </Button>
+                    </label>
+                  </div>
                 </CardContent>
               </Card>
             </motion.div>
+          )}
 
-            {/* Capture, Upload & Analyze */}
-            <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+          {/* Review step: show photo with actions */}
+          {step === "review" && (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="max-w-xl mx-auto"
+            >
               <Card className="overflow-hidden">
                 <CardHeader className="pb-2">
                   <CardTitle className="flex items-center gap-2 text-base">
                     <ImageIcon className="h-4 w-4" />
-                    Capture / Upload & Analyze
+                    Review Photo
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -343,16 +316,11 @@ export default function SoilTest() {
                         <img
                           src={preview}
                           alt="Soil preview"
-                          className="w-full object-cover max-h-[360px]"
+                          className="w-full object-cover max-h-[420px]"
                         />
-                        {/* Action overlay */}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-black/0 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                        <div className="absolute bottom-3 left-3 right-3 flex flex-wrap gap-2">
-                          <Button
-                            onClick={runCameraAnalysis}
-                            disabled={loading || !file}
-                            className="gap-2"
-                          >
+                        <div className="absolute bottom-3 left-3 right-3 flex flex-wrap gap-2 justify-center">
+                          <Button onClick={runCameraAnalysis} disabled={loading || !file} className="gap-2">
                             {loading ? (
                               <>
                                 <RefreshCw className="h-4 w-4 animate-spin" />
@@ -371,19 +339,13 @@ export default function SoilTest() {
                               setFile(null);
                               setPreview(null);
                               setResult(null);
+                              setStep("capture");
+                              startCamera().catch(() => {});
                             }}
                           >
-                            Clear
+                            Retake
                           </Button>
-                        </div>
-                      </>
-                    ) : (
-                      <div className="flex items-center justify-center h-48">
-                        <div className="text-center">
-                          <div className="text-sm text-muted-foreground mb-3">
-                            No image yet. Capture from camera or upload a photo.
-                          </div>
-                          <label className="inline-flex items-center gap-2">
+                          <label>
                             <input
                               type="file"
                               accept="image/*"
@@ -394,22 +356,22 @@ export default function SoilTest() {
                             <Button variant="outline" className="gap-2" asChild>
                               <span>
                                 <Upload className="h-4 w-4" />
-                                Upload Photo
+                                Add More
                               </span>
                             </Button>
                           </label>
                         </div>
+                      </>
+                    ) : (
+                      <div className="flex items-center justify-center h-48">
+                        <div className="text-sm text-muted-foreground">No image selected</div>
                       </div>
                     )}
                   </div>
 
-                  {/* Secondary actions */}
-                  <div className="flex flex-wrap gap-2">
-                    <Button variant="outline" onClick={() => document.querySelector<HTMLInputElement>('input[type="file"]')?.click()} className="gap-2">
-                      <Upload className="h-4 w-4" />
-                      Choose File
-                    </Button>
-                    <Button variant="secondary" onClick={run} disabled={loading} className="gap-2">
+                  {/* Optional: mock analysis */}
+                  <div className="flex justify-center">
+                    <Button variant="ghost" onClick={run} disabled={loading} className="gap-2">
                       {loading ? (
                         <>
                           <RefreshCw className="h-4 w-4 animate-spin" />
@@ -426,90 +388,160 @@ export default function SoilTest() {
                 </CardContent>
               </Card>
             </motion.div>
-          </div>
+          )}
 
-          {/* Results */}
-          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
-            <Card className="overflow-hidden">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base">Analysis Results</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {!result && (
-                  <div className="text-sm text-muted-foreground">
-                    Capture or upload a soil photo and run analysis to see results here.
-                  </div>
-                )}
-
-                {result && (
-                  <div className="space-y-6">
-                    {/* Primary metrics */}
-                    <div className="grid gap-3 sm:grid-cols-2">
-                      <div className="rounded-lg border p-4 bg-muted/30">
-                        <div className="text-xs text-muted-foreground mb-1">pH</div>
-                        <div className="flex items-baseline justify-between">
-                          <div className="text-2xl font-semibold">{result.ph}</div>
-                          <Badge variant="outline">Ideal: 6.0–7.5</Badge>
-                        </div>
-                        <div className="mt-3">
-                          <Progress value={((result.ph - 4) / (9 - 4)) * 100} />
-                        </div>
-                      </div>
-
-                      <div className="rounded-lg border p-4 bg-muted/30">
-                        <div className="text-xs text-muted-foreground mb-1">Moisture</div>
-                        <div className="flex items-baseline justify-between">
-                          <div className="text-2xl font-semibold">{result.moisture}%</div>
-                          <Badge variant="outline">Target: 20–40%</Badge>
-                        </div>
-                        <div className="mt-3">
-                          <Progress value={Math.min(100, Math.max(0, result.moisture))} />
-                        </div>
+          {/* Results step: show photo actions + results below */}
+          {step === "results" && (
+            <div className="max-w-5xl mx-auto space-y-6">
+              {/* Photo + actions */}
+              <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+                <Card className="overflow-hidden">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="flex items-center gap-2 text-base">
+                      <ImageIcon className="h-4 w-4" />
+                      Photo
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="relative rounded-xl border overflow-hidden bg-background">
+                      {preview && (
+                        <img
+                          src={preview}
+                          alt="Soil preview"
+                          className="w-full object-cover max-h-[360px]"
+                        />
+                      )}
+                      <div className="absolute bottom-3 left-3 right-3 flex flex-wrap gap-2 justify-center">
+                        <Button onClick={runCameraAnalysis} disabled={loading || !file} className="gap-2">
+                          {loading ? (
+                            <>
+                              <RefreshCw className="h-4 w-4 animate-spin" />
+                              Re-Analyzing…
+                            </>
+                          ) : (
+                            <>
+                              <Wand2 className="h-4 w-4" />
+                              Analyze Again
+                            </>
+                          )}
+                        </Button>
+                        <Button
+                          variant="secondary"
+                          onClick={() => {
+                            setFile(null);
+                            setPreview(null);
+                            setResult(null);
+                            setStep("capture");
+                            startCamera().catch(() => {});
+                          }}
+                        >
+                          Retake
+                        </Button>
+                        <label>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            capture="environment"
+                            onChange={onSelectFile}
+                            className="hidden"
+                          />
+                          <Button variant="outline" className="gap-2" asChild>
+                            <span>
+                              <Upload className="h-4 w-4" />
+                              Add More
+                            </span>
+                          </Button>
+                        </label>
                       </div>
                     </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
 
-                    {/* Nutrients */}
-                    <div className="grid gap-3 sm:grid-cols-3">
-                      <div className="rounded-lg border p-4">
-                        <div className="text-xs text-muted-foreground mb-1">Nitrogen</div>
-                        <div className="text-xl font-semibold">{result.nitrogen} mg/kg</div>
+              {/* Results */}
+              <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+                <Card className="overflow-hidden">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base">Analysis Results</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {!result && (
+                      <div className="text-sm text-muted-foreground">
+                        No results available. Analyze the photo to see results here.
                       </div>
-                      <div className="rounded-lg border p-4">
-                        <div className="text-xs text-muted-foreground mb-1">Phosphorus</div>
-                        <div className="text-xl font-semibold">{result.phosphorus} mg/kg</div>
-                      </div>
-                      <div className="rounded-lg border p-4">
-                        <div className="text-xs text-muted-foreground mb-1">Potassium</div>
-                        <div className="text-xl font-semibold">{result.potassium} mg/kg</div>
-                      </div>
-                    </div>
+                    )}
 
-                    {/* Organic matter */}
-                    <div className="rounded-lg border p-4 bg-muted/30">
-                      <div className="text-xs text-muted-foreground mb-2">Organic Matter</div>
-                      <div className="flex items-baseline justify-between">
-                        <div className="text-2xl font-semibold">{result.organicMatter}%</div>
-                        <Badge variant="outline">Healthy: 3–6%</Badge>
-                      </div>
-                      <div className="mt-3">
-                        <Progress value={Math.min(100, (result.organicMatter / 6) * 100)} />
-                      </div>
-                    </div>
+                    {result && (
+                      <div className="space-y-6">
+                        {/* Primary metrics */}
+                        <div className="grid gap-3 sm:grid-cols-2">
+                          <div className="rounded-lg border p-4 bg-muted/30">
+                            <div className="text-xs text-muted-foreground mb-1">pH</div>
+                            <div className="flex items-baseline justify-between">
+                              <div className="text-2xl font-semibold">{result.ph}</div>
+                              <Badge variant="outline">Ideal: 6.0–7.5</Badge>
+                            </div>
+                            <div className="mt-3">
+                              <Progress value={((result.ph - 4) / (9 - 4)) * 100} />
+                            </div>
+                          </div>
 
-                    {/* Recommendations */}
-                    <div>
-                      <div className="text-xs text-muted-foreground mb-2">Recommendations</div>
-                      <ul className="list-disc pl-5 space-y-1 text-sm">
-                        {result.recommendations.map((r, i) => (
-                          <li key={i}>{r}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </motion.div>
+                          <div className="rounded-lg border p-4 bg-muted/30">
+                            <div className="text-xs text-muted-foreground mb-1">Moisture</div>
+                            <div className="flex items-baseline justify-between">
+                              <div className="text-2xl font-semibold">{result.moisture}%</div>
+                              <Badge variant="outline">Target: 20–40%</Badge>
+                            </div>
+                            <div className="mt-3">
+                              <Progress value={Math.min(100, Math.max(0, result.moisture))} />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Nutrients */}
+                        <div className="grid gap-3 sm:grid-cols-3">
+                          <div className="rounded-lg border p-4">
+                            <div className="text-xs text-muted-foreground mb-1">Nitrogen</div>
+                            <div className="text-xl font-semibold">{result.nitrogen} mg/kg</div>
+                          </div>
+                          <div className="rounded-lg border p-4">
+                            <div className="text-xs text-muted-foreground mb-1">Phosphorus</div>
+                            <div className="text-xl font-semibold">{result.phosphorus} mg/kg</div>
+                          </div>
+                          <div className="rounded-lg border p-4">
+                            <div className="text-xs text-muted-foreground mb-1">Potassium</div>
+                            <div className="text-xl font-semibold">{result.potassium} mg/kg</div>
+                          </div>
+                        </div>
+
+                        {/* Organic matter */}
+                        <div className="rounded-lg border p-4 bg-muted/30">
+                          <div className="text-xs text-muted-foreground mb-2">Organic Matter</div>
+                          <div className="flex items-baseline justify-between">
+                            <div className="text-2xl font-semibold">{result.organicMatter}%</div>
+                            <Badge variant="outline">Healthy: 3–6%</Badge>
+                          </div>
+                          <div className="mt-3">
+                            <Progress value={Math.min(100, (result.organicMatter / 6) * 100)} />
+                          </div>
+                        </div>
+
+                        {/* Recommendations */}
+                        <div>
+                          <div className="text-xs text-muted-foreground mb-2">Recommendations</div>
+                          <ul className="list-disc pl-5 space-y-1 text-sm">
+                            {result.recommendations.map((r, i) => (
+                              <li key={i}>{r}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </div>
+          )}
         </div>
       </div>
     </AppShell>
