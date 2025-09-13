@@ -414,7 +414,11 @@ export default function Landing() {
                   <Button
                     variant="outline"
                     className="rounded-2xl px-5 py-5 text-base"
-                    onClick={() => navigate(-1)}
+                    onClick={() => {
+                      // Go back to language selection page
+                      setPostGate(false);
+                      setGateOpen(true);
+                    }}
                   >
                     Back
                   </Button>
