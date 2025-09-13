@@ -315,9 +315,19 @@ export default function Landing() {
   if (gateOpen) {
     return (
       <div className="min-h-screen relative overflow-hidden bg-black">
+        {/* New: impact background image + vignette */}
+        <div className="absolute inset-0 -z-30">
+          <img
+            src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1600&auto=format&fit=crop"
+            alt="Farm fields at dusk"
+            className="h-full w-full object-cover"
+            loading="eager"
+          />
+        </div>
+        <div className="absolute inset-0 -z-25 bg-gradient-to-b from-black/70 via-black/60 to-black/80" />
+
         {/* Edge-to-edge background sweep (amber->purple) */}
         <div className="absolute inset-0 -z-20 bg-gradient-to-br from-amber-500/30 via-transparent to-primary/30" />
-
         {/* Decorative flowing wave like reference */}
         <div className="pointer-events-none absolute inset-0 -z-10 opacity-90">
           <svg viewBox="0 0 1440 700" xmlns="http://www.w3.org/2000/svg" className="h-full w-full">
