@@ -508,16 +508,29 @@ export default function Landing() {
     <div className="min-h-screen flex flex-col">
       {/* Hero */}
       <section className="relative overflow-hidden">
+        {/* REPLACED: static background image with rotating live background */}
         <div className="absolute inset-0 -z-10">
-          <img
-            src="/logo_bg.svg"
-            alt="Hero background"
-            className="h-full w-full object-cover opacity-70"
-            loading="eager"
-          />
+          {/* Cross-fade rotating images */}
+          <div className="absolute inset-0">
+            {bgImages.map((src, i) => (
+              <img
+                key={src}
+                src={src}
+                alt="Hero background"
+                className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-700 ${bgIndex === i ? "opacity-100" : "opacity-0"}`}
+                loading={i === 0 ? "eager" : "lazy"}
+                onError={(e) => {
+                  const t = e.currentTarget as HTMLImageElement;
+                  if (t.src !== "/logo_bg.svg") t.src = "/logo_bg.svg";
+                  t.onerror = null;
+                }}
+              />
+            ))}
+          </div>
+          {/* Vignette + gradient overlays */}
+          <div className="absolute inset-0 bg-black/40" />
           <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-background/70 to-background" />
         </div>
-
         <div className="mx-auto w-full max-w-5xl px-4 pt-24 pb-16">
           {/* Top-right language selector for landing */}
           <div className="flex justify-end">
