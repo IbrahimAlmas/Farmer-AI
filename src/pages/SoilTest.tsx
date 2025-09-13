@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { api } from "@/convex/_generated/api";
 import { useAction, useMutation } from "convex/react";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 type Analysis = {
   ph: number;
@@ -24,6 +24,118 @@ export default function SoilTest() {
   const [loading, setLoading] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [cameraOn, setCameraOn] = useState(false);
+  const [cameraReady, setCameraReady] = useState(false);
+  const [cameraError, setCameraError] = useState<string | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+
+  // Start camera automatically on mount
+  useEffect(() => {
+    let didCancel = false;
+    (async () => {
+      try {
+        if (!navigator.mediaDevices?.getUserMedia) {
+          setCameraError("Camera not supported on this device/browser.");
+          return;
+        }
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: "environment" } },
+          audio: false,
+        });
+        if (didCancel) {
+          // If component unmounted early, stop tracks
+          stream.getTracks().forEach((t) => t.stop());
+          return;
+        }
+        streamRef.current = stream;
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          await videoRef.current.play().catch(() => {});
+        }
+        setCameraOn(true);
+        setCameraReady(true);
+        setCameraError(null);
+      } catch (e: any) {
+        setCameraError(e?.message ?? "Unable to access camera.");
+        setCameraOn(false);
+        setCameraReady(false);
+      }
+    })();
+    return () => {
+      didCancel = true;
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((t) => t.stop());
+        streamRef.current = null;
+      }
+      if (videoRef.current) {
+        videoRef.current.srcObject = null;
+      }
+    };
+  }, []);
+
+  const stopCamera = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((t) => t.stop());
+      streamRef.current = null;
+    }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+    setCameraOn(false);
+    setCameraReady(false);
+  };
+
+  const startCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: "environment" } },
+        audio: false,
+      });
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        await videoRef.current.play().catch(() => {});
+      }
+      setCameraOn(true);
+      setCameraReady(true);
+      setCameraError(null);
+    } catch (e: any) {
+      setCameraError(e?.message ?? "Unable to access camera.");
+      setCameraOn(false);
+      setCameraReady(false);
+    }
+  };
+
+  const capturePhoto = async () => {
+    if (!videoRef.current || !canvasRef.current) return;
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    const width = video.videoWidth || 1280;
+    const height = video.videoHeight || 720;
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    ctx.drawImage(video, 0, 0, width, height);
+
+    // Convert to blob, then File for upload
+    await new Promise<void>((resolve) => {
+      canvas.toBlob(
+        async (blob) => {
+          if (!blob) return resolve();
+          const photoFile = new File([blob], "soil.jpg", { type: "image/jpeg" });
+          setFile(photoFile);
+          const previewUrl = URL.createObjectURL(photoFile);
+          setPreview(previewUrl);
+          resolve();
+        },
+        "image/jpeg",
+        0.92,
+      );
+    });
+  };
 
   const onSelectFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
@@ -72,12 +184,43 @@ export default function SoilTest() {
         <Card>
           <CardHeader><CardTitle>Camera Analysis (AI)</CardTitle></CardHeader>
           <CardContent className="space-y-3">
-            <input
-              type="file"
-              accept="image/*"
-              capture="environment"
-              onChange={onSelectFile}
-            />
+            {/* Live Camera */}
+            <div className="space-y-2">
+              <div className="aspect-video w-full rounded-md border overflow-hidden bg-black">
+                <video
+                  ref={videoRef}
+                  className="h-full w-full object-cover"
+                  playsInline
+                  muted
+                  autoPlay
+                />
+              </div>
+              {!cameraReady && cameraError && (
+                <div className="text-xs text-red-600">
+                  {cameraError} — You can still upload a photo below.
+                </div>
+              )}
+              <div className="flex gap-2">
+                {!cameraOn ? (
+                  <Button variant="secondary" onClick={startCamera}>
+                    Enable Camera
+                  </Button>
+                ) : (
+                  <>
+                    <Button onClick={capturePhoto} disabled={!cameraReady || loading}>
+                      {loading ? "Processing..." : "Capture Photo"}
+                    </Button>
+                    <Button variant="outline" onClick={stopCamera}>
+                      Stop Camera
+                    </Button>
+                  </>
+                )}
+              </div>
+              {/* Hidden canvas for capture */}
+              <canvas ref={canvasRef} className="hidden" />
+            </div>
+
+            {/* Preview & Upload Flow */}
             {preview && (
               <img
                 src={preview}
@@ -85,6 +228,18 @@ export default function SoilTest() {
                 className="w-full rounded-md border"
               />
             )}
+
+            {/* Fallback file input */}
+            <div className="space-y-2">
+              <div className="text-xs text-muted-foreground">Or upload a photo:</div>
+              <input
+                type="file"
+                accept="image/*"
+                capture="environment"
+                onChange={onSelectFile}
+              />
+            </div>
+
             <div className="flex gap-2">
               <Button onClick={runCameraAnalysis} disabled={loading || !file}>
                 {loading ? "Analyzing..." : "Analyze Photo"}
