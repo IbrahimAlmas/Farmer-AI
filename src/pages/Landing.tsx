@@ -3,14 +3,132 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowRight, Mic, Sprout, Camera, ShoppingCart, Languages, ShieldCheck } from "lucide-react";
 import { useNavigate } from "react-router";
-import { useQuery } from "convex/react";
+import { useMemo } from "react";
+ // removed duplicate import of useQuery
 import { api } from "@/convex/_generated/api";
 import LanguageSelect from "@/components/LanguageSelect";
+import { useAction, useMutation, useQuery } from "convex/react";
+import { toast } from "sonner";
 
 export default function Landing() {
   const navigate = useNavigate();
+  const updateProfile = useMutation(api.profiles.update);
+  const tts = useAction(api.voice.tts);
+
+  // Map Indian states to regional language codes (fallbacks to Hindi for some)
+  const stateToLang = (state?: string): string | null => {
+    if (!state) return null;
+    const s = state.toLowerCase();
+    const map: Record<string, string> = {
+      "tamil nadu": "ta",
+      "andhra pradesh": "te",
+      "telangana": "te",
+      "kerala": "ml",
+      "karnataka": "kn",
+      "delhi": "hi",
+      "nct of delhi": "hi",
+      "uttar pradesh": "hi",
+      "uttarakhand": "hi",
+      "haryana": "hi",
+      "punjab": "pa",
+      "west bengal": "bn",
+      "maharashtra": "mr",
+      "gujarat": "gu",
+      "odisha": "or",
+      "assam": "as",
+      "bihar": "hi", // Bhojpuri optional; keep Hindi for stability
+      "madhya pradesh": "hi",
+      "rajasthan": "hi",
+      "chandigarh": "hi",
+      "goa": "mr",
+    };
+    return map[s] ?? null;
+  };
+
+  // Normalize browser locale to our short code
+  const localeToLang = (loc: string | undefined | null): string => {
+    const l = String(loc || "").toLowerCase();
+    const known = ["te","ta","ml","kn","hi","bn","mr","gu","pa","or","as","bho","en"];
+    const found = known.find((k) => l.startsWith(k));
+    return found || "en";
+  };
+
+  // Auto-localize: if user is logged in and prefers English, set to regional language based on saved state or browser locale
+  // Do NOT run for unauthenticated users (profile === null) to avoid errors
+  // Do NOT override if user already picked a non-English language
+  // Runs once when profile is loaded
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const profile = useQuery(api.profiles.get);
   const currentLang = String(profile?.preferredLang || "en");
+
+  // Auto-set preferred language once based on profile state or browser locale
+  // Only if profile exists (authenticated) and currently "en"
+  // This avoids surprise changes for users who already chose a language.
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useMemo(() => {
+    (async () => {
+      if (!profile) return; // not authenticated
+      const current = String(profile.preferredLang || "en");
+      if (current !== "en") return;
+
+      const fromState = stateToLang(profile.location?.state);
+      const nextLang = fromState || localeToLang(navigator.language);
+      if (nextLang && nextLang !== current) {
+        try {
+          await updateProfile({ preferredLang: nextLang });
+          toast.success("Language set based on your region");
+        } catch (e: any) {
+          // non-blocking
+        }
+      }
+    })();
+  }, [profile, updateProfile]);
+
+  // Localized voice intro strings
+  const greetings: Record<string, string> = {
+    ta: "வணக்கம்! நான் கிருஷிமித்ரா, உங்கள் விவசாய உதவியாளர்!",
+    te: "నమస్కారం! నేను కృషిమిత్ర, మీ వ్యవసాయ సహాయకుడు!",
+    ml: "നമസ്കാരം! ഞാൻ കൃഷിമിത്ര, നിങ്ങളുടെ കൃഷി സഹായി!",
+    kn: "ನಮಸ್ಕಾರ! ನಾನು ಕೃಷಿಮಿತ್ರ, ನಿಮ್ಮ ಕೃಷಿ ಸಹಾಯಕ!",
+    hi: "नमस्कार! मैं कृषिमित्र, आपका कृषि सहायक हूँ!",
+    bn: "নমস্কার! আমি কৃষিমিত্র, আপনার কৃষি সহকারী!",
+    mr: "नमस्कार! मी कृषीमित्र, तुमचा शेती सहाय्यक!",
+    gu: "નમસ્કાર! હું કૃષિમિત્ર, તમારો કૃષિ સહાયક!",
+    pa: "ਸਤ ਸ੍ਰੀ ਅਕਾਲ! ਮੈਂ ਕ੍ਰਿਸ਼ੀਮਿਤ੍ਰ, ਤੁਹਾਡਾ ਖੇਤੀ ਸਹਾਇਕ!",
+    or: "ନମସ୍କାର! ମୁଁ କୃଷିମିତ୍ର, ଆପଣଙ୍କ କୃଷି ସହାୟକ!",
+    as: "নমস্কাৰ! মই কৃষিমিত্ৰ, আপোনাৰ কৃষি সহায়ক!",
+    bho: "प्रणाम! हम कृषिमित्र, तोहार खेती सहायक बानी!",
+    en: "Hello! I am KrishiMitra, your farming assistant!",
+  };
+
+  const langToBCP47: Record<string, string> = {
+    te: "te-IN",
+    ta: "ta-IN",
+    ml: "ml-IN",
+    kn: "kn-IN",
+    hi: "hi-IN",
+    bn: "bn-IN",
+    mr: "mr-IN",
+    gu: "gu-IN",
+    pa: "pa-IN",
+    or: "or-IN",
+    as: "as-IN",
+    bho: "hi-IN", // fallback for TTS
+    en: "en-IN",
+  };
+
+  const playIntro = async () => {
+    try {
+      const lang = currentLang || "en";
+      const text = greetings[lang] || greetings.en;
+      const bcp = langToBCP47[lang] || "en-IN";
+      const base64 = await tts({ text, language: bcp });
+      const audio = new Audio(`data:audio/mp3;base64,${base64}`);
+      await audio.play();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed to play intro");
+    }
+  };
 
   const tr = (s: string) => {
     if (currentLang.startsWith("te")) {
@@ -89,6 +207,9 @@ export default function Landing() {
               </Button>
               <Button variant="secondary" className="rounded-2xl px-5 py-5 text-base" onClick={() => navigate("/market")}>
                 {tr("See Market Prices")}
+              </Button>
+              <Button variant="outline" className="rounded-2xl px-5 py-5 text-base" onClick={playIntro}>
+                Intro Voice
               </Button>
             </div>
             <div className="mt-8 inline-flex items-center gap-2 rounded-2xl border bg-card/70 backdrop-blur px-3 py-2 text-sm">

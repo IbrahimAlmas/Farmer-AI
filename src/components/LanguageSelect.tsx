@@ -8,8 +8,18 @@ type Option = { label: string; value: string };
 
 const options: Array<Option> = [
   { label: "English", value: "en" },
+  { label: "தமிழ் (Tamil)", value: "ta" },
   { label: "తెలుగు (Telugu)", value: "te" },
+  { label: "മലയാളം (Malayalam)", value: "ml" },
+  { label: "ಕನ್ನಡ (Kannada)", value: "kn" },
   { label: "हिन्दी (Hindi)", value: "hi" },
+  { label: "বাংলা (Bengali)", value: "bn" },
+  { label: "मराठी (Marathi)", value: "mr" },
+  { label: "ગુજરાતી (Gujarati)", value: "gu" },
+  { label: "ਪੰਜਾਬੀ (Punjabi)", value: "pa" },
+  { label: "ଓଡ଼ିଆ (Odia)", value: "or" },
+  { label: "অসমীয়া (Assamese)", value: "as" },
+  { label: "भोजपुरी (Bhojpuri)", value: "bho" },
 ];
 
 export default function LanguageSelect({ size = "sm" }: { size?: "sm" | "md" }) {
