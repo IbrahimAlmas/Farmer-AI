@@ -1,58 +1,63 @@
 import { AppShell } from "@/components/AppShell";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { useMutation, useQuery } from "convex/react";
-import { useState } from "react";
-import { toast } from "sonner";
+import { useMemo } from "react";
 
 export default function Market() {
-  const listings = useQuery(api.market.list);
-  const create = useMutation(api.market.create);
+  const profile = useQuery(api.profiles.get);
+  const items = useQuery(api.market_prices.getVegetablePrices, {}); // realtime query
+  const loading = items === undefined;
 
-  const [title, setTitle] = useState("");
-  const [price, setPrice] = useState<number | "">("");
-  const [unit, setUnit] = useState("kg");
-
-  const add = async () => {
-    if (!title || price === "" || isNaN(Number(price))) return;
-    try {
-      await create({ title, price: Number(price), unit, location: undefined, contact: undefined, description: undefined });
-      setTitle("");
-      setPrice("");
-      toast.success("Listing created");
-    } catch {
-      toast.error("Failed to create listing");
-    }
-  };
+  const regionLabel = useMemo(() => profile?.location?.state ?? "Delhi", [profile]);
 
   return (
     <AppShell title="Market">
       <div className="p-4 space-y-4">
-        <Card>
-          <CardHeader><CardTitle>New Listing</CardTitle></CardHeader>
-          <CardContent className="grid grid-cols-3 gap-2">
-            <Input placeholder="Item" value={title} onChange={(e) => setTitle(e.target.value)} />
-            <Input placeholder="Price" type="number" value={price} onChange={(e) => setPrice(e.target.value === "" ? "" : Number(e.target.value))} />
-            <Input placeholder="Unit" value={unit} onChange={(e) => setUnit(e.target.value)} />
-            <div className="col-span-3">
-              <Button onClick={add}>Post</Button>
-            </div>
-          </CardContent>
-        </Card>
+        <Card className="border-emerald-200/50">
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              Nearby Vegetable Prices
+              <span className="text-xs font-normal text-muted-foreground">
+                Region: {regionLabel}
+              </span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {loading && (
+              <div className="text-sm text-muted-foreground">Fetching latest prices…</div>
+            )}
 
-        <Card>
-          <CardHeader><CardTitle>Listings</CardTitle></CardHeader>
-          <CardContent className="space-y-2">
-            {listings?.length ? listings.map((l) => (
-              <div key={l._id} className="flex items-center justify-between border rounded-md p-2">
-                <div>
-                  <div className="font-medium">{l.title}</div>
-                  <div className="text-xs text-muted-foreground">₹{l.price} / {l.unit}</div>
-                </div>
+            {!loading && (!items || items.length === 0) && (
+              <div className="text-sm text-muted-foreground">
+                No prices available. Please try again later.
               </div>
-            )) : <div className="text-sm text-muted-foreground">No listings yet.</div>}
+            )}
+
+            {!loading && items && (
+              <div className="divide-y">
+                {items.map((it) => (
+                  <div key={it.name} className="py-3 flex items-center justify-between">
+                    <div>
+                      <div className="font-medium capitalize">{it.name}</div>
+                      <div className="text-xs text-muted-foreground">Per {it.unit}</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-base font-semibold">₹{it.price}</div>
+                      <div className="text-[10px] text-muted-foreground">
+                        Updated: {new Date(it.updatedAt).toLocaleDateString()}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {!loading && items && (
+              <div className="mt-4 text-[11px] text-muted-foreground">
+                Source: {items[0]?.source}. Prices are indicative and adjusted for your region.
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
