@@ -223,7 +223,8 @@ export default function Landing() {
 
   const playIntro = async () => {
     try {
-      const lang = currentLang || "en";
+      // Use the live selection during the language gate; otherwise use profile language
+      const lang = gateOpen ? selectedLang : (currentLang || "en");
       const text = greetings[lang] || greetings.en;
       const bcp = langToBCP47[lang] || "en-IN";
       const base64 = await tts({ text, language: bcp });
