@@ -398,7 +398,7 @@ export default function Landing() {
               key="welcome-full"
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
-              className="pt-12 text-center"
+              className="min-h-[70vh] flex flex-col items-center justify-center text-center pt-8 pb-12"
             >
               <h1 className="text-[34px] sm:text-[44px] font-extrabold leading-tight tracking-tight">
                 <span className="bg-gradient-to-r from-amber-400 via-white to-cyan-300 bg-clip-text text-transparent">
@@ -409,7 +409,18 @@ export default function Landing() {
               <p className="mt-3 text-sm sm:text-base text-white/70 max-w-xl">
                 Choose your preferred language to personalize a smooth, voice‑first experience.
               </p>
-
+              {/* Compact feature chips to reduce empty space on mobile */}
+              <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+                <span className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-3 py-1.5 text-xs text-white/90">
+                  <Mic className="h-3.5 w-3.5" /> Voice-first
+                </span>
+                <span className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-3 py-1.5 text-xs text-white/90">
+                  <Camera className="h-3.5 w-3.5" /> Camera Soil Test
+                </span>
+                <span className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-3 py-1.5 text-xs text-white/90">
+                  <ShoppingCart className="h-3.5 w-3.5" /> Market Prices
+                </span>
+              </div>
               <div className="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 justify-center">
                 <Button
                   className="rounded-2xl px-6 py-5 text-base bg-gradient-to-r from-amber-500 via-primary to-cyan-500 text-primary-foreground hover:opacity-90 w-full sm:w-auto"
@@ -425,7 +436,6 @@ export default function Landing() {
                   Intro Voice
                 </Button>
               </div>
-
               {/* Privacy pill */}
               <div className="mt-6 inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white/5 backdrop-blur px-3 py-2 text-sm text-white/90 mx-auto">
                 Private & secure. You control your data.
