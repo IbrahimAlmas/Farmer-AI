@@ -79,6 +79,10 @@ export default function Landing() {
         setGuestLang(stored);
         setSelectedLang(stored);
         setGateOpen(false);
+        // Ensure second landing (Back / Continue) appears when a guest language is already saved
+        if (!profile) {
+          setPostGate(true);
+        }
       } else {
         // If user not authenticated or profile prefers en, prompt selection once
         if (!profile) {
