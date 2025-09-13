@@ -416,6 +416,13 @@ export default function Landing() {
                     className="rounded-2xl px-5 py-5 text-base"
                     onClick={() => {
                       // Go back to language selection page
+                      try {
+                        localStorage.removeItem("km.lang");
+                      } catch {
+                        // ignore storage errors
+                      }
+                      setGuestLang(null);
+                      setSelectedLang("en");
                       setPostGate(false);
                       setGateOpen(true);
                     }}
