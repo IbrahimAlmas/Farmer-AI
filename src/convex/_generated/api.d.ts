@@ -22,6 +22,7 @@ import type * as market from "../market.js";
 import type * as profiles from "../profiles.js";
 import type * as resources from "../resources.js";
 import type * as seed from "../seed.js";
+import type * as sims from "../sims.js";
 import type * as soil from "../soil.js";
 import type * as tasks from "../tasks.js";
 import type * as users from "../users.js";
@@ -45,6 +46,7 @@ declare const fullApi: ApiFromModules<{
   profiles: typeof profiles;
   resources: typeof resources;
   seed: typeof seed;
+  sims: typeof sims;
   soil: typeof soil;
   tasks: typeof tasks;
   users: typeof users;

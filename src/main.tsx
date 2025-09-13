@@ -16,6 +16,14 @@ import "./types/global.d.ts";
 
 const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
 
+import MyFarm from "@/pages/MyFarm.tsx";
+import Tasks from "@/pages/Tasks.tsx";
+import Market from "@/pages/Market.tsx";
+import Learn from "@/pages/Learn.tsx";
+import Community from "@/pages/Community.tsx";
+import SoilTest from "@/pages/SoilTest.tsx";
+import Settings from "@/pages/Settings.tsx";
+
 function RouteSyncer() {
   const location = useLocation();
   useEffect(() => {
@@ -50,6 +58,13 @@ createRoot(document.getElementById("root")!).render(
             <Route path="/" element={<Onboarding />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/auth" element={<AuthPage redirectAfterAuth="/dashboard" />} />
+            <Route path="/my-farm" element={<MyFarm />} />
+            <Route path="/tasks" element={<Tasks />} />
+            <Route path="/market" element={<Market />} />
+            <Route path="/learn" element={<Learn />} />
+            <Route path="/community" element={<Community />} />
+            <Route path="/soil-test" element={<SoilTest />} />
+            <Route path="/settings" element={<Settings />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
