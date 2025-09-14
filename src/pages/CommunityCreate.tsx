@@ -149,15 +149,27 @@ export default function CommunityCreate() {
               What is this community about?
             </div>
           </div>
-          <Button
-            variant="secondary"
-            size="sm"
-            className="rounded-xl"
-            onClick={redetect}
-            disabled={detecting}
-          >
-            {detecting ? "Detecting..." : "Redetect Area"}
-          </Button>
+          {/* Right-side actions: Community link + Redetect */}
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="rounded-xl"
+              onClick={() => navigate("/community")}
+              aria-label="Go to Community"
+            >
+              Community
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              className="rounded-xl"
+              onClick={redetect}
+              disabled={detecting}
+            >
+              {detecting ? "Detecting..." : "Redetect Area"}
+            </Button>
+          </div>
         </div>
       </div>
 
