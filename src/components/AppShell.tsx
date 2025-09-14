@@ -54,14 +54,7 @@ export function AppShell({ children, title }: AppShellProps) {
   const isCommunity = location.pathname === "/community";
   const isCommunityCreate = location.pathname === "/community/create";
 
-  // Add: live time and scroll progress
-  const [now, setNow] = useState<Date>(new Date());
   const [scrollProgress, setScrollProgress] = useState<number>(0);
-
-  useEffect(() => {
-    const id = setInterval(() => setNow(new Date()), 1000);
-    return () => clearInterval(id);
-  }, []);
 
   useEffect(() => {
     const onScroll = () => {
@@ -236,20 +229,6 @@ export function AppShell({ children, title }: AppShellProps) {
                           Community
                         </Button>
                       )}
-                      {/* New: Live clock pill (dynamic element) */}
-                      <div
-                        className="hidden sm:flex items-center gap-2 rounded-xl border bg-card/70 px-2.5 py-1.5 text-xs text-muted-foreground"
-                        title="Live time"
-                        aria-label="Live time"
-                      >
-                        <span className="relative flex h-2 w-2">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500/50 opacity-75" />
-                          <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-                        </span>
-                        <span className="tabular-nums">
-                          {now.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
-                        </span>
-                      </div>
                       <LanguageSelect size="sm" />
                     </div>
                   )}
