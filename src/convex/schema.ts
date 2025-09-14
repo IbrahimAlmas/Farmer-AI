@@ -151,6 +151,28 @@ const schema = defineSchema(
       lastTick: v.number(),
     }).index("by_userId", ["userId"])
      .index("by_userId_and_farmId", ["userId", "farmId"]),
+
+    // Community groups (areas)
+    communities: defineTable({
+      name: v.string(),
+      description: v.optional(v.string()),
+      state: v.string(),
+      district: v.optional(v.string()),
+      lat: v.number(),
+      lng: v.number(),
+      image: v.optional(v.string()),
+    })
+      .index("by_state", ["state"])
+      .index("by_state_and_district", ["state", "district"]),
+
+    // Community memberships
+    community_members: defineTable({
+      communityId: v.id("communities"),
+      userId: v.id("users"),
+    })
+      .index("by_userId", ["userId"])
+      .index("by_communityId", ["communityId"])
+      .index("by_communityId_and_userId", ["communityId", "userId"]),
   },
   {
     schemaValidation: false,

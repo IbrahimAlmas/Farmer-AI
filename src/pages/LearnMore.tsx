@@ -15,10 +15,15 @@ export default function LearnMore() {
         <div className="relative">
           <div className="h-40 sm:h-52 w-full overflow-hidden rounded-b-3xl">
             <img
-              src="/logo_bg.svg"
+              src="/assets/Logo_.png"
               alt="Root AI"
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain bg-card/60"
               loading="eager"
+              onError={(e) => {
+                const t = e.currentTarget as HTMLImageElement;
+                if (t.src !== "/logo.svg") t.src = "/logo.svg";
+                t.onerror = null;
+              }}
             />
           </div>
           <div className="absolute inset-x-0 top-0 h-40 sm:h-52 bg-gradient-to-b from-black/30 to-transparent rounded-b-3xl" />

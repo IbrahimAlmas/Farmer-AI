@@ -16,6 +16,7 @@ import type {
 import type * as auth_emailOtp from "../auth/emailOtp.js";
 import type * as auth from "../auth.js";
 import type * as community from "../community.js";
+import type * as community_groups from "../community_groups.js";
 import type * as farms from "../farms.js";
 import type * as http from "../http.js";
 import type * as location from "../location.js";
@@ -43,6 +44,7 @@ declare const fullApi: ApiFromModules<{
   "auth/emailOtp": typeof auth_emailOtp;
   auth: typeof auth;
   community: typeof community;
+  community_groups: typeof community_groups;
   farms: typeof farms;
   http: typeof http;
   location: typeof location;
