@@ -34,11 +34,16 @@ export function LogoDropdown() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="h-10 w-10">
           <img
-            src="/logo.svg"
-            alt="Logo"
+            src="https://harmless-tapir-303.convex.cloud/api/storage/6ec3840c-aa68-4954-a82d-0f4642599b44"
+            alt="Root AI Logo"
             width={32}
             height={32}
             className="rounded-lg"
+            onError={(e) => {
+              const t = e.currentTarget as HTMLImageElement;
+              if (t.src !== '/logo.svg') t.src = '/logo.svg';
+              t.onerror = null;
+            }}
           />
         </Button>
       </DropdownMenuTrigger>
