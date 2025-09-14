@@ -467,7 +467,7 @@ export default function Landing() {
                       setGateOpen(true);
                     }}
                   >
-                    Language
+                    Change Language
                   </Button>
                   <Button
                     className="rounded-2xl px-5 py-5 text-base"
