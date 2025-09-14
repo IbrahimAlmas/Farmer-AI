@@ -214,26 +214,9 @@ export default function SoilTest() {
               animate={{ opacity: 1, y: 0 }}
               className=""
             >
-              {/* Balanced 3-column layout with fixed side rails */}
-              <div className="grid gap-6 items-start lg:grid-cols-[280px_1fr_280px]">
-                {/* Left side panel (sticky on large screens) */}
-                <div className="hidden lg:block lg:sticky lg:top-24 self-start">
-                  <Card className="overflow-hidden backdrop-blur supports-[backdrop-filter]:bg-card/70">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-sm">Why test soil?</CardTitle>
-                    </CardHeader>
-                    <CardContent className="text-xs text-muted-foreground space-y-2">
-                      <p>Soil health drives yield, quality, and sustainability.</p>
-                      <ul className="list-disc pl-5 space-y-1">
-                        <li>Detect pH problems early</li>
-                        <li>Optimize nutrient application</li>
-                        <li>Improve water retention</li>
-                      </ul>
-                    </CardContent>
-                  </Card>
-                </div>
-
-                {/* Center main card in fluid column */}
+              {/* Reworked layout: main card left, right rail stacks "Why test soil?" over "Sample insights" */}
+              <div className="grid gap-6 items-start lg:grid-cols-[1fr_320px]">
+                {/* LEFT: Main Soil Health Check (moved to the far left) */}
                 <div>
                   <Card className="overflow-hidden backdrop-blur supports-[backdrop-filter]:bg-card/70">
                     <CardHeader className="pb-2">
@@ -262,7 +245,7 @@ export default function SoilTest() {
                           <li>Upload a clear close-up of the soil</li>
                         </ul>
                       </div>
-                      <div className="flex justify-center">
+                      <div className="flex justify-start">
                         <Button
                           className="gap-2 px-6 py-6 text-base sm:text-lg rounded-xl w-full sm:w-auto min-w-[200px] bg-amber-600 hover:bg-amber-500 text-white shadow-md"
                           onClick={() => {
@@ -279,8 +262,24 @@ export default function SoilTest() {
                   </Card>
                 </div>
 
-                {/* Right side panel (sticky) */}
-                <div className="hidden lg:block lg:sticky lg:top-24 self-start">
+                {/* RIGHT: Sticky rail with Why test soil (top) and Sample insights (bottom) */}
+                <div className="hidden lg:flex lg:flex-col lg:gap-6 lg:sticky lg:top-24 self-start">
+                  {/* Why test soil? */}
+                  <Card className="overflow-hidden backdrop-blur supports-[backdrop-filter]:bg-card/70">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm">Why test soil?</CardTitle>
+                    </CardHeader>
+                    <CardContent className="text-xs text-muted-foreground space-y-2">
+                      <p>Soil health drives yield, quality, and sustainability.</p>
+                      <ul className="list-disc pl-5 space-y-1">
+                        <li>Detect pH problems early</li>
+                        <li>Optimize nutrient application</li>
+                        <li>Improve water retention</li>
+                      </ul>
+                    </CardContent>
+                  </Card>
+
+                  {/* Sample insights (stacked below) */}
                   <Card className="overflow-hidden backdrop-blur supports-[backdrop-filter]:bg-card/70">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm">Sample insights</CardTitle>
