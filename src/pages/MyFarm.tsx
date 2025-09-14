@@ -159,6 +159,8 @@ export default function MyFarm() {
                   ? f.crops
                   : []) as any;
               const palette: Array<string> = ["#8BC34A", "#4CAF50", "#FFC107", "#FF9800", "#9C27B0"];
+              // Add: unique input id for label->input pairing
+              const uploadId = `farm-photo-${f._id as any}`;
               return (
                 <div key={f._id} className="border rounded-md p-3 space-y-3">
                   <div className="flex items-center justify-between">
@@ -193,16 +195,17 @@ export default function MyFarm() {
                         Field photo: {(f.cornerPhotos?.length ?? 0)}/1
                       </div>
                       <div className="flex gap-2 flex-wrap">
-                        <label>
-                          <input
-                            type="file"
-                            accept="image/*"
-                            capture="environment"
-                            className="hidden"
-                            onChange={(e) => uploadCornerPhotos(f._id as any, e.target.files)}
-                          />
-                          <Button variant="outline" size="sm">Upload Field Photo</Button>
-                        </label>
+                        {/* Replace label-wrapper with Button asChild + htmlFor for reliable file picker */}
+                        <input
+                          id={uploadId}
+                          type="file"
+                          accept="image/*"
+                          className="sr-only"
+                          onChange={(e) => uploadCornerPhotos(f._id as any, e.target.files)}
+                        />
+                        <Button asChild variant="outline" size="sm">
+                          <label htmlFor={uploadId}>Upload Field Photo</label>
+                        </Button>
                         <Button
                           size="sm"
                           onClick={async () => {
