@@ -54,11 +54,17 @@ export default function OurTeam() {
         {/* Hero banner aligned to site theme */}
         <div className="relative">
           <div className="h-40 sm:h-52 w-full overflow-hidden rounded-b-3xl">
+            {/* Replace background crest with brand logo */}
             <img
-              src="/logo_bg.svg"
+              src="/assets/Logo_.png"
               alt="FarmHes"
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain bg-card/60"
               loading="eager"
+              onError={(e) => {
+                const t = e.currentTarget as HTMLImageElement;
+                if (t.src !== "/logo.svg") t.src = "/logo.svg";
+                t.onerror = null;
+              }}
             />
           </div>
           <div className="absolute inset-x-0 top-0 h-40 sm:h-52 bg-gradient-to-b from-black/25 to-transparent rounded-b-3xl" />
@@ -80,7 +86,7 @@ export default function OurTeam() {
           <h2 className="text-2xl font-extrabold">FarmHes — Team of 6</h2>
           <p className="mt-2 text-sm text-muted-foreground max-w-2xl">
             Builders and growers working on practical, voice‑first AI for agriculture —
-            matching Root AI’s clean, minimal aesthetic.
+            matching Root AI's clean, minimal aesthetic.
           </p>
 
           <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
