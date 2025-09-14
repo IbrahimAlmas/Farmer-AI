@@ -311,10 +311,10 @@ export default function SoilTest() {
               animate={{ opacity: 1, y: 0 }}
               className=""
             >
-              {/* UPDATED LAYOUT: Main capture on top, Pro tips + Sample preview below */}
-              <div className="space-y-4 lg:space-y-6">
-                {/* Main capture card */}
-                <div>
+              {/* UPDATED LAYOUT: Left = Soil Test capture, Right = Pro tips (top) + Sample preview (bottom) */}
+              <div className="grid gap-4 lg:gap-6 lg:grid-cols-[1fr_320px]">
+                {/* LEFT: Main capture card */}
+                <div className="">
                   <Card className="overflow-hidden backdrop-blur supports-[backdrop-filter]:bg-card/70">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-lg sm:text-xl font-semibold">Soil Test</CardTitle>
@@ -447,8 +447,8 @@ export default function SoilTest() {
                   </Card>
                 </div>
 
-                {/* BELOW: Pro tips and Sample result preview in two columns */}
-                <div className="grid gap-4 lg:gap-6 lg:grid-cols-2">
+                {/* RIGHT: Pro tips (top) + Sample result preview (bottom) */}
+                <div className="flex flex-col gap-4">
                   {/* Pro tips */}
                   <Card className="overflow-hidden backdrop-blur supports-[backdrop-filter]:bg-card/70">
                     <CardHeader className="pb-2">
