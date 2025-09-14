@@ -158,6 +158,33 @@ const schema = defineSchema(
       stage: v.string(),
       balance: v.number(),
       lastTick: v.number(),
+      
+      // Enhanced farming simulation fields
+      irrigationMethod: v.optional(v.string()), // "drip" | "sprinkler" | "flood"
+      growth: v.optional(v.number()), // 0..100
+      health: v.optional(v.number()), // 0..100
+      nutrients: v.optional(v.object({ 
+        n: v.number(), // nitrogen
+        p: v.number(), // phosphorus
+        k: v.number()  // potassium
+      })),
+      seed: v.optional(v.object({
+        key: v.string(), // catalog key
+        name: v.string(),
+        daysToMaturity: v.number(),
+        kc: v.object({ 
+          seedling: v.number(), 
+          vegetative: v.number(), 
+          flowering: v.number(), 
+          maturity: v.number() 
+        })
+      })),
+      lastIrrigation: v.optional(v.object({ 
+        method: v.string(), 
+        mm: v.number(), 
+        effectiveMm: v.number(), 
+        at: v.number() 
+      })),
     }).index("by_userId", ["userId"])
      .index("by_userId_and_farmId", ["userId", "farmId"]),
 

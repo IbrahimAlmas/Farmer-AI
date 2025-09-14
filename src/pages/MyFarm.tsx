@@ -8,6 +8,7 @@ import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { Link, useNavigate } from "react-router";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Progress } from "@/components/ui/progress";
 
 export default function MyFarm() {
   const farms = useQuery(api.farms.list);
@@ -22,6 +23,9 @@ export default function MyFarm() {
   const plant = useMutation(api.sims.plantCrop);
   const water = useMutation(api.sims.water);
   const harvest = useMutation(api.sims.harvest);
+  const sowSeed = useMutation(api.sims.sowSeed);
+  const setIrrigationMethodMutation = useMutation(api.sims.setIrrigationMethod);
+  const irrigateField = useMutation(api.sims.irrigate);
 
   const generate3D = useAction((api as any).meshy.generateFromFarmPhoto as any);
   const checkStatus = useAction((api as any).meshy.checkStatus as any);
@@ -51,6 +55,11 @@ export default function MyFarm() {
   const [selectedCrop, setSelectedCrop] = useState<string>("wheat");
   const [advisor, setAdvisor] = useState<any | null>(null);
   const [advisorLoading, setAdvisorLoading] = useState(false);
+
+  const [selectedSeed, setSelectedSeed] = useState<string>("wheat");
+  const [irrigationMethod, setIrrigationMethod] = useState<string>("sprinkler");
+  const [irrigationAmount, setIrrigationAmount] = useState<string>("10");
+  const [showAnimation, setShowAnimation] = useState<string | null>(null);
 
   useEffect(() => {
     if (sim?.crop) setSelectedCrop(sim.crop);
@@ -104,6 +113,43 @@ export default function MyFarm() {
       toast.error(e?.message ?? "Could not fetch recommendation");
     } finally {
       setAdvisorLoading(false);
+    }
+  };
+
+  const handleSowSeed = async () => {
+    try {
+      const res = await sowSeed({ seedKey: selectedSeed, farmId: simFarmId as any });
+      toast.success(`Sowed ${(res as any).seedName} successfully!`);
+      setShowAnimation("sowing");
+      setTimeout(() => setShowAnimation(null), 2000);
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed to sow seeds");
+    }
+  };
+
+  const handleSetIrrigation = async () => {
+    try {
+      await setIrrigationMethodMutation({ method: irrigationMethod, farmId: simFarmId as any });
+      toast.success(`Irrigation method set to ${irrigationMethod}`);
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed to set irrigation method");
+    }
+  };
+
+  const handleIrrigate = async () => {
+    const mm = parseFloat(irrigationAmount);
+    if (isNaN(mm) || mm <= 0 || mm > 100) {
+      toast.error("Please enter a valid irrigation amount (1-100mm)");
+      return;
+    }
+    
+    try {
+      const res = await irrigateField({ mm, farmId: simFarmId as any });
+      toast.success(`Applied ${(res as any).effectiveMm}mm effective water via ${(res as any).method}`);
+      setShowAnimation("irrigating");
+      setTimeout(() => setShowAnimation(null), 2000);
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed to irrigate field");
     }
   };
 
@@ -400,7 +446,7 @@ export default function MyFarm() {
                   </div>
                 )}
 
-                {/* Embedded 3D mini-viewer */}
+                {/* Embedded 3D mini-viewer with animation overlay */}
                 <div className="rounded-md border p-3">
                   <div className="text-sm font-medium mb-2">Field 3D View</div>
                   <div className="w-full grid place-items-center">
@@ -453,6 +499,83 @@ export default function MyFarm() {
                   {!photoUrl && (
                     <div className="text-xs text-muted-foreground mt-2 text-center">
                       Upload a field photo on My Farm to texture the model.
+                    </div>
+                  )}
+                  {/* Animation overlay */}
+                  {showAnimation && (
+                    <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+                      {showAnimation === "sowing" && (
+                        <div className="text-2xl animate-bounce">🌱 Sowing Seeds...</div>
+                      )}
+                      {showAnimation === "irrigating" && (
+                        <div className="text-2xl animate-pulse">💧 Irrigating Field...</div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Seeds Section */}
+                <div className="rounded-md border p-3 space-y-3">
+                  <div className="text-sm font-medium">Seeds & Planting</div>
+                  <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-end">
+                    <div className="w-full sm:w-48">
+                      <div className="text-xs text-muted-foreground mb-1">Seed Type</div>
+                      <Select value={selectedSeed} onValueChange={setSelectedSeed}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="wheat">Winter Wheat</SelectItem>
+                          <SelectItem value="rice">Basmati Rice</SelectItem>
+                          <SelectItem value="maize">Sweet Corn</SelectItem>
+                          <SelectItem value="soybean">Soybean</SelectItem>
+                          <SelectItem value="canola">Canola</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <Button onClick={handleSowSeed} disabled={!sim}>
+                      Sow Seeds (₹200)
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Irrigation Techniques Section */}
+                <div className="rounded-md border p-3 space-y-3">
+                  <div className="text-sm font-medium">Irrigation System</div>
+                  <div className="grid gap-2 sm:grid-cols-3 items-end">
+                    <div>
+                      <div className="text-xs text-muted-foreground mb-1">Method</div>
+                      <Select value={irrigationMethod} onValueChange={setIrrigationMethod}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="drip">Drip (90% efficient)</SelectItem>
+                          <SelectItem value="sprinkler">Sprinkler (75% efficient)</SelectItem>
+                          <SelectItem value="flood">Flood (55% efficient)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <div className="text-xs text-muted-foreground mb-1">Amount (mm)</div>
+                      <Input
+                        type="number"
+                        min="1"
+                        max="100"
+                        value={irrigationAmount}
+                        onChange={(e) => setIrrigationAmount(e.target.value)}
+                        placeholder="10"
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <Button variant="outline" onClick={handleSetIrrigation} disabled={!sim}>
+                        Set Method
+                      </Button>
+                      <Button onClick={handleIrrigate} disabled={!sim}>
+                        Irrigate (₹{Math.ceil(parseFloat(irrigationAmount || "0") * 2)})
+                      </Button>
+                    </div>
+                  </div>
+                  {sim?.lastIrrigation && (
+                    <div className="text-xs text-muted-foreground">
+                      Last: {sim.lastIrrigation.effectiveMm}mm via {sim.lastIrrigation.method} 
+                      ({new Date(sim.lastIrrigation.at).toLocaleString()})
                     </div>
                   )}
                 </div>
@@ -509,8 +632,28 @@ export default function MyFarm() {
                   )}
                 </div>
 
-                {/* Stats */}
-                <div className="grid gap-3 sm:grid-cols-2">
+                {/* Enhanced Stats with Growth & Health */}
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  <div className="rounded-md border p-3">
+                    <div className="text-xs text-muted-foreground mb-1">Growth Progress</div>
+                    {sim?.growth !== undefined ? (
+                      <div className="space-y-2">
+                        <Progress value={sim.growth} className="h-2" />
+                        <div className="text-sm font-semibold">{Math.round(sim.growth)}%</div>
+                      </div>
+                    ) : (
+                      <div className="text-lg font-semibold">—</div>
+                    )}
+                  </div>
+                  <div className="rounded-md border p-3">
+                    <div className="text-xs text-muted-foreground mb-1">Plant Health</div>
+                    <div className={`text-lg font-semibold ${
+                      sim?.health >= 80 ? 'text-green-600' : 
+                      sim?.health >= 60 ? 'text-yellow-600' : 'text-red-600'
+                    }`}>
+                      {sim?.health ? `${Math.round(sim.health)}%` : "—"}
+                    </div>
+                  </div>
                   <div className="rounded-md border p-3">
                     <div className="text-xs text-muted-foreground mb-1">Stage</div>
                     <div className="text-lg font-semibold">{sim?.stage ?? "—"}</div>
@@ -531,10 +674,12 @@ export default function MyFarm() {
                       {typeof sim?.balance === "number" ? `₹${sim.balance}` : "—"}
                     </div>
                   </div>
-                  <div className="rounded-md border p-3 sm:col-span-2">
-                    <div className="text-xs text-muted-foreground mb-1">Current Crop</div>
-                    <div className="text-lg font-semibold">{sim?.crop ?? "—"}</div>
-                  </div>
+                  {sim?.seed && (
+                    <div className="rounded-md border p-3 sm:col-span-2 lg:col-span-3">
+                      <div className="text-xs text-muted-foreground mb-1">Current Crop</div>
+                      <div className="text-lg font-semibold">{sim.seed.name}</div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Controls */}
