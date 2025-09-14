@@ -342,8 +342,12 @@ export default function SoilTest() {
                           <div>Or upload a clear close-up if your camera isn't available.</div>
                         </div>
                         <div className="flex flex-wrap items-center justify-center gap-3">
-                          <Button variant="secondary" onClick={startCamera} className="gap-2">
-                            <Play className="h-4 w-4" />
+                          <Button
+                            variant="secondary"
+                            onClick={startCamera}
+                            className="gap-2 px-6 py-6 text-base sm:text-lg rounded-xl w-full sm:w-auto min-w-[200px] bg-amber-600 hover:bg-amber-500 text-white shadow-md"
+                          >
+                            <Play className="h-5 w-5" />
                             Enable Camera
                           </Button>
                           <label>
@@ -354,9 +358,13 @@ export default function SoilTest() {
                               onChange={onSelectFile}
                               className="hidden"
                             />
-                            <Button variant="outline" className="gap-2" asChild>
+                            <Button
+                              variant="outline"
+                              className="gap-2 px-6 py-6 text-base sm:text-lg rounded-xl w-full sm:w-auto min-w-[200px] border-amber-500 text-amber-800 bg-amber-50 hover:bg-amber-100"
+                              asChild
+                            >
                               <span>
-                                <Upload className="h-4 w-4" />
+                                <Upload className="h-5 w-5" />
                                 Upload Photo
                               </span>
                             </Button>
@@ -397,9 +405,13 @@ export default function SoilTest() {
                         onChange={onSelectFile}
                         className="hidden"
                       />
-                      <Button variant="outline" className="gap-2" asChild>
+                      <Button
+                        variant="outline"
+                        className="gap-2 px-6 py-6 text-base sm:text-lg rounded-xl w-full sm:w-auto min-w-[200px] border-amber-500 text-amber-800 bg-amber-50 hover:bg-amber-100"
+                        asChild
+                      >
                         <span>
-                          <Upload className="h-4 w-4" />
+                          <Upload className="h-5 w-5" />
                           Upload Photo
                         </span>
                       </Button>
