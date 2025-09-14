@@ -8,8 +8,7 @@ import { Link, useParams } from "react-router";
 
 export default function FarmModelViewer() {
   const { id } = useParams() as { id: string };
-  const auth = useQuery(api.farms.authStatus);
-  const farm = useQuery(api.farms.getById, auth?.authenticated && id ? { id: id as any } : "skip") as any;
+  const farm = useQuery(api.farms.getById, id ? ({ id: id as any } as any) : "skip") as any;
   const photoId = farm?.cornerPhotos?.[0] ?? null;
   const photoUrl = useQuery(
     api.soil_upload.getFileUrl,
@@ -57,29 +56,6 @@ export default function FarmModelViewer() {
   }, []);
 
   const size = 320; // base size of the "field" cube
-
-  // Early return: show sign-in prompt if not authenticated
-  if (auth?.authenticated === false) {
-    return (
-      <AppShell title="3D Farm Model">
-        <div className="p-4 mx-auto max-w-xl">
-          <Card className="border-amber-300">
-            <CardHeader>
-              <CardTitle>Sign in required</CardTitle>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <div className="text-sm text-muted-foreground">
-                Please sign in to view this farm model.
-              </div>
-              <Button asChild className="bg-amber-600 hover:bg-amber-500 text-white">
-                <Link to="/auth">Go to Sign In</Link>
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </AppShell>
-    );
-  }
 
   return (
     <AppShell title="3D Farm Model">

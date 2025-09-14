@@ -10,7 +10,6 @@ import { Link, useNavigate } from "react-router";
 
 export default function MyFarm() {
   const farms = useQuery(api.farms.list);
-  const auth = useQuery(api.farms.authStatus);
   const create = useMutation(api.farms.create);
   const setCornerPhotos = useMutation(api.farms.setCornerPhotos);
   const finalizeModel = useMutation(api.farms.finalizeModel);
@@ -28,8 +27,6 @@ export default function MyFarm() {
   const [name, setName] = useState("");
   const [size, setSize] = useState<string>("");
   const [prevCropsInput, setPrevCropsInput] = useState<string>("");
-
-  const navigate = useNavigate();
 
   const [recordingFarmId, setRecordingFarmId] = useState<string | null>(null);
   const [path, setPath] = useState<Record<string, Array<{ lat: number; lng: number; ts: number }>>>({}); 
@@ -160,23 +157,6 @@ export default function MyFarm() {
   return (
     <AppShell title="My Farm">
       <div className="p-4 space-y-4">
-        {/* Show sign-in prompt if not authenticated */}
-        {auth?.authenticated === false && (
-          <Card className="border-amber-300">
-            <CardHeader>
-              <CardTitle>Sign in required</CardTitle>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <div className="text-sm text-muted-foreground">
-                Please sign in to create and manage your farms.
-              </div>
-              <Button asChild className="bg-amber-600 hover:bg-amber-500 text-white">
-                <Link to="/auth">Go to Sign In</Link>
-              </Button>
-            </CardContent>
-          </Card>
-        )}
-
         <Card>
           <CardHeader><CardTitle>Add Farm</CardTitle></CardHeader>
           <CardContent className="grid gap-2 sm:grid-cols-[1fr_140px_1fr_auto]">
@@ -192,8 +172,8 @@ export default function MyFarm() {
               value={prevCropsInput}
               onChange={(e) => setPrevCropsInput(e.target.value)}
             />
-            {/* Disable Add if not authenticated */}
-            <Button onClick={add} disabled={!auth?.authenticated || !name.trim()}>Add</Button>
+            {/* Enable Add without auth */}
+            <Button onClick={add} disabled={!name.trim()}>Add</Button>
           </CardContent>
         </Card>
 
@@ -226,7 +206,6 @@ export default function MyFarm() {
                           };
                           input.click();
                         }}
-                        disabled={!auth?.authenticated}
                       >
                         Upload Photo
                       </Button>
@@ -247,12 +226,11 @@ export default function MyFarm() {
                             toast.error(e?.message ?? "Failed to generate 3D model");
                           }
                         }}
-                        disabled={!auth?.authenticated}
                       >
                         Generate 3D Model (AI)
                       </Button>
 
-                      <Button size="sm" onClick={() => openSim(f._id as any)} disabled={!auth?.authenticated}>
+                      <Button size="sm" onClick={() => openSim(f._id as any)}>
                         Enter Simulation
                       </Button>
                     </div>
