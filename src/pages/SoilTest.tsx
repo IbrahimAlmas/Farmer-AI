@@ -311,23 +311,8 @@ export default function SoilTest() {
               animate={{ opacity: 1, y: 0 }}
               className=""
             >
-              <div className="grid gap-4 lg:gap-6 items-start lg:grid-cols-[280px_1fr_280px]">
-                {/* Left side tips */}
-                <div className="hidden lg:block lg:sticky lg:top-24 self-start">
-                  <Card className="overflow-hidden backdrop-blur supports-[backdrop-filter]:bg-card/70">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-sm">Pro tips</CardTitle>
-                    </CardHeader>
-                    <CardContent className="text-xs text-muted-foreground space-y-2">
-                      <ul className="list-disc pl-5 space-y-1">
-                        <li>Frame only the soil surface</li>
-                        <li>Avoid shadows; use daylight</li>
-                        <li>Hold steady for sharp focus</li>
-                      </ul>
-                    </CardContent>
-                  </Card>
-                </div>
-
+              {/* UPDATED LAYOUT: Main capture on top, Pro tips + Sample preview below */}
+              <div className="space-y-4 lg:space-y-6">
                 {/* Main capture card */}
                 <div>
                   <Card className="overflow-hidden backdrop-blur supports-[backdrop-filter]:bg-card/70">
@@ -462,8 +447,23 @@ export default function SoilTest() {
                   </Card>
                 </div>
 
-                {/* Right side sample preview */}
-                <div className="hidden lg:block lg:sticky lg:top-24 self-start">
+                {/* BELOW: Pro tips and Sample result preview in two columns */}
+                <div className="grid gap-4 lg:gap-6 lg:grid-cols-2">
+                  {/* Pro tips */}
+                  <Card className="overflow-hidden backdrop-blur supports-[backdrop-filter]:bg-card/70">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm">Pro tips</CardTitle>
+                    </CardHeader>
+                    <CardContent className="text-xs text-muted-foreground space-y-2">
+                      <ul className="list-disc pl-5 space-y-1">
+                        <li>Frame only the soil surface</li>
+                        <li>Avoid shadows; use daylight</li>
+                        <li>Hold steady for sharp focus</li>
+                      </ul>
+                    </CardContent>
+                  </Card>
+
+                  {/* Sample result preview */}
                   <Card className="overflow-hidden backdrop-blur supports-[backdrop-filter]:bg-card/70">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm">Sample result preview</CardTitle>
