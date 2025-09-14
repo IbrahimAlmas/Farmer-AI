@@ -32,11 +32,12 @@ export default function Dashboard() {
       <div className="p-4 space-y-6">
 
         {/* Page Header redesigned: centered brand with left/back and right/CTA */}
-        <div className="relative flex items-center justify-between gap-3">
+        {/* Floating/glassy, larger header */}
+        <div className="sticky top-3 z-30 mx-auto max-w-3xl flex items-center justify-between gap-3 rounded-3xl border bg-card/80 backdrop-blur px-3 py-2 shadow-[0_10px_25px_-10px_rgba(0,0,0,0.45)]">
           {/* Left: Go Back to Landing */}
           <Button
             variant="ghost"
-            className="rounded-2xl px-3 py-2 font-semibold"
+            className="rounded-2xl px-4 py-3 text-sm md:text-base font-semibold"
             onClick={() => navigate("/")}
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -49,20 +50,20 @@ export default function Dashboard() {
               <img
                 src="https://harmless-tapir-303.convex.cloud/api/storage/a4af3a5d-e126-420d-b31d-c1929a3c833b"
                 alt="Root AI"
-                className="h-6 w-6 rounded-full object-cover"
+                className="h-8 w-8 md:h-9 md:w-9 rounded-full object-cover"
                 onError={(e) => {
                   const t = e.currentTarget as HTMLImageElement;
                   if (t.src !== '/logo.svg') t.src = '/logo.svg';
                   t.onerror = null;
                 }}
               />
-              <span className="text-sm font-semibold">Root AI</span>
+              <span className="text-base md:text-lg font-bold tracking-wide">Root AI</span>
             </div>
           </div>
 
           {/* Right: CTA */}
           <Button
-            className="rounded-full bg-[oklch(0.42_0.12_130)] hover:bg-[oklch(0.42_0.12_130_/_90%)] text-white"
+            className="rounded-full px-5 py-3 text-sm md:text-base bg-[oklch(0.42_0.12_130)] hover:bg-[oklch(0.42_0.12_130_/_90%)] text-white"
             onClick={() => navigate("/learn")}
           >
             Learn More →
