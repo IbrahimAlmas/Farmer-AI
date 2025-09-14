@@ -226,7 +226,7 @@ export default function SoilTest() {
                     <CardContent className="space-y-3">
                       <div className="rounded-xl border overflow-hidden bg-muted">
                         <img
-                          src="/assets/Fild.jpeg"
+                          src="/assets/Soil.webp"
                           alt="Wide farmland with clearly visible soil rows"
                           className="w-full h-56 sm:h-60 object-cover"
                           onError={(e) => {
