@@ -46,6 +46,8 @@ export function AppShell({ children, title }: AppShellProps) {
   const transcribe = useAction(api.voice.stt);
   const profile = useQuery(api.profiles.get);
 
+  const hideTopBar = location.pathname === "/dashboard";
+
   const handleVoiceCommand = (text: string) => {
     const command = text.toLowerCase().trim();
     
@@ -102,26 +104,28 @@ export function AppShell({ children, title }: AppShellProps) {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      {/* Top Bar */}
-      <header className="sticky top-0 z-40">
-        <div className="px-4 pt-[env(safe-area-inset-top)]" />
-        <div className="mx-auto w-full max-w-md">
-          {/* Updated glass header */}
-          <div className="rounded-b-3xl border-b bg-card/70 backdrop-blur-xl supports-[backdrop-filter]:bg-card/60 shadow-[0_6px_30px_-10px_rgba(0,0,0,0.25)]">
-            <div className="flex items-center justify-between px-4 py-3">
-              <LogoDropdown />
-              <h1 className="text-base font-semibold truncate flex-1 text-center">
-                {title || "KrishiMitra"}
-              </h1>
-              <div className="w-auto">
-                <LanguageSelect size="sm" />
+      {/* Top Bar - hidden on dashboard */}
+      {!hideTopBar && (
+        <header className="sticky top-0 z-40">
+          <div className="px-4 pt-[env(safe-area-inset-top)]" />
+          <div className="mx-auto w-full max-w-md">
+            {/* Updated glass header */}
+            <div className="rounded-b-3xl border-b bg-card/70 backdrop-blur-xl supports-[backdrop-filter]:bg-card/60 shadow-[0_6px_30px_-10px_rgba(0,0,0,0.25)]">
+              <div className="flex items-center justify-between px-4 py-3">
+                <LogoDropdown />
+                <h1 className="text-base font-semibold truncate flex-1 text-center">
+                  {title || "KrishiMitra"}
+                </h1>
+                <div className="w-auto">
+                  <LanguageSelect size="sm" />
+                </div>
               </div>
+              {/* subtle gradient bar */}
+              <div className="h-1 w-full bg-gradient-to-r from-primary/30 via-cyan-400/30 to-primary/30" />
             </div>
-            {/* subtle gradient bar */}
-            <div className="h-1 w-full bg-gradient-to-r from-primary/30 via-cyan-400/30 to-primary/30" />
           </div>
-        </div>
-      </header>
+        </header>
+      )}
 
       {/* Main Content */}
       <main className="flex-1 pb-24">
