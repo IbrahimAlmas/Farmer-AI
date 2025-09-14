@@ -45,6 +45,7 @@ export function AppShell({ children, title }: AppShellProps) {
   const navigate = useNavigate();
   const transcribe = useAction(api.voice.stt);
   const profile = useQuery(api.profiles.get);
+  const myCommunity = useQuery(api.community_groups.myMembership);
 
   const hideTopBar = location.pathname === "/dashboard";
   const isLearnMoreSection = ["/learn-more", "/our-team", "/our-mission", "/future-plan"].includes(location.pathname);
@@ -164,6 +165,29 @@ export function AppShell({ children, title }: AppShellProps) {
                     </Button>
                   ) : (
                     <div className="flex items-center gap-2">
+                      {/* Added: current community chip in header on community page (and visible if membership exists) */}
+                      {isCommunity && myCommunity?.community && (
+                        <button
+                          onClick={() => navigate("/community")}
+                          className="flex items-center gap-2 rounded-xl border bg-card/70 hover:bg-card/90 transition-colors px-2.5 py-1.5"
+                          aria-label="Current Community"
+                          title={myCommunity.community.name}
+                        >
+                          <img
+                            src={myCommunity.community.image ?? "/assets/Logo_.png"}
+                            alt={myCommunity.community.name}
+                            className="h-6 w-6 rounded-lg object-cover"
+                            onError={(e) => {
+                              const t = e.currentTarget as HTMLImageElement;
+                              if (t.src !== '/logo.png') t.src = '/logo.png';
+                              t.onerror = null;
+                            }}
+                          />
+                          <span className="text-xs font-medium truncate max-w-[120px]">
+                            {myCommunity.community.name}
+                          </span>
+                        </button>
+                      )}
                       {isCommunity && (
                         <Button
                           variant="secondary"

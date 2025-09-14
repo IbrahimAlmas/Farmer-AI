@@ -87,13 +87,13 @@ const [body, setBody] = useState("");
   return (
     <AppShell title="Community">
       <div className="p-4 space-y-4">
-        {/* Nearby Communities & Create */}
-        <Card className="overflow-hidden">
-          <div className="relative h-28 w-full">
+        {/* Hero with layered gradients and texture */}
+        <Card className="overflow-hidden border-0 shadow-none">
+          <div className="relative h-36 sm:h-44 w-full rounded-3xl overflow-hidden">
             <img
-              src="https://images.unsplash.com/photo-1464226184884-fa280b87c399?q=80&w=1600&auto=format&fit=crop"
+              src="https://images.unsplash.com/photo-1543255006-c93fdbf9a21f?q=80&w=1600&auto=format&fit=crop"
               alt="Community banner"
-              className="absolute inset-0 h-full w-full object-cover"
+              className="absolute inset-0 h-full w-full object-cover scale-105"
               loading="eager"
               onError={(e) => {
                 const t = e.currentTarget as HTMLImageElement;
@@ -101,69 +101,87 @@ const [body, setBody] = useState("");
                 t.onerror = null;
               }}
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-black/10" />
-            <div className="absolute inset-0 flex items-center px-5">
-              <div>
-                <div className="text-white text-xs opacity-90">Find your people</div>
-                <div className="text-white text-xl font-bold">Communities Near You</div>
+            <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/20 to-transparent" />
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,transparent,rgba(0,0,0,0.5))]" />
+            <div className="absolute bottom-3 left-4 right-4 flex items-end justify-between">
+              <div className="text-white drop-shadow">
+                <div className="text-xs uppercase tracking-widest opacity-90">Find your people</div>
+                <div className="text-2xl font-extrabold">Communities Near You</div>
                 {area?.state && (
-                  <div className="text-white/80 text-xs">
+                  <div className="text-white/80 text-xs mt-1">
                     {area.district ? `${area.district}, ` : ""}{area.state}
                   </div>
                 )}
               </div>
+              {/* Quick action to create */}
+              <Button
+                variant="secondary"
+                size="sm"
+                className="rounded-xl"
+                onClick={() => (window.location.href = "/community/create")}
+              >
+                Create Community
+              </Button>
             </div>
           </div>
+        </Card>
 
-          <CardContent className="p-4">
-            {/* Already a member */}
-            {my?.community ? (
-              <div className="rounded-2xl border bg-card/70 p-4 mb-4">
-                <div className="text-sm text-muted-foreground mb-1">You're a member of</div>
-                <div className="flex items-center gap-3">
-                  <img
-                    src={my.community.image ?? "/assets/Logo_.png"}
-                    className="h-10 w-10 rounded-xl object-cover"
-                    alt={my.community.name}
-                    onError={(e) => {
-                      const t = e.currentTarget as HTMLImageElement;
-                      if (t.src !== '/logo.png') t.src = '/logo.png';
-                      t.onerror = null;
-                    }}
-                  />
-                  <div>
-                    <div className="font-semibold">{my.community.name}</div>
-                    <div className="text-xs text-muted-foreground">
-                      {my.community.district ? `${my.community.district}, ` : ""}{my.community.state}
-                    </div>
-                  </div>
-                </div>
+        {/* Current membership spotlight */}
+        {my?.community && (
+          <div className="rounded-3xl border bg-card/70 p-4 flex items-center gap-4 shadow-sm">
+            <img
+              src={my.community.image ?? "/assets/Logo_.png"}
+              className="h-12 w-12 rounded-2xl object-cover"
+              alt={my.community.name}
+              onError={(e) => {
+                const t = e.currentTarget as HTMLImageElement;
+                if (t.src !== '/logo.png') t.src = '/logo.png';
+                t.onerror = null;
+              }}
+            />
+            <div className="flex-1">
+              <div className="text-sm text-muted-foreground">You're a member of</div>
+              <div className="font-semibold leading-tight">{my.community.name}</div>
+              <div className="text-xs text-muted-foreground">
+                {my.community.district ? `${my.community.district}, ` : ""}{my.community.state}
               </div>
-            ) : null}
+            </div>
+          </div>
+        )}
 
-            {/* Nearby list to join */}
-            <div className="grid sm:grid-cols-2 gap-3">
+        {/* Nearby Communities */}
+        <Card className="overflow-hidden">
+          <CardHeader>
+            <CardTitle>Discover Nearby</CardTitle>
+          </CardHeader>
+          <CardContent className="p-4">
+            <div className="grid sm:grid-cols-2 gap-4">
               {(nearby ?? []).map((c: any) => (
-                <div key={c._id} className="rounded-2xl border overflow-hidden">
-                  <div className="h-24 w-full">
+                <div key={c._id} className="group relative rounded-2xl border overflow-hidden">
+                  <div className="h-28 w-full relative">
                     <img
-                      src={c.image ?? "https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=1200&auto=format&fit=crop"}
-                      className="h-full w-full object-cover"
+                      src={c.image ?? "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1400&auto=format&fit=crop"}
+                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
                       alt={c.name}
+                      loading="lazy"
                       onError={(e) => {
                         const t = e.currentTarget as HTMLImageElement;
                         if (t.src !== '/logo_bg.png') t.src = '/logo_bg.png';
                         t.onerror = null;
                       }}
                     />
-                  </div>
-                  <div className="p-3">
-                    <div className="font-semibold">{c.name}</div>
-                    <div className="text-xs text-muted-foreground">
-                      {c.district ? `${c.district}, ` : ""}{c.state} • {c.membersCount ?? 0} members
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                    <div className="absolute bottom-2 left-3 right-3 text-white">
+                      <div className="font-semibold">{c.name}</div>
+                      <div className="text-[11px] opacity-90">
+                        {c.district ? `${c.district}, ` : ""}{c.state} • {c.membersCount ?? 0} members
+                      </div>
                     </div>
+                  </div>
+                  <div className="p-3 flex items-center justify-between">
+                    <div className="text-xs text-muted-foreground">Local group</div>
                     {!my?.community && (
-                      <Button className="mt-2 rounded-xl" size="sm" onClick={() => handleJoin(c._id as any)}>
+                      <Button className="rounded-xl" size="sm" onClick={() => handleJoin(c._id as any)}>
                         Join
                       </Button>
                     )}
@@ -171,13 +189,11 @@ const [body, setBody] = useState("");
                 </div>
               ))}
             </div>
-
-            {/* Community creation moved to a separate page */}
           </CardContent>
         </Card>
 
         {/* Existing Post Composer */}
-        <Card>
+        <Card className="border shadow-sm">
           <CardHeader><CardTitle>Create Post</CardTitle></CardHeader>
           <CardContent className="flex gap-2">
             <Input placeholder="Share your update..." value={body} onChange={(e) => setBody(e.target.value)} />
@@ -190,8 +206,20 @@ const [body, setBody] = useState("");
           <CardHeader><CardTitle>Feed</CardTitle></CardHeader>
           <CardContent className="space-y-3">
             {posts?.length ? posts.map((p) => (
-              <div key={p._id} className="border rounded-md p-3">
-                <div className="text-sm text-muted-foreground">{p.user?.name ?? "Anonymous"}</div>
+              <div key={p._id} className="border rounded-2xl p-3 bg-card/70">
+                <div className="flex items-center gap-2 mb-1">
+                  <img
+                    src={p.user?.image ?? "/logo.png"}
+                    alt={p.user?.name ?? "User"}
+                    className="h-6 w-6 rounded-lg object-cover"
+                    onError={(e) => {
+                      const t = e.currentTarget as HTMLImageElement;
+                      if (t.src !== '/logo.png') t.src = '/logo.png';
+                      t.onerror = null;
+                    }}
+                  />
+                  <div className="text-sm text-muted-foreground">{p.user?.name ?? "Anonymous"}</div>
+                </div>
                 <div className="font-medium">{p.body}</div>
                 <div className="text-xs text-muted-foreground mt-1">❤️ {p.likes} • 💬 {p.commentsCount}</div>
               </div>
