@@ -6,9 +6,11 @@ import { api } from "@/convex/_generated/api";
 import { useMutation, useQuery } from "convex/react";
 import { useState, useRef } from "react";
 import { toast } from "sonner";
+import { Link } from "react-router";
 
 export default function MyFarm() {
   const farms = useQuery(api.farms.list);
+  const auth = useQuery(api.farms.authStatus);
   const create = useMutation(api.farms.create);
   const setCornerPhotos = useMutation(api.farms.setCornerPhotos);
   const setWalkPath = useMutation(api.farms.setWalkPath);
@@ -58,8 +60,14 @@ export default function MyFarm() {
       setSize("");
       setPrevCropsInput("");
       toast.success("Farm added");
-    } catch {
-      toast.error("Failed to add farm");
+    } catch (e: any) {
+      // Improve error messaging for auth
+      const msg = e?.message ?? "";
+      if (typeof msg === "string" && msg.toLowerCase().includes("not authenticated")) {
+        toast.error("Please sign in to add a farm.");
+      } else {
+        toast.error("Failed to add farm");
+      }
     }
   };
 
@@ -138,6 +146,23 @@ export default function MyFarm() {
   return (
     <AppShell title="My Farm">
       <div className="p-4 space-y-4">
+        {/* Show sign-in prompt if not authenticated */}
+        {auth?.authenticated === false && (
+          <Card className="border-amber-300">
+            <CardHeader>
+              <CardTitle>Sign in required</CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div className="text-sm text-muted-foreground">
+                Please sign in to create and manage your farms.
+              </div>
+              <Button asChild className="bg-amber-600 hover:bg-amber-500 text-white">
+                <Link to="/auth">Go to Sign In</Link>
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
         <Card>
           <CardHeader><CardTitle>Add Farm</CardTitle></CardHeader>
           <CardContent className="grid gap-2 sm:grid-cols-[1fr_140px_1fr_auto]">
@@ -153,7 +178,8 @@ export default function MyFarm() {
               value={prevCropsInput}
               onChange={(e) => setPrevCropsInput(e.target.value)}
             />
-            <Button onClick={add}>Add</Button>
+            {/* Disable Add if not authenticated */}
+            <Button onClick={add} disabled={!auth?.authenticated || !name.trim()}>Add</Button>
           </CardContent>
         </Card>
 

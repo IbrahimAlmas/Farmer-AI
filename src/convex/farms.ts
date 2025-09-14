@@ -137,3 +137,11 @@ export const finalizeModel = mutation({
     return { success: true };
   },
 });
+
+export const authStatus = query({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    return { authenticated: !!userId };
+  },
+});
