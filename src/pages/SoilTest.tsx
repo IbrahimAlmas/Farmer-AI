@@ -37,7 +37,7 @@ export default function SoilTest() {
   const [cameraReady, setCameraReady] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
-  const [step, setStep] = useState<"capture" | "review" | "results">("capture");
+  const [step, setStep] = useState<"intro" | "capture" | "review" | "results">("intro");
 
   useEffect(() => {
     let didCancel = false;
@@ -169,8 +169,13 @@ export default function SoilTest() {
       setResult(null);
       const raw = e?.message ?? "";
       let msg = "Unable to analyze this image. Please upload a clear photo of soil.";
-      if (typeof raw === "string" && raw.toLowerCase().includes("photo of soil")) {
-        msg = "Please upload a clear photo of soil.";
+      if (typeof raw === "string") {
+        const lc = raw.toLowerCase();
+        if (lc.includes("please add a photo of soil") || lc.includes("not a soil")) {
+          msg = "This is not a soil photo. Please upload a clear photo of soil.";
+        } else if (lc.includes("photo of soil")) {
+          msg = "Please upload a clear photo of soil.";
+        }
       }
       setErrorMsg(msg);
     } finally {
@@ -188,6 +193,58 @@ export default function SoilTest() {
         </div>
 
         <div className="p-4">
+          {/* NEW: Intro step with information and single CTA */}
+          {step === "intro" && (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="max-w-2xl mx-auto"
+            >
+              <Card className="overflow-hidden backdrop-blur supports-[backdrop-filter]:bg-card/70">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base">Soil Health Check</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="rounded-xl border overflow-hidden bg-muted">
+                    <img
+                      src="https://images.unsplash.com/photo-1501004318641-b39e6451bec6?q=80&w=1400&auto=format&fit=crop"
+                      alt="Soil illustration"
+                      className="w-full h-48 object-cover"
+                      onError={(e) => {
+                        const t = e.currentTarget as HTMLImageElement;
+                        if (t.src !== '/logo_bg.png') t.src = '/logo_bg.png';
+                        t.onerror = null;
+                      }}
+                    />
+                  </div>
+                  <div className="text-sm text-muted-foreground space-y-2">
+                    <p>
+                      Check your soil's pH, moisture, and nutrient indicators with a quick photo-based test.
+                    </p>
+                    <ul className="list-disc pl-5 space-y-1">
+                      <li>Use natural light and focus on bare soil surface</li>
+                      <li>Avoid leaves, tools, or people in the frame</li>
+                      <li>Upload a clear close-up of the soil</li>
+                    </ul>
+                  </div>
+                  <div className="flex justify-center">
+                    <Button
+                      className="gap-2"
+                      onClick={() => {
+                        setErrorMsg(null);
+                        setResult(null);
+                        setStep("capture");
+                        // do not auto-start camera; user can choose click or upload on next screen
+                      }}
+                    >
+                      Start Soil Test
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
+
           {/* Centered capture step */}
           {step === "capture" && (
             <motion.div
@@ -284,7 +341,7 @@ export default function SoilTest() {
             </motion.div>
           )}
 
-          {/* Review step: show photo with actions */}
+          {/* Review step */}
           {step === "review" && (
             <motion.div
               initial={{ opacity: 0, y: 8 }}
@@ -368,7 +425,7 @@ export default function SoilTest() {
             </motion.div>
           )}
 
-          {/* Results step: show photo actions + results below */}
+          {/* Results step */}
           {step === "results" && (
             <div className="max-w-5xl mx-auto space-y-6">
               {/* Photo + actions */}
