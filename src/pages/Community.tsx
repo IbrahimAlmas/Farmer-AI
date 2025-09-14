@@ -7,7 +7,7 @@ import { useMutation, useQuery } from "convex/react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useAction } from "convex/react";
-import { Textarea } from "@/components/ui/textarea";
+/* removed unused Textarea import */
 
 export default function Community() {
   const posts = useQuery(api.community.list);
@@ -19,16 +19,16 @@ export default function Community() {
   const [area, setArea] = useState<{ state: string; district?: string } | null>(null);
 
   // Mutations/queries for groups
-  const my = useQuery(api.community_groups.myMembership);
+  const my = useQuery(api.community.groupMyMembership);
   const nearby = useQuery(
-    api.community_groups.listNearby,
+    api.community.groupListNearby,
     area ? { state: area.state, district: area.district } : "skip"
   );
-  const join = useMutation(api.community_groups.join);
-  const createGroup = useMutation(api.community_groups.create);
+  const join = useMutation(api.community.groupJoin);
+  // removed: createGroup mutation; creation moved off this page
 
-  const [newName, setNewName] = useState("");
-  const [newDesc, setNewDesc] = useState("");
+  // removed: new community name state
+  // removed: new community description state
 
   // Acquire location -> state/district once
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -72,29 +72,7 @@ export default function Community() {
     }
   };
 
-  const handleCreate = async () => {
-    if (!area || !coords) {
-      toast.error("Location not ready");
-      return;
-    }
-    if (!newName.trim()) return;
-    try {
-      await createGroup({
-        name: newName.trim(),
-        description: newDesc.trim() || undefined,
-        state: area.state,
-        district: area.district,
-        lat: coords.lat,
-        lng: coords.lng,
-        image: "/assets/Logo_.png",
-      });
-      setNewName("");
-      setNewDesc("");
-      toast.success("Community created");
-    } catch (e: any) {
-      toast.error(e?.message ?? "Failed to create");
-    }
-  };
+  // removed: handleCreate; creation moved to a dedicated flow/page
 
   const [body, setBody] = useState("");
 
@@ -197,22 +175,7 @@ export default function Community() {
               ))}
             </div>
 
-            {/* Create community */}
-            {!my?.community && (
-              <div className="mt-4 rounded-2xl border bg-muted/40 p-4">
-                <div className="font-semibold mb-2">Create a new community</div>
-                <div className="grid gap-2">
-                  <Input placeholder="Community name" value={newName} onChange={(e) => setNewName(e.target.value)} />
-                  <Textarea placeholder="Short description (optional)" value={newDesc} onChange={(e) => setNewDesc(e.target.value)} />
-                  <Button className="rounded-xl" onClick={handleCreate} disabled={!coords || !area}>
-                    Create in {area?.district ? `${area.district}, ` : ""}{area?.state ?? "your area"}
-                  </Button>
-                  <div className="text-xs text-muted-foreground">
-                    Note: An area can have at most two communities.
-                  </div>
-                </div>
-              </div>
-            )}
+            {/* Create community moved to a dedicated page; no creation on this page */}
           </CardContent>
         </Card>
 
