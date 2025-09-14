@@ -114,9 +114,9 @@ export function AppShell({ children, title }: AppShellProps) {
         <header className="sticky top-0 z-40">
           <div className="px-4 pt-[env(safe-area-inset-top)]" />
           <div className="mx-auto w-full max-w-2xl">
-            {/* Updated glass header */}
-            <div className="rounded-b-3xl border-b bg-card/70 backdrop-blur-xl supports-[backdrop-filter]:bg-card/60 shadow-[0_6px_30px_-10px_rgba(0,0,0,0.25)]">
-              <div className="flex items-center justify-between px-4 py-4">
+            {/* Updated glass header - cleaner, floating pill */}
+            <div className="mx-3 md:mx-0 rounded-2xl border bg-card/80 backdrop-blur-xl supports-[backdrop-filter]:bg-card/70 shadow-[0_12px_40px_-12px_rgba(0,0,0,0.35)] ring-1 ring-black/5">
+              <div className="flex items-center justify-between px-4 py-3">
                 <LogoDropdown />
                 {/* Replace title with contextual nav for Learn More section pages */}
                 {["/learn-more", "/our-team", "/our-mission", "/future-plan"].includes(location.pathname) ? (
@@ -147,7 +147,7 @@ export function AppShell({ children, title }: AppShellProps) {
                     </Button>
                   </div>
                 ) : (
-                  <h1 className="text-base font-semibold truncate flex-1 text-center">
+                  <h1 className="text-[15px] sm:text-base font-semibold tracking-wide truncate flex-1 text-center">
                     {title || "KrishiMitra"}
                   </h1>
                 )}
@@ -220,7 +220,7 @@ export function AppShell({ children, title }: AppShellProps) {
                 </div>
               </div>
               {/* subtle gradient bar */}
-              <div className="h-1 w-full bg-gradient-to-r from-primary/30 via-cyan-400/30 to-primary/30" />
+              <div className="h-[2px] w-full bg-[linear-gradient(90deg,theme(colors.primary/20),theme(colors.cyan.400/20),theme(colors.primary/20))]" />
             </div>
           </div>
         </header>
