@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useQuery, useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { motion } from "framer-motion";
-import { Sprout, CheckSquare, TrendingUp, Camera, Users, Calendar } from "lucide-react";
+import { Sprout, CheckSquare, TrendingUp, Camera, Users, Calendar, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
 
@@ -31,26 +31,34 @@ export default function Dashboard() {
     <AppShell title="Dashboard">
       <div className="p-4 space-y-6">
 
-        {/* Page Header redesigned like reference: brand left, nav center, CTA right */}
-        <div className="flex items-center justify-between gap-3">
-          {/* Left: Brand -> go to Landing */}
+        {/* Page Header redesigned: centered brand with left/back and right/CTA */}
+        <div className="relative flex items-center justify-between gap-3">
+          {/* Left: Go Back to Landing */}
           <Button
             variant="ghost"
             className="rounded-2xl px-3 py-2 font-semibold"
             onClick={() => navigate("/")}
           >
-            <img
-              src="https://harmless-tapir-303.convex.cloud/api/storage/a4af3a5d-e126-420d-b31d-c1929a3c833b"
-              alt="Root AI"
-              className="h-6 w-6 mr-2 rounded-full object-cover"
-              onError={(e) => {
-                const t = e.currentTarget as HTMLImageElement;
-                if (t.src !== '/logo.svg') t.src = '/logo.svg';
-                t.onerror = null;
-              }}
-            />
-            Root AI
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Go Back
           </Button>
+
+          {/* Center: Brand */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="flex items-center gap-2">
+              <img
+                src="https://harmless-tapir-303.convex.cloud/api/storage/a4af3a5d-e126-420d-b31d-c1929a3c833b"
+                alt="Root AI"
+                className="h-6 w-6 rounded-full object-cover"
+                onError={(e) => {
+                  const t = e.currentTarget as HTMLImageElement;
+                  if (t.src !== '/logo.svg') t.src = '/logo.svg';
+                  t.onerror = null;
+                }}
+              />
+              <span className="text-sm font-semibold">Root AI</span>
+            </div>
+          </div>
 
           {/* Right: CTA */}
           <Button
