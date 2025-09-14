@@ -254,60 +254,74 @@ export default function SoilTest() {
             >
               <Card className="overflow-hidden backdrop-blur supports-[backdrop-filter]:bg-card/70">
                 <CardHeader className="pb-2">
-                  <CardTitle className="flex items-center gap-2 text-base">
-                    <CameraIcon className="h-4 w-4" />
-                    Click Photo
-                  </CardTitle>
+                  <CardTitle className="text-lg sm:text-xl font-semibold">Soil Test</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="relative rounded-xl border overflow-hidden bg-muted">
-                    <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/10 via-transparent to-transparent" />
-                    <div className="aspect-[4/3] w-full">
-                      <video
-                        ref={videoRef}
-                        className="h-full w-full object-cover"
-                        playsInline
-                        muted
-                        autoPlay
-                      />
-                    </div>
+                  {cameraOn ? (
+                    <div className="relative rounded-xl border overflow-hidden bg-muted">
+                      <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/10 via-transparent to-transparent" />
+                      <div className="aspect-[4/3] w-full">
+                        <video
+                          ref={videoRef}
+                          className="h-full w-full object-cover"
+                          playsInline
+                          muted
+                          autoPlay
+                        />
+                      </div>
 
-                    {/* Overlay controls */}
-                    <div className="absolute bottom-3 left-3 right-3 flex items-center justify-center">
-                      <div className="flex flex-wrap gap-2">
-                        {!cameraOn ? (
-                          <Button variant="secondary" onClick={startCamera} className="gap-2">
-                            <Play className="h-4 w-4" />
-                            Enable Camera
+                      {/* Overlay controls when camera is ON */}
+                      <div className="absolute bottom-3 left-3 right-3 flex items-center justify-center">
+                        <div className="flex flex-wrap gap-2">
+                          <Button
+                            onClick={capturePhoto}
+                            disabled={!cameraReady || loading}
+                            className="gap-2"
+                          >
+                            {loading ? (
+                              <>
+                                <RefreshCw className="h-4 w-4 animate-spin" />
+                                Processing…
+                              </>
+                            ) : (
+                              <>
+                                <CameraIcon className="h-4 w-4" />
+                                Click Photo
+                              </>
+                            )}
                           </Button>
-                        ) : (
-                          <>
-                            <Button
-                              onClick={capturePhoto}
-                              disabled={!cameraReady || loading}
-                              className="gap-2"
-                            >
-                              {loading ? (
-                                <>
-                                  <RefreshCw className="h-4 w-4 animate-spin" />
-                                  Processing…
-                                </>
-                              ) : (
-                                <>
-                                  <CameraIcon className="h-4 w-4" />
-                                  Click Photo
-                                </>
-                              )}
-                            </Button>
-                            <Button variant="outline" onClick={stopCamera} className="gap-2">
-                              <RefreshCw className="h-4 w-4" />
-                              Stop
-                            </Button>
-                          </>
-                        )}
+                          <Button variant="outline" onClick={stopCamera} className="gap-2">
+                            <RefreshCw className="h-4 w-4" />
+                            Stop
+                          </Button>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  ) : (
+                    // Placeholder panel BEFORE enabling camera
+                    <div className="relative rounded-xl border overflow-hidden bg-muted flex items-center justify-center aspect-[4/3]">
+                      <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/5 via-transparent to-transparent" />
+                      <div className="flex flex-col items-center justify-center gap-3 p-6 text-center">
+                        <img
+                          src="https://images.unsplash.com/photo-1501004318641-b39e6451bec6?q=80&w=1400&auto=format&fit=crop"
+                          alt="Soil illustration"
+                          className="w-full max-w-md h-40 object-cover rounded-lg border"
+                          onError={(e) => {
+                            const t = e.currentTarget as HTMLImageElement;
+                            if (t.src !== '/logo_bg.png') t.src = '/logo_bg.png';
+                            t.onerror = null;
+                          }}
+                        />
+                        <div className="text-sm text-muted-foreground">
+                          Enable camera to take a photo for soil analysis, or upload a photo below.
+                        </div>
+                        <Button variant="secondary" onClick={startCamera} className="gap-2">
+                          <Play className="h-4 w-4" />
+                          Enable Camera
+                        </Button>
+                      </div>
+                    </div>
+                  )}
 
                   {cameraError && !cameraReady && (
                     <div className="text-xs text-red-600 text-center">
@@ -318,7 +332,7 @@ export default function SoilTest() {
                   {/* Hidden canvas for capture */}
                   <canvas ref={canvasRef} className="hidden" />
 
-                  {/* Upload alternative */}
+                  {/* Upload alternative (always visible) */}
                   <div className="text-center">
                     <label className="inline-flex items-center gap-2">
                       <input
