@@ -40,12 +40,12 @@ export default function Dashboard() {
             onClick={() => navigate("/")}
           >
             <img
-              src="/logo.svg"
+              src="https://harmless-tapir-303.convex.cloud/api/storage/f3242bc3-cc14-44cb-bf20-dc6e3f827048"
               alt="Root AI"
               className="h-6 w-6 mr-2 rounded-full object-cover"
               onError={(e) => {
                 const t = e.currentTarget as HTMLImageElement;
-                if (t.src !== '/logo_bg.svg') t.src = '/logo_bg.svg';
+                if (t.src !== '/logo.svg') t.src = '/logo.svg';
                 t.onerror = null;
               }}
             />
