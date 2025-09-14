@@ -206,18 +206,18 @@ export default function SoilTest() {
           <div className="absolute -bottom-24 -right-16 h-72 w-72 rounded-full bg-gradient-to-br from-sky-400/20 to-indigo-400/10 blur-3xl" />
         </div>
 
-        <div className="p-4">
+        <div className="p-4 mx-auto max-w-6xl">
           {/* NEW: Intro step with information and single CTA */}
           {step === "intro" && (
             <motion.div
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mx-auto max-w-5xl"
+              className=""
             >
-              {/* Grid to fill side space on large screens */}
-              <div className="grid gap-4 lg:grid-cols-3">
+              {/* Balanced 3-column layout with fixed side rails */}
+              <div className="grid gap-6 items-start lg:grid-cols-[280px_1fr_280px]">
                 {/* Left side panel (sticky on large screens) */}
-                <div className="hidden lg:block lg:sticky lg:top-24">
+                <div className="hidden lg:block lg:sticky lg:top-24 self-start">
                   <Card className="overflow-hidden backdrop-blur supports-[backdrop-filter]:bg-card/70">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm">Why test soil?</CardTitle>
@@ -233,8 +233,8 @@ export default function SoilTest() {
                   </Card>
                 </div>
 
-                {/* Center main card explicitly spans cols 1-2 */}
-                <div className="lg:col-span-2 lg:col-start-1">
+                {/* Center main card in fluid column */}
+                <div>
                   <Card className="overflow-hidden backdrop-blur supports-[backdrop-filter]:bg-card/70">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-base">Soil Health Check</CardTitle>
@@ -279,8 +279,8 @@ export default function SoilTest() {
                   </Card>
                 </div>
 
-                {/* Right side panel (sticky, forced to top-right of the first row) */}
-                <div className="hidden lg:block lg:sticky lg:top-24 lg:col-start-3 lg:row-start-1">
+                {/* Right side panel (sticky) */}
+                <div className="hidden lg:block lg:sticky lg:top-24 self-start">
                   <Card className="overflow-hidden backdrop-blur supports-[backdrop-filter]:bg-card/70">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm">Sample insights</CardTitle>
@@ -309,11 +309,11 @@ export default function SoilTest() {
             <motion.div
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mx-auto max-w-5xl"
+              className=""
             >
-              <div className="grid gap-4 lg:grid-cols-3">
+              <div className="grid gap-6 items-start lg:grid-cols-[280px_1fr_280px]">
                 {/* Left side tips */}
-                <div className="hidden lg:block lg:sticky lg:top-24">
+                <div className="hidden lg:block lg:sticky lg:top-24 self-start">
                   <Card className="overflow-hidden backdrop-blur supports-[backdrop-filter]:bg-card/70">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm">Pro tips</CardTitle>
@@ -329,7 +329,7 @@ export default function SoilTest() {
                 </div>
 
                 {/* Main capture card */}
-                <div className="lg:col-span-2">
+                <div>
                   <Card className="overflow-hidden backdrop-blur supports-[backdrop-filter]:bg-card/70">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-lg sm:text-xl font-semibold">Soil Test</CardTitle>
@@ -463,7 +463,7 @@ export default function SoilTest() {
                 </div>
 
                 {/* Right side sample preview */}
-                <div className="hidden lg:block lg:sticky lg:top-24">
+                <div className="hidden lg:block lg:sticky lg:top-24 self-start">
                   <Card className="overflow-hidden backdrop-blur supports-[backdrop-filter]:bg-card/70">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm">Sample result preview</CardTitle>
