@@ -329,220 +329,73 @@ export default function Landing() {
 
   if (gateOpen) {
     return (
-      <div className="min-h-screen relative overflow-hidden bg-black">
-        {/* Live rotating background images + vignette */}
-        <div className="absolute inset-0 z-0">
-          {/* Cross-fade stack */}
-          <div className="absolute inset-0">
-            {bgImages.map((src, i) => (
-              <img
-                key={src}
-                src={src}
-                alt="Farm fields"
-                className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-700 ${bgIndex === i ? "opacity-100" : "opacity-0"}`}
-                loading={i === 0 ? "eager" : "lazy"}
-                onError={(e) => {
-                  const t = e.currentTarget as HTMLImageElement;
-                  if (t.src !== "/logo_bg.svg") t.src = "/logo_bg.svg";
-                  t.onerror = null;
-                }}
-              />
-            ))}
-          </div>
+      <div className="min-h-screen relative overflow-hidden bg-[#0D0715] text-[color:oklch(0.97_0.02_260)] flex items-center justify-center px-4">
+        {/* Background gradients to subtly glow */}
+        <div className="pointer-events-none absolute inset-0 z-0">
+          <div className="absolute inset-0 bg-[radial-gradient(60rem_60rem_at_20%_0%,oklch(0.74_0.2_320)/12%,transparent),radial-gradient(50rem_50rem_at_100%_10%,oklch(0.78_0.18_300)/10%,transparent)]" />
         </div>
-        {/* Lighten overlay so the image is visible on mobile too */}
-        <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/40 via-black/35 to-black/55" />
 
-        {/* Edge-to-edge background sweep (amber->purple) */}
-        <div className="absolute inset-0 z-20 bg-gradient-to-br from-amber-500/30 via-transparent to-primary/30" />
-        {/* Decorative flowing wave like reference */}
-        <div className="pointer-events-none absolute inset-0 z-20 opacity-90">
-          <svg viewBox="0 0 1440 700" xmlns="http://www.w3.org/2000/svg" className="h-full w-full">
-            <defs>
-              <linearGradient id="gateSweep" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor="oklch(0.78 0.22 80)" />
-                <stop offset="50%" stopColor="oklch(0.70 0.22 300)" />
-                <stop offset="100%" stopColor="oklch(0.66 0.16 260)" />
-              </linearGradient>
-            </defs>
-            <path
-              d="M0,520 C240,420 360,200 700,240 C1040,280 1160,140 1440,220 L1440,700 L0,700 Z"
-              fill="url(#gateSweep)"
-              opacity="0.25"
+        <div className="relative z-10 w-full max-w-md space-y-5">
+          {/* Logo + Title */}
+          <div className="text-center">
+            <img
+              src="/logo.svg"
+              alt="Root AI"
+              className="mx-auto h-32 w-32 drop-shadow-[0_0_10px_oklch(0.8_0.16_85)/40%] animate-pulse"
+              onError={(e) => {
+                const t = e.currentTarget as HTMLImageElement;
+                if (t.src !== '/logo_bg.svg') t.src = '/logo_bg.svg';
+                t.onerror = null;
+              }}
             />
-            <path
-              d="M0,560 C220,560 420,360 720,380 C1020,400 1180,260 1440,320 L1440,700 L0,700 Z"
-              fill="url(#gateSweep)"
-              opacity="0.18"
-            />
-          </svg>
-        </div>
-
-        {/* Top bar (compact, mobile-first) */}
-        <div className="relative z-30 px-4 pt-[env(safe-area-inset-top)] pb-2 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <img src="https://harmless-tapir-303.convex.cloud/api/storage/6ec3840c-aa68-4954-a82d-0f4642599b44" alt="Root AI" className="h-9 w-9 rounded-xl shadow" />
-            <span className="text-xs uppercase tracking-wide text-white/80">Root AI</span>
+            <h1 className="mt-4 text-3xl font-extrabold tracking-[0.15em] text-accent">
+              ROOT AI
+            </h1>
+            <p className="mt-1 text-sm tracking-wider text-white/70">
+              Intelligent Agriculture
+            </p>
           </div>
-          <div className="hidden sm:flex items-center gap-5 text-[11px] text-white/70">
-            <span className="hidden md:inline">Home</span>
-            <span className="hidden md:inline">About</span>
-            <span className="hidden md:inline">Help</span>
+
+          {/* Card */}
+          <div className="rounded-2xl border border-[oklch(0.24_0.04_260)/35%] bg-[oklch(0.2_0.04_250)/55%] backdrop-blur p-5 shadow-[0_10px_40px_rgba(0,0,0,0.35)]">
+            <div className="text-center">
+              <h2 className="text-lg font-semibold">Choose your preferred language</h2>
+            </div>
+
+            {/* Language grid (2 x 3 on mobile) */}
+            <div className="mt-4 grid grid-cols-2 gap-2">
+              {langOptions.slice(0, 6).map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => setSelectedLang(opt.value)}
+                  className={`rounded-lg border-2 px-3 py-3 text-sm transition-all ${
+                    selectedLang === opt.value
+                      ? 'border-accent bg-[oklch(0.3_0.09_85/25%)] shadow-[0_0_12px_oklch(0.8_0.16_85)/30%]'
+                      : 'border-[oklch(0.24_0.04_260)/45%] hover:border-primary hover:bg-[oklch(0.3_0.09_85/15%)]'
+                  }`}
+                  aria-pressed={selectedLang === opt.value}
+                  aria-label={`Select ${opt.label}`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Next CTA */}
+            <div className="mt-5">
+              <Button
+                className="w-full rounded-full py-6 text-base font-bold bg-accent text-[oklch(0.16_0.03_260)] hover:opacity-95"
+                onClick={confirmLanguage}
+              >
+                Next
+              </Button>
+            </div>
           </div>
-        </div>
 
-        {/* Slides */}
-        <div className="relative z-30 mx-auto max-w-md px-4">
-          {gateSlide === 0 ? (
-            <motion.div
-              key="welcome-full"
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="min-h-[70vh] flex flex-col items-center justify-center text-center pt-8 pb-12"
-            >
-              {/* Make headline larger for stronger impact */}
-              <h1 className="text-[40px] sm:text-[52px] font-extrabold leading-tight tracking-tight">
-                <span className="bg-gradient-to-r from-amber-400 via-white to-cyan-300 bg-clip-text text-transparent">
-                  Welcome.
-                </span>
-              </h1>
-              <p className="mt-3 text-sm sm:text-base text-white/70 max-w-xl">
-                Choose your preferred language to personalize a smooth, voice‑first experience.
-              </p>
-
-              {/* Compact feature chips to reduce empty space on mobile */}
-              <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
-                <span className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-3 py-1.5 text-xs text-white/90">
-                  <Mic className="h-3.5 w-3.5" /> Voice-first
-                </span>
-                <span className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-3 py-1.5 text-xs text-white/90">
-                  <Camera className="h-3.5 w-3.5" /> Camera Soil Test
-                </span>
-                <span className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-3 py-1.5 text-xs text-white/90">
-                  <ShoppingCart className="h-3.5 w-3.5" /> Market Prices
-                </span>
-              </div>
-
-              {/* New: mini highlights grid to fill space and add visual interest */}
-              <div className="mt-6 grid grid-cols-2 gap-3 w-full max-w-md px-2">
-                <div className="rounded-2xl border border-white/15 bg-white/5 backdrop-blur p-3 text-left">
-                  <div className="flex items-center gap-2 text-white">
-                    <Mic className="h-4 w-4" />
-                    <div className="text-sm font-medium">Talk in your language</div>
-                  </div>
-                  <div className="text-[11px] text-white/70 mt-1">Telugu, Hindi, English and more</div>
-                </div>
-                <div className="rounded-2xl border border-white/15 bg-white/5 backdrop-blur p-3 text-left">
-                  <div className="flex items-center gap-2 text-white">
-                    <Camera className="h-4 w-4" />
-                    <div className="text-sm font-medium">Camera Soil Test</div>
-                  </div>
-                  <div className="text-[11px] text-white/70 mt-1">Snap photos for instant tips</div>
-                </div>
-                <div className="rounded-2xl border border-white/15 bg-white/5 backdrop-blur p-3 text-left">
-                  <div className="flex items-center gap-2 text-white">
-                    <ShoppingCart className="h-4 w-4" />
-                    <div className="text-sm font-medium">Local Market Prices</div>
-                  </div>
-                  <div className="text-[11px] text-white/70 mt-1">Indicative rates near you</div>
-                </div>
-                <div className="rounded-2xl border border-white/15 bg-white/5 backdrop-blur p-3 text-left">
-                  <div className="flex items-center gap-2 text-white">
-                    <Sprout className="h-4 w-4" />
-                    <div className="text-sm font-medium">Manage Your Farm</div>
-                  </div>
-                  <div className="text-[11px] text-white/70 mt-1">Simple actions, clear progress</div>
-                </div>
-              </div>
-
-              <div className="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 justify-center">
-                <Button
-                  className="rounded-2xl px-6 py-5 text-base bg-gradient-to-r from-amber-500 via-primary to-cyan-500 text-primary-foreground hover:opacity-90 w-full sm:w-auto"
-                  onClick={() => setGateSlide(1)}
-                >
-                  Next: Choose Language
-                </Button>
-                <Button
-                  variant="outline"
-                  className="rounded-2xl px-6 py-5 text-base border-white/30 text-white hover:bg-white/10 w-full sm:w-auto"
-                  onClick={playIntro}
-                >
-                  Intro Voice
-                </Button>
-              </div>
-              {/* Privacy pill */}
-              <div className="mt-6 inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white/5 backdrop-blur px-3 py-2 text-sm text-white/90 mx-auto">
-                Private & secure. You control your data.
-              </div>
-            </motion.div>
-          ) : (
-            <motion.div
-              key="language-full"
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="pt-10 pb-6 text-center"
-            >
-              <h2 className="text-2xl sm:text-3xl font-bold text-white">Choose your language</h2>
-              <p className="mt-2 text-sm sm:text-base text-white/70 max-w-xl">
-                Select your preferred language to personalize the experience.
-              </p>
-
-              <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 gap-3 justify-items-center">
-                {langOptions.map((opt) => (
-                  <button
-                    key={opt.value}
-                    onClick={() => setSelectedLang(opt.value)}
-                    className={`w-full rounded-2xl border bg-white/5 backdrop-blur px-4 py-4 text-sm text-white transition active:scale-[0.99] ${
-                      selectedLang === opt.value
-                        ? "border-primary text-primary shadow-sm ring-1 ring-primary/40"
-                        : "border-white/15 hover:bg-white/10"
-                    }`}
-                    aria-pressed={selectedLang === opt.value}
-                    aria-label={`Select ${opt.label}`}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
-
-              <div className="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 justify-center">
-                <Button
-                  variant="outline"
-                  className="rounded-2xl px-6 py-5 text-base border-white/30 text-white hover:bg-white/10 w-full sm:w-auto"
-                  onClick={() => setGateSlide(0)}
-                >
-                  Back
-                </Button>
-                <Button
-                  className="rounded-2xl px-6 py-5 text-base bg-gradient-to-r from-amber-500 via-primary to-cyan-500 text-primary-foreground hover:opacity-90 w-full sm:w-auto"
-                  onClick={confirmLanguage}
-                >
-                  Continue
-                </Button>
-                <Button
-                  variant="outline"
-                  className="rounded-2xl px-6 py-5 text-base border-white/30 text-white hover:bg-white/10 w-full sm:w-auto"
-                  onClick={playIntro}
-                >
-                  Preview Voice
-                </Button>
-              </div>
-            </motion.div>
-          )}
-        </div>
-
-        {/* Slide dots centered near bottom */}
-        <div className="relative z-30 absolute inset-x-0 bottom-8 mb-[env(safe-area-inset-bottom)] flex items-center justify-center gap-2">
-          <button
-            aria-label="Welcome slide"
-            onClick={() => setGateSlide(0)}
-            className={`h-2.5 rounded-full transition-all ${gateSlide === 0 ? "bg-amber-400 w-6" : "bg-white/40 w-2.5"}`}
-          />
-          <button
-            aria-label="Language slide"
-            onClick={() => setGateSlide(1)}
-            className={`h-2.5 rounded-full transition-all ${gateSlide === 1 ? "bg-cyan-400 w-6" : "bg-white/40 w-2.5"}`}
-          />
+          {/* Footer note */}
+          <div className="text-center text-xs text-white/50">
+            Private & secure. You control your data.
+          </div>
         </div>
       </div>
     );
