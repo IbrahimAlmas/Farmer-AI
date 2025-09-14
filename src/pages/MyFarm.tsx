@@ -89,7 +89,10 @@ export default function MyFarm() {
         ids.push(storageId);
       }
       await setCornerPhotos({ id: farmId as any, photoIds: ids as any });
-      toast.success("Field photo saved");
+      // Auto-generate 3D model and prep simulator
+      await finalizeModel({ id: farmId as any });
+      await ensureSim({ farmId: farmId as any });
+      toast.success("3D model generated and simulator ready");
     } catch (e: any) {
       toast.error(e?.message ?? "Failed to upload photos");
     }
@@ -189,6 +192,14 @@ export default function MyFarm() {
             {farms?.length ? farms.map((f) => {
               const isRec = recordingFarmId === (f._id as any);
               const points = path[f._id as any]?.length ?? 0;
+              // Add crops to visualize in the 3D preview (prefer previousCrops for variety)
+              const cropsList: Array<string> =
+                (Array.isArray((f as any).previousCrops) && (f as any).previousCrops.length > 0
+                  ? (f as any).previousCrops
+                  : Array.isArray(f.crops)
+                  ? f.crops
+                  : []) as any;
+              const palette: Array<string> = ["#8BC34A", "#4CAF50", "#FFC107", "#FF9800", "#9C27B0"];
               return (
                 <div key={f._id} className="border rounded-md p-3 space-y-3">
                   <div className="flex items-center justify-between">
@@ -219,7 +230,8 @@ export default function MyFarm() {
                     <div className="text-sm font-medium mb-2">3D Capture</div>
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <div className="text-xs text-muted-foreground">
-                        Field photo: {(f.cornerPhotos?.length ?? 0)}/1 • Walk points: {points || (f.walkPath?.length ?? 0)}
+                        {/* Simplified test mode stat */}
+                        Field photo: {(f.cornerPhotos?.length ?? 0)}/1
                       </div>
                       <div className="flex gap-2 flex-wrap">
                         <label>
@@ -241,18 +253,20 @@ export default function MyFarm() {
                             Stop & Save Walk
                           </Button>
                         )}
+                        {/* Auto-finalized on upload; keep hidden manual rebuild if needed */}
                         <Button
                           size="sm"
+                          className="hidden"
                           onClick={async () => {
                             try {
                               await finalizeModel({ id: f._id as any });
-                              toast.success("3D model finalized");
+                              toast.success("3D model rebuilt");
                             } catch (e: any) {
-                              toast.error(e?.message ?? "Finalize failed");
+                              toast.error(e?.message ?? "Rebuild failed");
                             }
                           }}
                         >
-                          Finalize 3D Model
+                          Rebuild 3D Model
                         </Button>
                       </div>
                     </div>
@@ -266,16 +280,55 @@ export default function MyFarm() {
                         <Button size="sm" onClick={() => openSim(f._id as any)}>Enter Simulation</Button>
                       </div>
 
-                      {/* Minimal 3D Preview placeholder */}
+                      {/* 3D-like Field Preview derived from crops */}
                       <div className="rounded-lg border bg-gradient-to-br from-emerald-50 to-emerald-100 p-3">
                         <div className="aspect-[4/3] w-full rounded-md bg-white grid place-items-center overflow-hidden relative">
                           <div className="absolute inset-0 bg-[linear-gradient(45deg,#e2f7e2_12%,transparent_12%,transparent_50%,#e2f7e2_50%,#e2f7e2_62%,transparent_62%,transparent_100%)] bg-[length:24px_24px] opacity-50" />
-                          <div className="relative">
-                            <div className="h-24 w-24 bg-emerald-500/80 rounded-md shadow-lg animate-[spin_8s_linear_infinite]" />
+                          <div className="relative w-full h-full grid place-items-center">
+                            <div
+                              className="w-[80%] h-[65%] mx-auto rounded-md shadow"
+                              style={{
+                                transform: "perspective(900px) rotateX(55deg) rotateZ(-12deg)",
+                                transformOrigin: "center",
+                                background: "#d4f7d9",
+                                border: "1px solid rgba(0,0,0,0.08)",
+                                boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
+                                overflow: "hidden",
+                              }}
+                            >
+                              {(cropsList?.length ?? 0) > 0 ? (
+                                cropsList.slice(0, 5).map((crop, i) => (
+                                  <div
+                                    key={i}
+                                    className="relative"
+                                    style={{
+                                      height: `${100 / Math.min(5, cropsList.length)}%`,
+                                      background: `linear-gradient(135deg, ${palette[i % palette.length]}66, ${palette[i % palette.length]})`,
+                                      borderBottom: "1px solid rgba(0,0,0,0.12)",
+                                      boxShadow: "inset 0 2px 6px rgba(0,0,0,0.12)",
+                                    }}
+                                  >
+                                    <div
+                                      className="absolute left-2 top-1 text-[10px] font-medium text-black/80"
+                                      style={{ transform: "rotateX(-55deg) rotateZ(12deg)" }}
+                                    >
+                                      {crop}
+                                    </div>
+                                  </div>
+                                ))
+                              ) : (
+                                <div
+                                  className="absolute inset-0 grid place-items-center text-xs text-muted-foreground"
+                                  style={{ transform: "rotateX(-55deg) rotateZ(12deg)" }}
+                                >
+                                  Add crops to visualize plots
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </div>
                         <div className="mt-2 text-[11px] text-muted-foreground">
-                          3D preview generated from your corner photos and walk path.
+                          Simple 3D field sketch derived from your photo and crops.
                         </div>
                       </div>
 
