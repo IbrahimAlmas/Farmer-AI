@@ -48,6 +48,7 @@ export function AppShell({ children, title }: AppShellProps) {
 
   const hideTopBar = location.pathname === "/dashboard";
   const isLearnMoreSection = ["/learn-more", "/our-team", "/our-mission", "/future-plan"].includes(location.pathname);
+  const isOurTeam = location.pathname === "/our-team";
 
   const handleVoiceCommand = (text: string) => {
     const command = text.toLowerCase().trim();
@@ -148,7 +149,21 @@ export function AppShell({ children, title }: AppShellProps) {
                   </h1>
                 )}
                 <div className="w-auto">
-                  {!isLearnMoreSection && <LanguageSelect size="sm" />}
+                  {/* Show Home button on Learn More pages; otherwise show language selector */}
+                  {isLearnMoreSection ? (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="rounded-xl px-3 py-2"
+                      onClick={() => navigate("/")}
+                      aria-label="Home"
+                    >
+                      <Home className="h-4 w-4 mr-2" />
+                      Home
+                    </Button>
+                  ) : (
+                    <LanguageSelect size="sm" />
+                  )}
                 </div>
               </div>
               {/* subtle gradient bar */}
@@ -164,72 +179,74 @@ export function AppShell({ children, title }: AppShellProps) {
       </main>
 
       {/* Bottom Navigation (mobile-first) */}
-      <nav className="fixed bottom-0 left-0 right-0 z-30">
-        <div className="pb-[calc(env(safe-area-inset-bottom))]" />
-        <div className="mx-auto w-full max-w-md px-3">
-          {/* Updated glass nav */}
-          <div className="rounded-3xl border bg-card/80 backdrop-blur-xl supports-[backdrop-filter]:bg-card/70 shadow-[0_-10px_35px_-15px_rgba(0,0,0,0.4)]">
-            <div className="flex items-center justify-between px-2 py-2">
-              {navItems.map((item) => {
-                const isActive = location.pathname === item.path;
-                const Icon = item.icon;
-                return (
-                  <Button
-                    key={item.path}
-                    variant="ghost"
-                    size="sm"
-                    className={`flex flex-col items-center gap-1 h-auto py-2 px-3 min-w-16 rounded-2xl transition-[background,transform,color] ${
-                      isActive ? "text-primary bg-primary/10 shadow-sm" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                    } hover:scale-[1.02]`}
-                    onClick={() => navigate(item.path)}
-                    aria-label={tr(item.label)}
-                    aria-current={isActive ? "page" : undefined}
-                  >
-                    <Icon className="h-[22px] w-[22px]" />
-                    <span className="text-[11px] leading-none">{tr(item.label)}</span>
-                  </Button>
-                );
-              })}
+      {!isOurTeam && (
+        <nav className="fixed bottom-0 left-0 right-0 z-30">
+          <div className="pb-[calc(env(safe-area-inset-bottom))]" />
+          <div className="mx-auto w-full max-w-md px-3">
+            {/* Updated glass nav */}
+            <div className="rounded-3xl border bg-card/80 backdrop-blur-xl supports-[backdrop-filter]:bg-card/70 shadow-[0_-10px_35px_-15px_rgba(0,0,0,0.4)]">
+              <div className="flex items-center justify-between px-2 py-2">
+                {navItems.map((item) => {
+                  const isActive = location.pathname === item.path;
+                  const Icon = item.icon;
+                  return (
+                    <Button
+                      key={item.path}
+                      variant="ghost"
+                      size="sm"
+                      className={`flex flex-col items-center gap-1 h-auto py-2 px-3 min-w-16 rounded-2xl transition-[background,transform,color] ${
+                        isActive ? "text-primary bg-primary/10 shadow-sm" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                      } hover:scale-[1.02]`}
+                      onClick={() => navigate(item.path)}
+                      aria-label={tr(item.label)}
+                      aria-current={isActive ? "page" : undefined}
+                    >
+                      <Icon className="h-[22px] w-[22px]" />
+                      <span className="text-[11px] leading-none">{tr(item.label)}</span>
+                    </Button>
+                  );
+                })}
 
-              {/* More menu */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className={`flex flex-col items-center gap-1 h-auto py-2 px-3 min-w-16 rounded-2xl ${
-                      moreItems.some((m) => m.path === location.pathname)
-                        ? "text-primary bg-primary/10 shadow-sm"
-                        : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                    } hover:scale-[1.02]`}
-                    aria-label={tr("More")}
-                    aria-haspopup="menu"
-                  >
-                    <MoreHorizontal className="h-[22px] w-[22px]" />
-                    <span className="text-[11px] leading-none">{tr("More")}</span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-44" align="end" side="top">
-                  {moreItems.map((m) => {
-                    const Icon = m.icon;
-                    const isActive = location.pathname === m.path;
-                    return (
-                      <DropdownMenuItem
-                        key={m.path}
-                        onClick={() => navigate(m.path)}
-                        className={isActive ? "text-primary" : undefined}
-                      >
-                        <Icon className="mr-2 h-4 w-4" />
-                        {tr(m.label)}
-                      </DropdownMenuItem>
-                    );
-                  })}
-                </DropdownMenuContent>
-              </DropdownMenu>
+                {/* More menu */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className={`flex flex-col items-center gap-1 h-auto py-2 px-3 min-w-16 rounded-2xl ${
+                        moreItems.some((m) => m.path === location.pathname)
+                          ? "text-primary bg-primary/10 shadow-sm"
+                          : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                      } hover:scale-[1.02]`}
+                      aria-label={tr("More")}
+                      aria-haspopup="menu"
+                    >
+                      <MoreHorizontal className="h-[22px] w-[22px]" />
+                      <span className="text-[11px] leading-none">{tr("More")}</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-44" align="end" side="top">
+                    {moreItems.map((m) => {
+                      const Icon = m.icon;
+                      const isActive = location.pathname === m.path;
+                      return (
+                        <DropdownMenuItem
+                          key={m.path}
+                          onClick={() => navigate(m.path)}
+                          className={isActive ? "text-primary" : undefined}
+                        >
+                          <Icon className="mr-2 h-4 w-4" />
+                          {tr(m.label)}
+                        </DropdownMenuItem>
+                      );
+                    })}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
           </div>
-        </div>
-      </nav>
+        </nav>
+      )}
 
       {/* Voice Button (floats above nav safely) */}
       <VoiceButton
