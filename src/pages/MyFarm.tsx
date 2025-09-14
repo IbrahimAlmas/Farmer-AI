@@ -7,6 +7,7 @@ import { useMutation, useQuery } from "convex/react";
 import { useState, useRef } from "react";
 import { toast } from "sonner";
 import { Link, useNavigate } from "react-router";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export default function MyFarm() {
   const farms = useQuery(api.farms.list);
@@ -32,6 +33,12 @@ export default function MyFarm() {
   const [recordingFarmId, setRecordingFarmId] = useState<string | null>(null);
   const [path, setPath] = useState<Record<string, Array<{ lat: number; lng: number; ts: number }>>>({}); 
   const watchIdRef = useRef<number | null>(null);
+
+  const [simFarmId, setSimFarmId] = useState<string | null>(null); // Window: which farm is open in sim
+
+  // Derived: active farm + sim state
+  const activeFarm = (farms ?? []).find((ff: any) => (ff._id as any) === simFarmId) as any | undefined;
+  const sim = useQuery(api.sims.get, simFarmId ? ({ farmId: simFarmId as any } as any) : "skip") as any;
 
   const add = async () => {
     if (!name.trim()) return;
@@ -98,6 +105,7 @@ export default function MyFarm() {
 
   const openSim = async (farmId: string) => {
     try {
+      setSimFarmId(farmId); // open the in-app window
       await ensureSim({ farmId: farmId as any });
       toast.success("Simulation ready");
     } catch (e: any) {
@@ -313,6 +321,71 @@ export default function MyFarm() {
             }) : <div className="text-sm text-muted-foreground">No farms yet.</div>}
           </CardContent>
         </Card>
+
+        {/* Simulation Window (in-app) */}
+        <Dialog open={!!simFarmId} onOpenChange={(o) => { if (!o) setSimFarmId(null); }}>
+          <DialogContent className="sm:max-w-3xl">
+            <DialogHeader>
+              <DialogTitle>Simulation{activeFarm ? ` — ${activeFarm.name}` : ""}</DialogTitle>
+            </DialogHeader>
+
+            <div className="space-y-4">
+              {!sim ? (
+                <div className="text-sm text-muted-foreground">Loading simulation…</div>
+              ) : (
+                <>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div className="rounded-md border p-3">
+                      <div className="text-xs text-muted-foreground mb-1">Stage</div>
+                      <div className="text-lg font-semibold">{sim.stage}</div>
+                    </div>
+                    <div className="rounded-md border p-3">
+                      <div className="text-xs text-muted-foreground mb-1">Weather</div>
+                      <div className="text-lg font-semibold">{sim.weather}</div>
+                    </div>
+                    <div className="rounded-md border p-3">
+                      <div className="text-xs text-muted-foreground mb-1">Soil Moisture</div>
+                      <div className="text-lg font-semibold">{sim.soilMoisture}%</div>
+                    </div>
+                    <div className="rounded-md border p-3">
+                      <div className="text-xs text-muted-foreground mb-1">Balance</div>
+                      <div className="text-lg font-semibold">₹{sim.balance}</div>
+                    </div>
+                    <div className="rounded-md border p-3 sm:col-span-2">
+                      <div className="text-xs text-muted-foreground mb-1">Current Crop</div>
+                      <div className="text-lg font-semibold">{sim.crop ?? "—"}</div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button onClick={() => advance({ farmId: simFarmId as any })}>Advance Day</Button>
+                    <Button variant="outline" onClick={() => water({ farmId: simFarmId as any })}>Water Field</Button>
+                    <Button variant="secondary" onClick={() => plant({ crop: "rice", farmId: simFarmId as any })}>Plant Rice (₹200)</Button>
+                    <Button variant="secondary" onClick={() => plant({ crop: "wheat", farmId: simFarmId as any })}>Plant Wheat (₹200)</Button>
+                    <Button
+                      className="col-span-2"
+                      onClick={async () => {
+                        try {
+                          const res = await harvest({ farmId: simFarmId as any });
+                          const gained = (res as any)?.payout ?? 0;
+                          toast.success(`Harvested! Earned ₹${gained}`);
+                        } catch (e: any) {
+                          toast.error(e?.message ?? "Failed to harvest");
+                        }
+                      }}
+                    >
+                      Harvest
+                    </Button>
+                  </div>
+                </>
+              )}
+            </div>
+
+            <DialogFooter className="justify-between sm:justify-end">
+              <Button variant="outline" onClick={() => setSimFarmId(null)}>Close</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </AppShell>
   );
