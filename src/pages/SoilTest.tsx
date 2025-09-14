@@ -225,7 +225,7 @@ export default function SoilTest() {
                     <CardContent className="space-y-4">
                       <div className="rounded-xl border overflow-hidden bg-muted">
                         <img
-                          src="https://images.unsplash.com/photo-1501004318641-b39e6451bec6?q=80&w=1400&auto=format&fit=crop"
+                          src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=1600&auto=format&fit=crop"
                           alt="Soil illustration"
                           className="w-full h-48 object-cover"
                           onError={(e) => {
@@ -239,10 +239,15 @@ export default function SoilTest() {
                         <p>
                           Check your soil's pH, moisture, and nutrient indicators with a quick photo-based test.
                         </p>
+                        <p>
+                          For best results, photograph a small patch of bare soil in natural light. Avoid harsh shadows and keep the frame steady and close to the ground.
+                        </p>
                         <ul className="list-disc pl-5 space-y-1">
                           <li>Use natural light and focus on bare soil surface</li>
                           <li>Avoid leaves, tools, or people in the frame</li>
                           <li>Upload a clear close-up of the soil</li>
+                          <li>Fill most of the frame with soil; keep angle roughly top‑down</li>
+                          <li>Wipe moisture or debris off the lens before shooting</li>
                         </ul>
                       </div>
                       <div className="flex justify-start">
