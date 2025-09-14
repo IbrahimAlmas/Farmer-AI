@@ -53,7 +53,7 @@ export const generateFromFarmPhoto: any = action({
     });
 
     // Submit job to Meshy
-    const submitResp = await fetch("https://api.meshy.ai/v2/image-to-3d", {
+    const submitResp = await fetch("https://api.meshy.ai/openapi/v1/image-to-3d", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,
@@ -74,7 +74,10 @@ export const generateFromFarmPhoto: any = action({
       throw new Error(`Meshy submission failed: ${submitResp.status} ${txt || submitResp.statusText}`);
     }
     const submitJson: any = await submitResp.json();
-    const taskId: string = submitJson?.task_id || submitJson?.taskId;
+    const taskId: string =
+      (typeof submitJson?.result === "string" && submitJson.result) ||
+      submitJson?.task_id ||
+      submitJson?.taskId;
     if (!taskId) {
       await ctx.runMutation(internal.farms.setModelMeta, {
         id: args.id,
@@ -94,14 +97,16 @@ export const generateFromFarmPhoto: any = action({
     let previewUrl: string | undefined;
     for (let i = 0; i < 40; i++) {
       await delay(3000);
-      const statusResp = await fetch(`https://api.meshy.ai/v2/tasks/${taskId}`, {
+      const statusResp = await fetch(`https://api.meshy.ai/openapi/v1/image-to-3d/${taskId}`, {
         headers: { Authorization: `Bearer ${apiKey}` },
       });
       if (!statusResp.ok) continue;
       const statusJson: any = await statusResp.json();
 
-      const status: string =
+      const rawStatus =
         statusJson?.status || statusJson?.task_status || statusJson?.data?.status;
+      const status =
+        typeof rawStatus === "string" ? rawStatus.toLowerCase() : String(rawStatus || "").toLowerCase();
 
       if (status === "succeeded" || status === "completed" || status === "success") {
         const result = statusJson?.result || statusJson?.output || statusJson?.data || {};
@@ -169,7 +174,7 @@ export const checkStatus: any = action({
       };
     }
 
-    const statusResp = await fetch(`https://api.meshy.ai/v2/tasks/${taskId}`, {
+    const statusResp = await fetch(`https://api.meshy.ai/openapi/v1/image-to-3d/${taskId}`, {
       headers: { Authorization: `Bearer ${apiKey}` },
     });
 
@@ -182,8 +187,10 @@ export const checkStatus: any = action({
     }
 
     const statusJson: any = await statusResp.json();
-    const status: string =
+    const rawStatus =
       statusJson?.status || statusJson?.task_status || statusJson?.data?.status;
+    const status =
+      typeof rawStatus === "string" ? rawStatus.toLowerCase() : String(rawStatus || "").toLowerCase();
 
     if (status === "succeeded" || status === "completed" || status === "success") {
       const result = statusJson?.result || statusJson?.output || statusJson?.data || {};

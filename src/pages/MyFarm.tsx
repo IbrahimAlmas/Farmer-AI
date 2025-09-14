@@ -374,70 +374,11 @@ export default function MyFarm() {
                                   transform: `translate(-50%, -50%) rotateX(90deg) translateZ(${size / 2}px)`,
                                   backgroundImage: photoUrl
                                     ? `url(${photoUrl})`
-                                    : "linear-gradient(135deg, #dcedc8, #a5d6a7)",
+                                    : "linear-gradient(135deg, #8bc34a, #4caf50)",
                                   backgroundSize: "cover",
                                   backgroundPosition: "center",
                                   border: "1px solid rgba(0,0,0,0.1)",
-                                  boxShadow: "inset 0 0 80px rgba(0,0,0,0.15)",
-                                }}
-                              />
-                              <div
-                                style={{
-                                  position: "absolute",
-                                  width: size,
-                                  height: size,
-                                  left: "50%",
-                                  top: "50%",
-                                  transform: `translate(-50%, -50%) rotateX(-90deg) translateZ(${size / 2}px)`,
-                                  background: "#795548",
-                                }}
-                              />
-                              <div
-                                style={{
-                                  position: "absolute",
-                                  width: size,
-                                  height: size / 3,
-                                  left: "50%",
-                                  top: "50%",
-                                  transform: `translate(-50%, -50%) translateZ(${size / 2}px)`,
-                                  background: "linear-gradient(to bottom, #795548, #5d4037)",
-                                  border: "1px solid rgba(0,0,0,0.08)",
-                                }}
-                              />
-                              <div
-                                style={{
-                                  position: "absolute",
-                                  width: size,
-                                  height: size / 3,
-                                  left: "50%",
-                                  top: "50%",
-                                  transform: `translate(-50%, -50%) rotateY(180deg) translateZ(${size / 2}px)`,
-                                  background: "linear-gradient(to bottom, #795548, #5d4037)",
-                                  border: "1px solid rgba(0,0,0,0.08)",
-                                }}
-                              />
-                              <div
-                                style={{
-                                  position: "absolute",
-                                  width: size,
-                                  height: size / 3,
-                                  left: "50%",
-                                  top: "50%",
-                                  transform: `translate(-50%, -50%) rotateY(-90deg) translateZ(${size / 2}px)`,
-                                  background: "linear-gradient(to bottom, #795548, #5d4037)",
-                                  border: "1px solid rgba(0,0,0,0.08)",
-                                }}
-                              />
-                              <div
-                                style={{
-                                  position: "absolute",
-                                  width: size,
-                                  height: size / 3,
-                                  left: "50%",
-                                  top: "50%",
-                                  transform: `translate(-50%, -50%) rotateY(90deg) translateZ(${size / 2}px)`,
-                                  background: "linear-gradient(to bottom, #795548, #5d4037)",
-                                  border: "1px solid rgba(0,0,0,0.08)",
+                                  boxShadow: "inset 0 0 40px rgba(0,0,0,0.12)",
                                 }}
                               />
                             </>

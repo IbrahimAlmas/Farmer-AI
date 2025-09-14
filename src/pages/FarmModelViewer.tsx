@@ -102,8 +102,7 @@ export default function FarmModelViewer() {
                     transition: isDraggingRef.current ? "none" : "transform 0.08s ease-out",
                   }}
                 >
-                  {/* Field box — 6 faces */}
-                  {/* Top (texture from uploaded photo) */}
+                  {/* Field plane — top texture only */}
                   <div
                     style={{
                       position: "absolute",
@@ -114,14 +113,13 @@ export default function FarmModelViewer() {
                       transform: `translate(-50%, -50%) rotateX(90deg) translateZ(${size / 2}px)`,
                       backgroundImage: photoUrl
                         ? `url(${photoUrl})`
-                        : "linear-gradient(135deg, #dcedc8, #a5d6a7)",
+                        : "linear-gradient(135deg, #8bc34a, #4caf50)",
                       backgroundSize: "cover",
                       backgroundPosition: "center",
                       border: "1px solid rgba(0,0,0,0.1)",
-                      boxShadow: "inset 0 0 80px rgba(0,0,0,0.15)",
+                      boxShadow: "inset 0 0 40px rgba(0,0,0,0.12)",
                     }}
                   >
-                    {/* Optional overlay stripes if we know prior crops */}
                     {Array.isArray(farm?.previousCrops) && farm.previousCrops.length > 0 && (
                       <div style={{ position: "absolute", inset: 0 }}>
                         {farm.previousCrops.slice(0, 5).map((crop: string, i: number) => {
