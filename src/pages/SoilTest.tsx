@@ -313,7 +313,7 @@ export default function SoilTest() {
             >
               <div className="grid gap-4 lg:grid-cols-3">
                 {/* Left side tips */}
-                <div className="hidden lg:block">
+                <div className="hidden lg:block lg:sticky lg:top-24">
                   <Card className="overflow-hidden backdrop-blur supports-[backdrop-filter]:bg-card/70">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm">Pro tips</CardTitle>
@@ -486,7 +486,7 @@ export default function SoilTest() {
                 </div>
 
                 {/* Right side sample preview */}
-                <div className="hidden lg:block">
+                <div className="hidden lg:block lg:sticky lg:top-24">
                   <Card className="overflow-hidden backdrop-blur supports-[backdrop-filter]:bg-card/70">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm">Sample result preview</CardTitle>
