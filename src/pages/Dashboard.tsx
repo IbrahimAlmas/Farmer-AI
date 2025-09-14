@@ -7,7 +7,6 @@ import { motion } from "framer-motion";
 import { Sprout, CheckSquare, TrendingUp, Camera, Users, Calendar } from "lucide-react";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
-import { ArrowLeft } from "lucide-react";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -32,15 +31,49 @@ export default function Dashboard() {
     <AppShell title="Dashboard">
       <div className="p-4 space-y-6">
 
-        {/* Page Header with Back to Landing */}
-        <div className="flex items-center justify-between">
+        {/* Page Header redesigned like reference: brand left, nav center, CTA right */}
+        <div className="flex items-center justify-between gap-3">
+          {/* Left: Brand -> go to Landing */}
           <Button
-            variant="outline"
-            className="rounded-2xl"
+            variant="ghost"
+            className="rounded-2xl px-3 py-2 font-semibold"
             onClick={() => navigate("/")}
           >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Landing
+            <img
+              src="/logo.svg"
+              alt="Root AI"
+              className="h-6 w-6 mr-2 rounded-md"
+              onError={(e) => {
+                const t = e.currentTarget as HTMLImageElement;
+                if (t.src !== '/logo_bg.svg') t.src = '/logo_bg.svg';
+                t.onerror = null;
+              }}
+            />
+            Root AI
+          </Button>
+
+          {/* Center: Simple nav */}
+          <div className="hidden sm:flex items-center gap-4 text-sm">
+            <Button variant="ghost" className="rounded-2xl" onClick={() => navigate("/learn")}>
+              Benefits
+            </Button>
+            <Button variant="ghost" className="rounded-2xl" onClick={() => navigate("/market")}>
+              Specifications
+            </Button>
+            <Button variant="ghost" className="rounded-2xl" onClick={() => navigate("/soil-test")}>
+              How‑to
+            </Button>
+            <Button variant="ghost" className="rounded-2xl" onClick={() => navigate("/")}>
+              Contact Us
+            </Button>
+          </div>
+
+          {/* Right: CTA */}
+          <Button
+            className="rounded-full bg-[oklch(0.42_0.12_130)] hover:bg-[oklch(0.42_0.12_130_/_90%)] text-white"
+            onClick={() => navigate("/learn")}
+          >
+            Learn More →
           </Button>
         </div>
 
