@@ -146,3 +146,14 @@ export const authStatus = query({
     return { authenticated: !!userId };
   },
 });
+
+export const getById = query({
+  args: { id: v.id("farms") },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const farm = await ctx.db.get(args.id);
+    if (!farm || farm.userId !== userId) throw new Error("Farm not found or access denied");
+    return farm;
+  },
+});

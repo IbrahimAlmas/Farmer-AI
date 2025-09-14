@@ -28,6 +28,7 @@ import OurTeam from "@/pages/OurTeam.tsx";
 import OurMission from "@/pages/OurMission.tsx";
 import FuturePlan from "@/pages/FuturePlan.tsx";
 import CommunityCreate from "@/pages/CommunityCreate.tsx";
+import FarmModelViewer from "@/pages/FarmModelViewer.tsx";
 
 function RouteSyncer() {
   const location = useLocation();
@@ -75,6 +76,7 @@ createRoot(document.getElementById("root")!).render(
             <Route path="/community/create" element={<CommunityCreate />} />
             <Route path="/soil-test" element={<SoilTest />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/farm/:id/model" element={<FarmModelViewer />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

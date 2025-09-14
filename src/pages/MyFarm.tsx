@@ -6,14 +6,13 @@ import { api } from "@/convex/_generated/api";
 import { useMutation, useQuery } from "convex/react";
 import { useState, useRef } from "react";
 import { toast } from "sonner";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 
 export default function MyFarm() {
   const farms = useQuery(api.farms.list);
   const auth = useQuery(api.farms.authStatus);
   const create = useMutation(api.farms.create);
   const setCornerPhotos = useMutation(api.farms.setCornerPhotos);
-  const setWalkPath = useMutation(api.farms.setWalkPath);
   const finalizeModel = useMutation(api.farms.finalizeModel);
 
   const ensureSim = useMutation(api.sims.ensure);
@@ -28,8 +27,10 @@ export default function MyFarm() {
   const [size, setSize] = useState<string>("");
   const [prevCropsInput, setPrevCropsInput] = useState<string>("");
 
+  const navigate = useNavigate();
+
   const [recordingFarmId, setRecordingFarmId] = useState<string | null>(null);
-  const [path, setPath] = useState<Record<string, Array<{ lat: number; lng: number; ts: number }>>>({});
+  const [path, setPath] = useState<Record<string, Array<{ lat: number; lng: number; ts: number }>>>({}); 
   const watchIdRef = useRef<number | null>(null);
 
   const add = async () => {
@@ -76,7 +77,7 @@ export default function MyFarm() {
     if (!files || files.length === 0) return;
     try {
       const ids: string[] = [];
-      const max = Math.min(4, files.length);
+      const max = Math.min(1, files.length); // limit to 1
       for (let i = 0; i < max; i++) {
         const f = files[i];
         const url = await getUploadUrl({});
@@ -89,54 +90,12 @@ export default function MyFarm() {
         ids.push(storageId);
       }
       await setCornerPhotos({ id: farmId as any, photoIds: ids as any });
-      // Auto-generate 3D model and prep simulator
-      await finalizeModel({ id: farmId as any });
-      await ensureSim({ farmId: farmId as any });
-      toast.success("3D model generated and simulator ready");
+      toast.success("Photo uploaded. Click 'Generate 3D Model' to continue.");
     } catch (e: any) {
-      toast.error(e?.message ?? "Failed to upload photos");
+      toast.error(e?.message ?? "Failed to upload photo");
     }
   };
 
-  // GPS recording controls
-  const startRecording = (farmId: string) => {
-    if (!navigator.geolocation) {
-      toast.error("Geolocation not supported");
-      return;
-    }
-    setRecordingFarmId(farmId);
-    const local: Array<{ lat: number; lng: number; ts: number }> = [];
-    const watchId = navigator.geolocation.watchPosition(
-      (pos) => {
-        local.push({ lat: pos.coords.latitude, lng: pos.coords.longitude, ts: Date.now() });
-        setPath((prev) => ({ ...prev, [farmId]: [...local] }));
-      },
-      () => {},
-      { enableHighAccuracy: true, maximumAge: 0, timeout: 20000 },
-    );
-    watchIdRef.current = watchId as any;
-  };
-
-  const stopRecording = async (farmId: string) => {
-    if (watchIdRef.current !== null) {
-      navigator.geolocation.clearWatch(watchIdRef.current);
-      watchIdRef.current = null;
-    }
-    setRecordingFarmId(null);
-    try {
-      const p = path[farmId] ?? [];
-      if (p.length < 10) {
-        toast.error("Walk a bit more around the field to capture shape");
-        return;
-      }
-      await setWalkPath({ id: farmId as any, path: p });
-      toast.success("Walk path saved");
-    } catch (e: any) {
-      toast.error(e?.message ?? "Failed to save path");
-    }
-  };
-
-  // Simulation helpers (per farm)
   const openSim = async (farmId: string) => {
     try {
       await ensureSim({ farmId: farmId as any });
@@ -244,29 +203,20 @@ export default function MyFarm() {
                           />
                           <Button variant="outline" size="sm">Upload Field Photo</Button>
                         </label>
-                        {!isRec ? (
-                          <Button variant="secondary" size="sm" onClick={() => startRecording(f._id as any)}>
-                            Start GPS Walk
-                          </Button>
-                        ) : (
-                          <Button size="sm" onClick={() => stopRecording(f._id as any)}>
-                            Stop & Save Walk
-                          </Button>
-                        )}
-                        {/* Auto-finalized on upload; keep hidden manual rebuild if needed */}
                         <Button
                           size="sm"
-                          className="hidden"
                           onClick={async () => {
                             try {
                               await finalizeModel({ id: f._id as any });
-                              toast.success("3D model rebuilt");
+                              toast.success("3D model generated");
+                              navigate(`/farm/${f._id as any}/model`);
                             } catch (e: any) {
-                              toast.error(e?.message ?? "Rebuild failed");
+                              toast.error(e?.message ?? "Failed to generate model");
                             }
                           }}
+                          disabled={(f.cornerPhotos?.length ?? 0) < 1}
                         >
-                          Rebuild 3D Model
+                          Generate 3D Model
                         </Button>
                       </div>
                     </div>
