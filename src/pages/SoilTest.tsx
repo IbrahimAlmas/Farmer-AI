@@ -225,9 +225,9 @@ export default function SoilTest() {
                     <CardContent className="space-y-4">
                       <div className="rounded-xl border overflow-hidden bg-muted">
                         <img
-                          src="https://images.unsplash.com/photo-1442512595331-e89e73853f31?q=80&w=2000&auto=format&fit=crop"
+                          src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=2000&auto=format&fit=crop"
                           alt="Wide farmland with clearly visible soil rows"
-                          className="w-full h-56 sm:h-64 object-cover"
+                          className="w-full h-52 sm:h-60 object-cover"
                           onError={(e) => {
                             const t = e.currentTarget as HTMLImageElement;
                             if (t.src !== '/logo_bg.png') t.src = '/logo_bg.png';
@@ -237,15 +237,11 @@ export default function SoilTest() {
                       </div>
                       <div className="text-sm text-muted-foreground space-y-2">
                         <p>
-                          Check your soil's pH, moisture, and nutrient indicators with a quick photo-based test.
-                        </p>
-                        <p>
-                          For best results, use natural light and frame a small patch of bare soil. Avoid harsh shadows.
+                          Quickly estimate pH, moisture, and key nutrients from a soil photo. Use daylight and frame a small patch of bare soil.
                         </p>
                         <ul className="list-disc pl-5 space-y-1">
                           <li>Use natural light and focus on bare soil surface</li>
                           <li>Avoid leaves, tools, or people in the frame</li>
-                          <li>Upload a clear close-up of the soil</li>
                           <li>Fill most of the frame with soil; keep angle roughly top‑down</li>
                         </ul>
                       </div>
