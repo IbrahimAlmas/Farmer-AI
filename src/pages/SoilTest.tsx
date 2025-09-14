@@ -645,9 +645,9 @@ export default function SoilTest() {
 
               {/* Results */}
               <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
-                <Card className="overflow-hidden">
+                <Card className="overflow-hidden border-emerald-200 bg-emerald-50/70 dark:bg-emerald-900/10">
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-base">Analysis Results</CardTitle>
+                    <CardTitle className="text-base text-emerald-900 dark:text-emerald-200">Analysis Results</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {errorMsg && (
@@ -667,54 +667,54 @@ export default function SoilTest() {
                       <div className="space-y-6">
                         {/* Primary metrics */}
                         <div className="grid gap-3 sm:grid-cols-2">
-                          <div className="rounded-lg border p-4 bg-muted/30">
+                          <div className="rounded-lg border border-emerald-200 p-4 bg-emerald-50/60 dark:bg-emerald-900/20">
                             <div className="text-xs text-muted-foreground mb-1">pH</div>
                             <div className="flex items-baseline justify-between">
                               <div className="text-2xl font-semibold">{result.ph}</div>
-                              <Badge variant="outline">Ideal: 6.0–7.5</Badge>
+                              <Badge variant="outline" className="border-emerald-400 text-emerald-700 dark:text-emerald-300">Ideal: 6.0–7.5</Badge>
                             </div>
                             <div className="mt-3">
-                              <Progress value={((result.ph - 4) / (9 - 4)) * 100} />
+                              <Progress value={((result.ph - 4) / (9 - 4)) * 100} className="bg-emerald-100 [&>div]:bg-emerald-500" />
                             </div>
                           </div>
 
-                          <div className="rounded-lg border p-4 bg-muted/30">
+                          <div className="rounded-lg border border-emerald-200 p-4 bg-emerald-50/60 dark:bg-emerald-900/20">
                             <div className="text-xs text-muted-foreground mb-1">Moisture</div>
                             <div className="flex items-baseline justify-between">
                               <div className="text-2xl font-semibold">{result.moisture}%</div>
-                              <Badge variant="outline">Target: 20–40%</Badge>
+                              <Badge variant="outline" className="border-emerald-400 text-emerald-700 dark:text-emerald-300">Target: 20–40%</Badge>
                             </div>
                             <div className="mt-3">
-                              <Progress value={Math.min(100, Math.max(0, result.moisture))} />
+                              <Progress value={Math.min(100, Math.max(0, result.moisture))} className="bg-emerald-100 [&>div]:bg-emerald-500" />
                             </div>
                           </div>
                         </div>
 
                         {/* Nutrients */}
                         <div className="grid gap-3 sm:grid-cols-3">
-                          <div className="rounded-lg border p-4">
+                          <div className="rounded-lg border border-emerald-200 p-4">
                             <div className="text-xs text-muted-foreground mb-1">Nitrogen</div>
                             <div className="text-xl font-semibold">{result.nitrogen} mg/kg</div>
                           </div>
-                          <div className="rounded-lg border p-4">
+                          <div className="rounded-lg border border-emerald-200 p-4">
                             <div className="text-xs text-muted-foreground mb-1">Phosphorus</div>
                             <div className="text-xl font-semibold">{result.phosphorus} mg/kg</div>
                           </div>
-                          <div className="rounded-lg border p-4">
+                          <div className="rounded-lg border border-emerald-200 p-4">
                             <div className="text-xs text-muted-foreground mb-1">Potassium</div>
                             <div className="text-xl font-semibold">{result.potassium} mg/kg</div>
                           </div>
                         </div>
 
                         {/* Organic matter */}
-                        <div className="rounded-lg border p-4 bg-muted/30">
+                        <div className="rounded-lg border border-emerald-200 p-4 bg-emerald-50/60 dark:bg-emerald-900/20">
                           <div className="text-xs text-muted-foreground mb-2">Organic Matter</div>
                           <div className="flex items-baseline justify-between">
                             <div className="text-2xl font-semibold">{result.organicMatter}%</div>
-                            <Badge variant="outline">Healthy: 3–6%</Badge>
+                            <Badge variant="outline" className="border-emerald-400 text-emerald-700 dark:text-emerald-300">Healthy: 3–6%</Badge>
                           </div>
                           <div className="mt-3">
-                            <Progress value={Math.min(100, (result.organicMatter / 6) * 100)} />
+                            <Progress value={Math.min(100, (result.organicMatter / 6) * 100)} className="bg-emerald-100 [&>div]:bg-emerald-500" />
                           </div>
                         </div>
 
