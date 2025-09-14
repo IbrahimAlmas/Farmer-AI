@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { Sprout, CheckSquare, TrendingUp, Camera, Users, Calendar } from "lucide-react";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
+import { ArrowLeft } from "lucide-react";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -30,6 +31,18 @@ export default function Dashboard() {
   return (
     <AppShell title="Dashboard">
       <div className="p-4 space-y-6">
+
+        {/* Page Header with Back to Landing */}
+        <div className="flex items-center justify-between">
+          <Button
+            variant="outline"
+            className="rounded-2xl"
+            onClick={() => navigate("/")}
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Landing
+          </Button>
+        </div>
 
         {/* Greeting */}
         <motion.div
