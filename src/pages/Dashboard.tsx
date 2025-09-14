@@ -40,7 +40,7 @@ export default function Dashboard() {
             onClick={() => navigate("/")}
           >
             <img
-              src="https://harmless-tapir-303.convex.cloud/api/storage/f3242bc3-cc14-44cb-bf20-dc6e3f827048"
+              src="/logo.svg"
               alt="Root AI"
               className="h-6 w-6 mr-2 rounded-full object-cover"
               onError={(e) => {

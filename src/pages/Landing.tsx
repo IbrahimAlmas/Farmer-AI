@@ -441,7 +441,7 @@ export default function Landing() {
             className="text-center"
           >
             <div className="flex justify-center">
-              <img src="https://harmless-tapir-303.convex.cloud/api/storage/f3242bc3-cc14-44cb-bf20-dc6e3f827048" alt="Root AI" className="h-14 w-14 rounded-full object-cover shadow" />
+              <img src="/logo.svg" alt="Root AI" className="h-14 w-14 rounded-full object-cover shadow" />
             </div>
             <h1 className="mt-6 text-4xl md:text-5xl font-extrabold tracking-tight leading-[1.1]">
               {tr("Root AI — Intelligent Agriculture Companion")}
