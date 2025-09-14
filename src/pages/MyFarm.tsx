@@ -23,6 +23,9 @@ export default function MyFarm() {
   const harvest = useMutation(api.sims.harvest);
 
   const [name, setName] = useState("");
+  const [size, setSize] = useState<string>("");
+  const [prevCropsInput, setPrevCropsInput] = useState<string>("");
+
   const [recordingFarmId, setRecordingFarmId] = useState<string | null>(null);
   const [path, setPath] = useState<Record<string, Array<{ lat: number; lng: number; ts: number }>>>({});
   const watchIdRef = useRef<number | null>(null);
@@ -30,8 +33,30 @@ export default function MyFarm() {
   const add = async () => {
     if (!name.trim()) return;
     try {
-      await create({ name, crops: [], location: undefined });
+      // Parse previous crops from comma-separated input
+      const previousCrops = prevCropsInput
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+
+      // Parse numeric size if provided
+      const numericSize = size.trim() ? Number(size) : undefined;
+      if (numericSize !== undefined && (isNaN(numericSize) || numericSize <= 0)) {
+        toast.error("Please enter a valid farm size (number > 0)");
+        return;
+      }
+
+      await create({
+        name,
+        crops: [],
+        location: undefined,
+        // pass new optional fields
+        size: numericSize as any,
+        previousCrops: previousCrops as any,
+      });
       setName("");
+      setSize("");
+      setPrevCropsInput("");
       toast.success("Farm added");
     } catch {
       toast.error("Failed to add farm");
@@ -115,8 +140,19 @@ export default function MyFarm() {
       <div className="p-4 space-y-4">
         <Card>
           <CardHeader><CardTitle>Add Farm</CardTitle></CardHeader>
-          <CardContent className="flex gap-2">
+          <CardContent className="grid gap-2 sm:grid-cols-[1fr_140px_1fr_auto]">
             <Input placeholder="Farm name" value={name} onChange={(e) => setName(e.target.value)} />
+            <Input
+              placeholder="Size (acres)"
+              inputMode="decimal"
+              value={size}
+              onChange={(e) => setSize(e.target.value)}
+            />
+            <Input
+              placeholder="Previous crops (comma separated)"
+              value={prevCropsInput}
+              onChange={(e) => setPrevCropsInput(e.target.value)}
+            />
             <Button onClick={add}>Add</Button>
           </CardContent>
         </Card>
@@ -134,6 +170,13 @@ export default function MyFarm() {
                       <div className="font-medium">{f.name}</div>
                       <div className="text-xs text-muted-foreground">
                         {(f.crops ?? []).join(", ") || "No crops yet"}
+                      </div>
+                      {/* Show size and previous crops */}
+                      <div className="text-xs text-muted-foreground mt-1">
+                        {typeof (f as any).size === "number" ? `Size: ${(f as any).size} acres • ` : ""}
+                        {Array.isArray((f as any).previousCrops) && (f as any).previousCrops.length > 0
+                          ? `Previous: ${(f as any).previousCrops.join(", ")}`
+                          : "Previous: —"}
                       </div>
                     </div>
                     <div className="text-xs">
@@ -192,12 +235,26 @@ export default function MyFarm() {
 
                   {/* Simulation Section */}
                   {f.modelReady && (
-                    <div className="rounded-md border p-3">
+                    <div className="rounded-md border p-3 space-y-3">
                       <div className="flex items-center justify-between">
                         <div className="text-sm font-medium">Simulation</div>
                         <Button size="sm" onClick={() => openSim(f._id as any)}>Enter Simulation</Button>
                       </div>
-                      <div className="mt-2 grid grid-cols-2 gap-2">
+
+                      {/* Minimal 3D Preview placeholder */}
+                      <div className="rounded-lg border bg-gradient-to-br from-emerald-50 to-emerald-100 p-3">
+                        <div className="aspect-[4/3] w-full rounded-md bg-white grid place-items-center overflow-hidden relative">
+                          <div className="absolute inset-0 bg-[linear-gradient(45deg,#e2f7e2_12%,transparent_12%,transparent_50%,#e2f7e2_50%,#e2f7e2_62%,transparent_62%,transparent_100%)] bg-[length:24px_24px] opacity-50" />
+                          <div className="relative">
+                            <div className="h-24 w-24 bg-emerald-500/80 rounded-md shadow-lg animate-[spin_8s_linear_infinite]" />
+                          </div>
+                        </div>
+                        <div className="mt-2 text-[11px] text-muted-foreground">
+                          3D preview generated from your corner photos and walk path.
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
                         <Button onClick={() => advance({ farmId: f._id as any })}>Advance Day</Button>
                         <Button variant="outline" onClick={() => water({ farmId: f._id as any })}>Water Field</Button>
                         <Button variant="secondary" onClick={() => plant({ crop: "rice", farmId: f._id as any })}>

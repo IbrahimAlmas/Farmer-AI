@@ -79,6 +79,9 @@ const schema = defineSchema(
         ts: v.number(),
       }))),
       modelReady: v.optional(v.boolean()),
+      // Added fields: size (e.g., acres) and user's previous crops
+      size: v.optional(v.number()),
+      previousCrops: v.optional(v.array(v.string())),
     }).index("by_userId", ["userId"]),
 
     // Tasks for users

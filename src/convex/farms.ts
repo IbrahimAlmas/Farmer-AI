@@ -24,6 +24,9 @@ export const create = mutation({
       address: v.optional(v.string()),
     })),
     crops: v.array(v.string()),
+    // New optional inputs
+    size: v.optional(v.number()),
+    previousCrops: v.optional(v.array(v.string())),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -34,6 +37,9 @@ export const create = mutation({
       name: args.name,
       location: args.location,
       crops: args.crops,
+      // store new optional fields if provided
+      size: args.size,
+      previousCrops: args.previousCrops,
     });
   },
 });
