@@ -53,12 +53,12 @@ export default function OurTeam() {
       <div className="pb-24">
         {/* Hero banner aligned to site theme */}
         <div className="relative">
-          <div className="h-40 sm:h-52 w-full overflow-hidden rounded-b-3xl">
-            {/* Replace background crest with brand logo */}
+          <div className="h-56 sm:h-72 w-full overflow-hidden rounded-b-3xl">
+            {/* Replace background crest with brand logo and make it super big */}
             <img
               src="/assets/Logo_.png"
               alt="FarmHes"
-              className="w-full h-full object-contain bg-card/60"
+              className="w-full h-full object-contain bg-card/60 scale-150"
               loading="eager"
               onError={(e) => {
                 const t = e.currentTarget as HTMLImageElement;
@@ -67,11 +67,11 @@ export default function OurTeam() {
               }}
             />
           </div>
-          <div className="absolute inset-x-0 top-0 h-40 sm:h-52 bg-gradient-to-b from-black/25 to-transparent rounded-b-3xl" />
+          <div className="absolute inset-x-0 top-0 h-56 sm:h-72 bg-gradient-to-b from-black/25 to-transparent rounded-b-3xl" />
           <div className="absolute bottom-4 left-4 right-4">
             <div className="flex items-center justify-between">
               <div className="text-white drop-shadow">
-                <div className="text-xl font-bold tracking-tight">FarmHes</div>
+                <div className="text-4xl font-extrabold tracking-tight">FarmHes</div>
                 <div className="text-xs opacity-90">Our Team</div>
               </div>
             </div>
@@ -83,7 +83,7 @@ export default function OurTeam() {
           <div className="mt-6 mb-2 text-xs font-semibold tracking-[0.25em] text-muted-foreground">
             MEET THE TEAM
           </div>
-          <h2 className="text-2xl font-extrabold">FarmHes — Team of 6</h2>
+          <h2 className="text-2xl font-extrabold">FarmHes</h2>
           <p className="mt-2 text-sm text-muted-foreground max-w-2xl">
             Builders and growers working on practical, voice‑first AI for agriculture —
             matching Root AI's clean, minimal aesthetic.
