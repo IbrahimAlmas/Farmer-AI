@@ -52,22 +52,6 @@ export default function Dashboard() {
             Root AI
           </Button>
 
-          {/* Center: Simple nav */}
-          <div className="hidden sm:flex items-center gap-4 text-sm">
-            <Button variant="ghost" className="rounded-2xl" onClick={() => navigate("/learn")}>
-              Benefits
-            </Button>
-            <Button variant="ghost" className="rounded-2xl" onClick={() => navigate("/market")}>
-              Specifications
-            </Button>
-            <Button variant="ghost" className="rounded-2xl" onClick={() => navigate("/soil-test")}>
-              How‑to
-            </Button>
-            <Button variant="ghost" className="rounded-2xl" onClick={() => navigate("/")}>
-              Contact Us
-            </Button>
-          </div>
-
           {/* Right: CTA */}
           <Button
             className="rounded-full bg-[oklch(0.42_0.12_130)] hover:bg-[oklch(0.42_0.12_130_/_90%)] text-white"
