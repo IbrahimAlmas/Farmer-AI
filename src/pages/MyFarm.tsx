@@ -185,12 +185,17 @@ export default function MyFarm() {
                           : "Previous: —"}
                       </div>
                     </div>
-                    <div className="text-xs">
-                      {f.modelReady ? (
-                        <span className="text-green-600">3D model ready</span>
-                      ) : (
-                        <span className="text-amber-600">3D model not ready</span>
-                      )}
+                    <div className="flex items-center gap-2">
+                      <div className="text-xs">
+                        {f.modelReady ? (
+                          <span className="text-green-600">3D model ready</span>
+                        ) : (
+                          <span className="text-amber-600">3D model not ready</span>
+                        )}
+                      </div>
+                      <Button size="sm" onClick={() => openSim(f._id as any)} disabled={!auth?.authenticated}>
+                        Enter Simulation
+                      </Button>
                     </div>
                   </div>
 
