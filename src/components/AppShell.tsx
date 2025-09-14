@@ -109,10 +109,10 @@ export function AppShell({ children, title }: AppShellProps) {
       {!hideTopBar && (
         <header className="sticky top-0 z-40">
           <div className="px-4 pt-[env(safe-area-inset-top)]" />
-          <div className="mx-auto w-full max-w-md">
+          <div className="mx-auto w-full max-w-2xl">
             {/* Updated glass header */}
             <div className="rounded-b-3xl border-b bg-card/70 backdrop-blur-xl supports-[backdrop-filter]:bg-card/60 shadow-[0_6px_30px_-10px_rgba(0,0,0,0.25)]">
-              <div className="flex items-center justify-between px-4 py-3">
+              <div className="flex items-center justify-between px-4 py-4">
                 <LogoDropdown />
                 {/* Replace title with contextual nav for Learn More section pages */}
                 {["/learn-more", "/our-team", "/our-mission", "/future-plan"].includes(location.pathname) ? (
