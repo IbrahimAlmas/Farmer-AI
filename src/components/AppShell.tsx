@@ -155,7 +155,7 @@ export function AppShell({ children, title }: AppShellProps) {
                       variant="outline"
                       size="sm"
                       className="rounded-xl px-3 py-2"
-                      onClick={() => navigate("/")}
+                      onClick={() => navigate("/dashboard")}
                       aria-label="Home"
                     >
                       <Home className="h-4 w-4 mr-2" />
