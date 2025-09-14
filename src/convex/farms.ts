@@ -4,6 +4,18 @@ import { v } from "convex/values";
 import { internalMutation, internalQuery } from "./_generated/server";
 
 // Add helper to use a Test User when unauthenticated
+async function getTestUserIdIfExists(ctx: any) {
+  const email = "test@demo.local";
+  const existing =
+    (await ctx.db
+      .query("users")
+      .withIndex("email", (q: any) => q.eq("email", email))
+      .unique()
+      .catch(() => null)) || null;
+  return existing?._id ?? null;
+}
+
+/** Create or return the Test User for mutations when unauthenticated */
 async function getOrCreateTestUserId(ctx: any) {
   const email = "test@demo.local";
   const existing =
@@ -20,7 +32,8 @@ async function getOrCreateTestUserId(ctx: any) {
 export const list = query({
   args: {},
   handler: async (ctx) => {
-    const userId = (await getAuthUserId(ctx)) ?? (await getOrCreateTestUserId(ctx));
+    const userId = (await getAuthUserId(ctx)) ?? (await getTestUserIdIfExists(ctx));
+    if (!userId) return [];
     return await ctx.db
       .query("farms")
       .withIndex("by_userId", (q) => q.eq("userId", userId))
@@ -145,7 +158,7 @@ export const authStatus = query({
 export const getById = query({
   args: { id: v.id("farms") },
   handler: async (ctx, args) => {
-    const userId = (await getAuthUserId(ctx)) ?? (await getOrCreateTestUserId(ctx));
+    const userId = (await getAuthUserId(ctx)) ?? (await getTestUserIdIfExists(ctx));
     const farm = await ctx.db.get(args.id);
     if (!farm || farm.userId !== userId) throw new Error("Farm not found or access denied");
     return farm;
@@ -156,7 +169,7 @@ export const getById = query({
 export const ownedFarm = internalQuery({
   args: { id: v.id("farms") },
   handler: async (ctx, args) => {
-    const userId = (await getAuthUserId(ctx)) ?? (await getOrCreateTestUserId(ctx));
+    const userId = (await getAuthUserId(ctx)) ?? (await getTestUserIdIfExists(ctx));
     const farm = await ctx.db.get(args.id);
     if (!farm || farm.userId !== userId) throw new Error("Farm not found or access denied");
     return farm;

@@ -16,10 +16,22 @@ async function getOrCreateTestUserId(ctx: any) {
   return id;
 }
 
+// Add a query-safe helper for queries only
+async function getTestUserIdIfExists(ctx: any) {
+  const email = "test@demo.local";
+  const existing =
+    (await ctx.db
+      .query("users")
+      .withIndex("email", (q: any) => q.eq("email", email))
+      .unique()
+      .catch(() => null)) || null;
+  return existing?._id ?? null;
+}
+
 export const get = query({
   args: { farmId: v.optional(v.id("farms")) },
   handler: async (ctx, args) => {
-    const userId = (await getAuthUserId(ctx)) ?? (await getOrCreateTestUserId(ctx));
+    const userId = (await getAuthUserId(ctx)) ?? (await getTestUserIdIfExists(ctx));
     if (args.farmId) {
       const existing = await ctx.db
         .query("sims")
