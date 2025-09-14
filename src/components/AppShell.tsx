@@ -20,6 +20,7 @@ import { toast } from "sonner";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal } from "lucide-react";
 import LanguageSelect from "@/components/LanguageSelect";
+import { useEffect, useState } from "react";
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -52,6 +53,27 @@ export function AppShell({ children, title }: AppShellProps) {
   const isOurTeam = location.pathname === "/our-team";
   const isCommunity = location.pathname === "/community";
   const isCommunityCreate = location.pathname === "/community/create";
+
+  // Add: live time and scroll progress
+  const [now, setNow] = useState<Date>(new Date());
+  const [scrollProgress, setScrollProgress] = useState<number>(0);
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  useEffect(() => {
+    const onScroll = () => {
+      const doc = document.documentElement;
+      const total = (doc.scrollHeight - doc.clientHeight) || 1;
+      const scrolled = Math.min(Math.max(window.scrollY / total, 0), 1);
+      setScrollProgress(Math.round(scrolled * 100));
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const handleVoiceCommand = (text: string) => {
     const command = text.toLowerCase().trim();
@@ -119,7 +141,7 @@ export function AppShell({ children, title }: AppShellProps) {
               <div className="flex items-center justify-between px-4 py-3">
                 <LogoDropdown />
                 {/* Replace title with contextual nav for Learn More section pages */}
-                {["/learn-more", "/our-team", "/our-mission", "/future-plan"].includes(location.pathname) ? (
+                {[ "/learn-more", "/our-team", "/our-mission", "/future-plan" ].includes(location.pathname) ? (
                   <div className="flex-1 flex items-center justify-center gap-2">
                     <Button
                       variant={location.pathname === "/our-team" ? "secondary" : "ghost"}
@@ -214,13 +236,34 @@ export function AppShell({ children, title }: AppShellProps) {
                           Community
                         </Button>
                       )}
+                      {/* New: Live clock pill (dynamic element) */}
+                      <div
+                        className="hidden sm:flex items-center gap-2 rounded-xl border bg-card/70 px-2.5 py-1.5 text-xs text-muted-foreground"
+                        title="Live time"
+                        aria-label="Live time"
+                      >
+                        <span className="relative flex h-2 w-2">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500/50 opacity-75" />
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                        </span>
+                        <span className="tabular-nums">
+                          {now.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
+                        </span>
+                      </div>
                       <LanguageSelect size="sm" />
                     </div>
                   )}
                 </div>
               </div>
-              {/* subtle gradient bar */}
-              <div className="h-[2px] w-full bg-[linear-gradient(90deg,theme(colors.primary/20),theme(colors.cyan.400/20),theme(colors.primary/20))]" />
+              {/* subtle gradient bar enhanced with scroll progress */}
+              <div className="relative h-[2px] w-full">
+                <div className="absolute inset-0 bg-muted/60" />
+                <div
+                  className="h-full bg-[linear-gradient(90deg,theme(colors.primary/60),theme(colors.cyan.400/60),theme(colors.primary/60))] transition-[width] duration-200"
+                  style={{ width: `${scrollProgress}%` }}
+                  aria-hidden
+                />
+              </div>
             </div>
           </div>
         </header>
@@ -247,7 +290,7 @@ export function AppShell({ children, title }: AppShellProps) {
                       key={item.path}
                       variant="ghost"
                       size="sm"
-                      className={`flex flex-col items-center gap-1 h-auto py-2 px-3 min-w-16 rounded-2xl transition-[background,transform,color] ${
+                      className={`relative flex flex-col items-center gap-1 h-auto py-2 px-3 min-w-16 rounded-2xl transition-[background,transform,color] ${
                         isActive ? "text-primary bg-primary/10 shadow-sm" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                       } hover:scale-[1.02]`}
                       onClick={() => navigate(item.path)}
@@ -256,6 +299,10 @@ export function AppShell({ children, title }: AppShellProps) {
                     >
                       <Icon className="h-[22px] w-[22px]" />
                       <span className="text-[11px] leading-none">{tr(item.label)}</span>
+                      {/* Active indicator: animated underline */}
+                      {isActive && (
+                        <span className="mt-1 h-1 w-6 rounded-full bg-primary/80 animate-pulse" aria-hidden />
+                      )}
                     </Button>
                   );
                 })}
@@ -276,6 +323,9 @@ export function AppShell({ children, title }: AppShellProps) {
                     >
                       <MoreHorizontal className="h-[22px] w-[22px]" />
                       <span className="text-[11px] leading-none">{tr("More")}</span>
+                      {moreItems.some((m) => m.path === location.pathname) && (
+                        <span className="mt-1 h-1 w-6 rounded-full bg-primary/80 animate-pulse" aria-hidden />
+                      )}
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-44" align="end" side="top">
