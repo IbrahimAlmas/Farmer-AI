@@ -206,7 +206,8 @@ export default function SoilTest() {
           <div className="absolute -bottom-24 -right-16 h-72 w-72 rounded-full bg-gradient-to-br from-sky-400/20 to-indigo-400/10 blur-3xl" />
         </div>
 
-        <div className="p-4 mx-auto max-w-6xl">
+        {/* Tighter, centered container */}
+        <div className="p-4 mx-auto max-w-5xl">
           {/* NEW: Intro step with information and single CTA */}
           {step === "intro" && (
             <motion.div
@@ -214,20 +215,20 @@ export default function SoilTest() {
               animate={{ opacity: 1, y: 0 }}
               className=""
             >
-              {/* Reworked layout: main card left, right rail stacks "Why test soil?" over "Sample insights" */}
-              <div className="grid gap-6 items-start lg:grid-cols-[1fr_320px]">
-                {/* LEFT: Main Soil Health Check (moved to the far left) */}
+              {/* Reworked layout with tighter gaps and fixed right rail width */}
+              <div className="grid items-start gap-4 lg:gap-6 lg:grid-cols-[1fr_300px]">
+                {/* LEFT: Main Soil Health Check */}
                 <div>
                   <Card className="overflow-hidden backdrop-blur supports-[backdrop-filter]:bg-card/70">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-base">Soil Health Check</CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-4">
+                    <CardContent className="space-y-3">
                       <div className="rounded-xl border overflow-hidden bg-muted">
                         <img
                           src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=2000&auto=format&fit=crop"
                           alt="Wide farmland with clearly visible soil rows"
-                          className="w-full h-52 sm:h-60 object-cover"
+                          className="w-full h-56 sm:h-60 object-cover"
                           onError={(e) => {
                             const t = e.currentTarget as HTMLImageElement;
                             if (t.src !== '/logo_bg.png') t.src = '/logo_bg.png';
@@ -235,7 +236,7 @@ export default function SoilTest() {
                           }}
                         />
                       </div>
-                      <div className="text-sm text-muted-foreground space-y-2">
+                      <div className="text-sm text-muted-foreground space-y-1.5">
                         <p>
                           Quickly estimate pH, moisture, and key nutrients from a soil photo. Use daylight and frame a small patch of bare soil.
                         </p>
@@ -263,7 +264,7 @@ export default function SoilTest() {
                 </div>
 
                 {/* RIGHT: Sticky rail with Why test soil (top) and Sample insights (bottom) */}
-                <div className="hidden lg:flex lg:flex-col lg:gap-6 lg:sticky lg:top-24 self-start">
+                <div className="hidden lg:flex lg:flex-col lg:gap-4 lg:sticky lg:top-24 self-start w-[300px]">
                   {/* Why test soil? */}
                   <Card className="overflow-hidden backdrop-blur supports-[backdrop-filter]:bg-card/70">
                     <CardHeader className="pb-2">
@@ -279,7 +280,7 @@ export default function SoilTest() {
                     </CardContent>
                   </Card>
 
-                  {/* Sample insights (stacked below) */}
+                  {/* Sample insights */}
                   <Card className="overflow-hidden backdrop-blur supports-[backdrop-filter]:bg-card/70">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm">Sample insights</CardTitle>
@@ -310,7 +311,7 @@ export default function SoilTest() {
               animate={{ opacity: 1, y: 0 }}
               className=""
             >
-              <div className="grid gap-6 items-start lg:grid-cols-[280px_1fr_280px]">
+              <div className="grid gap-4 lg:gap-6 items-start lg:grid-cols-[280px_1fr_280px]">
                 {/* Left side tips */}
                 <div className="hidden lg:block lg:sticky lg:top-24 self-start">
                   <Card className="overflow-hidden backdrop-blur supports-[backdrop-filter]:bg-card/70">
