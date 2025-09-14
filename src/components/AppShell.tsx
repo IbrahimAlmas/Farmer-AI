@@ -51,6 +51,7 @@ export function AppShell({ children, title }: AppShellProps) {
   const isLearnMoreSection = ["/learn-more", "/our-team", "/our-mission", "/future-plan"].includes(location.pathname);
   const isOurTeam = location.pathname === "/our-team";
   const isCommunity = location.pathname === "/community";
+  const isCommunityCreate = location.pathname === "/community/create";
 
   const handleVoiceCommand = (text: string) => {
     const command = text.toLowerCase().trim();
@@ -199,6 +200,18 @@ export function AppShell({ children, title }: AppShellProps) {
                           aria-label="Create Community"
                         >
                           Create Community
+                        </Button>
+                      )}
+                      {/* New: Show a back-to-community button on the Create page */}
+                      {isCommunityCreate && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="rounded-xl px-3 py-2"
+                          onClick={() => navigate("/community")}
+                          aria-label="Back to Community"
+                        >
+                          Community
                         </Button>
                       )}
                       <LanguageSelect size="sm" />
