@@ -170,7 +170,7 @@ export function AppShell({ children, title }: AppShellProps) {
                           size="sm"
                           className="rounded-xl px-3 py-2"
                           onClick={() => {
-                            toast.info("Community creation is handled in a dedicated flow.");
+                            navigate("/community/create");
                           }}
                           aria-label="Create Community"
                         >

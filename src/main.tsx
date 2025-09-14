@@ -27,6 +27,7 @@ import LearnMore from "@/pages/LearnMore.tsx";
 import OurTeam from "@/pages/OurTeam.tsx";
 import OurMission from "@/pages/OurMission.tsx";
 import FuturePlan from "@/pages/FuturePlan.tsx";
+import CommunityCreate from "@/pages/CommunityCreate.tsx";
 
 function RouteSyncer() {
   const location = useLocation();
@@ -71,6 +72,7 @@ createRoot(document.getElementById("root")!).render(
             <Route path="/our-mission" element={<OurMission />} />
             <Route path="/future-plan" element={<FuturePlan />} />
             <Route path="/community" element={<Community />} />
+            <Route path="/community/create" element={<CommunityCreate />} />
             <Route path="/soil-test" element={<SoilTest />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="*" element={<NotFound />} />
