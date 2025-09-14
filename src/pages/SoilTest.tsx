@@ -240,14 +240,13 @@ export default function SoilTest() {
                           Check your soil's pH, moisture, and nutrient indicators with a quick photo-based test.
                         </p>
                         <p>
-                          For best results, photograph a small patch of bare soil in natural light. Avoid harsh shadows and keep the frame steady and close to the ground.
+                          For best results, use natural light and frame a small patch of bare soil. Avoid harsh shadows.
                         </p>
                         <ul className="list-disc pl-5 space-y-1">
                           <li>Use natural light and focus on bare soil surface</li>
                           <li>Avoid leaves, tools, or people in the frame</li>
                           <li>Upload a clear close-up of the soil</li>
                           <li>Fill most of the frame with soil; keep angle roughly top‑down</li>
-                          <li>Wipe moisture or debris off the lens before shooting</li>
                         </ul>
                       </div>
                       <div className="flex justify-start">
