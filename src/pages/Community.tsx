@@ -17,18 +17,19 @@ export default function Community() {
   const reverseGeocode = useAction(api.location.reverseGeocode);
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [area, setArea] = useState<{ state: string; district?: string } | null>(null);
+// Post composer state
+const [body, setBody] = useState("");
 
   // Mutations/queries for groups
-  const my = useQuery(api.community.groupMyMembership);
+  const my = useQuery(api.community_groups.myMembership);
   const nearby = useQuery(
-    api.community.groupListNearby,
+    api.community_groups.listNearby,
     area ? { state: area.state, district: area.district } : "skip"
   );
-  const join = useMutation(api.community.groupJoin);
-  // removed: createGroup mutation; creation moved off this page
+  const join = useMutation(api.community_groups.join);
 
-  // removed: new community name state
-  // removed: new community description state
+  /* removed create-community local state */
+  /* removed create-community local state */
 
   // Acquire location -> state/district once
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -71,10 +72,6 @@ export default function Community() {
       toast.error(e?.message ?? "Failed to join");
     }
   };
-
-  // removed: handleCreate; creation moved to a dedicated flow/page
-
-  const [body, setBody] = useState("");
 
   const submit = async () => {
     if (!body.trim()) return;
@@ -175,7 +172,7 @@ export default function Community() {
               ))}
             </div>
 
-            {/* Create community moved to a dedicated page; no creation on this page */}
+            {/* Community creation moved to a separate page */}
           </CardContent>
         </Card>
 
