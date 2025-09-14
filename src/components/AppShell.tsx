@@ -47,6 +47,7 @@ export function AppShell({ children, title }: AppShellProps) {
   const profile = useQuery(api.profiles.get);
 
   const hideTopBar = location.pathname === "/dashboard";
+  const isLearnMoreSection = ["/learn-more", "/our-team", "/our-mission", "/future-plan"].includes(location.pathname);
 
   const handleVoiceCommand = (text: string) => {
     const command = text.toLowerCase().trim();
@@ -147,7 +148,7 @@ export function AppShell({ children, title }: AppShellProps) {
                   </h1>
                 )}
                 <div className="w-auto">
-                  <LanguageSelect size="sm" />
+                  {!isLearnMoreSection && <LanguageSelect size="sm" />}
                 </div>
               </div>
               {/* subtle gradient bar */}
