@@ -70,32 +70,46 @@ export default function SoilTest() {
   const startCamera = async () => {
     try {
       setErrorMsg(null);
+      // Stop any existing stream first (prevents stuck camera on retry)
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((t) => t.stop());
+        streamRef.current = null;
+      }
       if (!navigator.mediaDevices?.getUserMedia) {
         setCameraError("Live camera isn't supported by this browser. Use 'Upload Photo' instead.");
         setCameraOn(false);
         setCameraReady(false);
         return;
       }
-      // Request permission on user gesture
-      const stream = await navigator.mediaDevices.getUserMedia({
+      const constraints: MediaStreamConstraints = {
         video: {
           facingMode: { ideal: "environment" },
-          // Broader compatibility across devices
           width: { ideal: 1280 },
           height: { ideal: 720 },
         },
         audio: false,
-      });
+      };
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
       streamRef.current = stream;
+
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
+        // Wait for metadata to ensure correct videoWidth/Height before drawImage
+        await new Promise<void>((resolve) => {
+          const v = videoRef.current!;
+          const onLoaded = () => {
+            v.removeEventListener("loadedmetadata", onLoaded);
+            resolve();
+          };
+          v.addEventListener("loadedmetadata", onLoaded);
+        });
         await videoRef.current.play().catch(() => {});
       }
+
       setCameraOn(true);
       setCameraReady(true);
       setCameraError(null);
     } catch (e: any) {
-      // Give actionable hint
       const msg =
         e?.name === "NotAllowedError"
           ? "Camera permission denied. Enable camera access in browser settings or use 'Upload Photo'."
@@ -270,6 +284,14 @@ export default function SoilTest() {
                         />
                       </div>
 
+                      {/* Camera overlay guides */}
+                      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                        <div className="h-[55%] w-[70%] max-w-[520px] rounded-2xl border border-white/30 shadow-[0_0_0_9999px_rgba(0,0,0,0.08)]" />
+                      </div>
+                      <div className="pointer-events-none absolute top-3 left-3 text-[11px] font-medium px-2 py-0.5 rounded-full bg-black/40 text-white">
+                        Aim at bare soil, avoid leaves/tools
+                      </div>
+
                       {/* Overlay controls when camera is ON */}
                       <div className="absolute bottom-3 left-3 right-3 flex items-center justify-center">
                         <div className="flex flex-wrap gap-2">
@@ -298,27 +320,60 @@ export default function SoilTest() {
                       </div>
                     </div>
                   ) : (
-                    // Placeholder panel BEFORE enabling camera
-                    <div className="relative rounded-xl border overflow-hidden bg-muted flex items-center justify-center aspect-[4/3]">
+                    // Enhanced placeholder BEFORE enabling camera
+                    <div className="relative rounded-xl border overflow-hidden bg-muted">
                       <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/5 via-transparent to-transparent" />
-                      <div className="flex flex-col items-center justify-center gap-3 p-6 text-center">
+                      <div className="flex flex-col items-center justify-center gap-4 p-6 text-center">
                         <img
-                          src="https://images.unsplash.com/photo-1501004318641-b39e6451bec6?q=80&w=1400&auto=format&fit=crop"
-                          alt="Soil illustration"
-                          className="w-full max-w-md h-40 object-cover rounded-lg border"
+                          src="https://images.unsplash.com/photo-1525824236856-8b420b9bb75b?q=80&w=1600&auto=format&fit=crop"
+                          alt="Soil guide"
+                          className="w-full max-w-2xl h-44 object-cover rounded-lg border"
                           onError={(e) => {
                             const t = e.currentTarget as HTMLImageElement;
                             if (t.src !== '/logo_bg.png') t.src = '/logo_bg.png';
                             t.onerror = null;
                           }}
                         />
-                        <div className="text-sm text-muted-foreground">
-                          Enable camera to take a photo for soil analysis, or upload a photo below.
+                        <div className="grid gap-2 text-sm text-muted-foreground">
+                          <div className="flex items-center justify-center gap-2">
+                            <Badge variant="outline">Tip</Badge>
+                            Use natural light • Focus on bare soil • Keep phone steady
+                          </div>
+                          <div>Or upload a clear close-up if your camera isn't available.</div>
                         </div>
-                        <Button variant="secondary" onClick={startCamera} className="gap-2">
-                          <Play className="h-4 w-4" />
-                          Enable Camera
-                        </Button>
+                        <div className="flex flex-wrap items-center justify-center gap-3">
+                          <Button variant="secondary" onClick={startCamera} className="gap-2">
+                            <Play className="h-4 w-4" />
+                            Enable Camera
+                          </Button>
+                          <label>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              capture="environment"
+                              onChange={onSelectFile}
+                              className="hidden"
+                            />
+                            <Button variant="outline" className="gap-2" asChild>
+                              <span>
+                                <Upload className="h-4 w-4" />
+                                Upload Photo
+                              </span>
+                            </Button>
+                          </label>
+                        </div>
+
+                        {/* Troubleshooter */}
+                        <details className="w-full max-w-xl mx-auto text-left mt-1">
+                          <summary className="text-xs text-muted-foreground cursor-pointer">
+                            Having trouble enabling camera?
+                          </summary>
+                          <div className="text-xs text-muted-foreground mt-2 space-y-1">
+                            <p>1) Allow camera permission in your browser settings.</p>
+                            <p>2) Switch to a browser like Chrome, Safari, or Edge.</p>
+                            <p>3) If still blocked, use Upload Photo.</p>
+                          </div>
+                        </details>
                       </div>
                     </div>
                   )}
@@ -332,7 +387,7 @@ export default function SoilTest() {
                   {/* Hidden canvas for capture */}
                   <canvas ref={canvasRef} className="hidden" />
 
-                  {/* Upload alternative (always visible) */}
+                  {/* Keep the bottom upload as an alternate path too */}
                   <div className="text-center">
                     <label className="inline-flex items-center gap-2">
                       <input
