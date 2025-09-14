@@ -22,7 +22,8 @@ export default function MyFarm() {
   const water = useMutation(api.sims.water);
   const harvest = useMutation(api.sims.harvest);
 
-  const generate3D = useAction(api.meshy.generateFromFarmPhoto);
+  const generate3D = useAction((api as any).meshy.generateFromFarmPhoto as any);
+  const checkStatus = useAction((api as any).meshy.checkStatus as any);
 
   const [name, setName] = useState("");
   const [size, setSize] = useState<string>("");
@@ -186,6 +187,11 @@ export default function MyFarm() {
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="font-medium">{f.name}</div>
+                      {f.modelStatus && (
+                        <div className="text-xs text-muted-foreground">
+                          Model: {f.modelStatus}
+                        </div>
+                      )}
                     </div>
                     <div className="flex items-center gap-2">
                       <Button
@@ -229,6 +235,68 @@ export default function MyFarm() {
                       >
                         Generate 3D Model (AI)
                       </Button>
+
+                      {f.modelStatus === "processing" && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={async () => {
+                            try {
+                              const res = await checkStatus({ id: f._id as any });
+                              const status = (res as any)?.status;
+                              if ((res as any)?.success && status === "ready") {
+                                toast.success("3D model is ready!");
+                              } else if ((res as any)?.success) {
+                                toast.info(`Model status: ${status ?? "processing"}`);
+                              } else {
+                                toast.error((res as any)?.error ?? "Failed to check status");
+                              }
+                            } catch (e: any) {
+                              toast.error(e?.message ?? "Failed to check status");
+                            }
+                          }}
+                        >
+                          Check Status
+                        </Button>
+                      )}
+
+                      {f.modelStatus === "failed" && (
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={async () => {
+                            try {
+                              toast.info("Retrying 3D generation...");
+                              const res = await generate3D({ id: f._id as any });
+                              if ((res as any)?.pending) {
+                                toast.success("Model retry started. It may take a couple of minutes.");
+                              } else {
+                                toast.success("3D model ready!");
+                              }
+                            } catch (e: any) {
+                              toast.error(e?.message ?? "Retry failed");
+                            }
+                          }}
+                        >
+                          Retry
+                        </Button>
+                      )}
+
+                      {f.modelStatus === "ready" && f.modelPreviewUrl && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            try {
+                              window.open(f.modelPreviewUrl as string, "_blank");
+                            } catch {
+                              /* noop */
+                            }
+                          }}
+                        >
+                          Preview
+                        </Button>
+                      )}
 
                       <Button size="sm" onClick={() => openSim(f._id as any)}>
                         Enter Simulation

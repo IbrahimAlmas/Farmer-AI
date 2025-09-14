@@ -7,9 +7,9 @@ import { internal, api } from "./_generated/api";
 // Utility sleep
 const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
-export const generateFromFarmPhoto = action({
+export const generateFromFarmPhoto: any = action({
   args: { id: v.id("farms") },
-  handler: async (ctx, args) => {
+  handler: async (ctx: any, args: any): Promise<any> => {
     const apiKey = process.env.MESHY_API_KEY;
     if (!apiKey) {
       throw new Error("Meshy API key not configured. Please set MESHY_API_KEY in Integrations.");
@@ -17,6 +17,22 @@ export const generateFromFarmPhoto = action({
 
     // Ensure user owns the farm, and get farm data
     const farm = await ctx.runQuery(internal.farms.ownedFarm, { id: args.id });
+
+    // Short-circuit if already ready
+    if (farm.modelStatus === "ready") {
+      return {
+        success: true,
+        modelUrl: farm.modelUrl,
+        previewUrl: farm.modelPreviewUrl,
+        taskId: farm.meshyTaskId,
+        note: "Model already ready",
+      };
+    }
+    // If already processing, avoid submitting another job
+    if (farm.modelStatus === "processing" && farm.meshyTaskId) {
+      return { success: true, pending: true, taskId: farm.meshyTaskId, note: "Already processing" };
+    }
+
     const firstPhoto = farm.cornerPhotos?.[0];
     if (!firstPhoto) {
       throw new Error("Please upload a field photo first.");
@@ -46,21 +62,24 @@ export const generateFromFarmPhoto = action({
       body: JSON.stringify({
         image_url: photoUrl,
         enable_pbr: true,
-        // Optional tuning:
-        // mode: "standard", // or "refine"
-        // top_k: 1,
-        // texture_size: 2048,
-        // colorize: false,
       }),
     });
 
     if (!submitResp.ok) {
       const txt = await submitResp.text().catch(() => "");
-      throw new Error(`Meshy submission failed: ${submitResp.status} ${txt}`);
+      await ctx.runMutation(internal.farms.setModelMeta, {
+        id: args.id,
+        modelStatus: "failed",
+      });
+      throw new Error(`Meshy submission failed: ${submitResp.status} ${txt || submitResp.statusText}`);
     }
     const submitJson: any = await submitResp.json();
     const taskId: string = submitJson?.task_id || submitJson?.taskId;
     if (!taskId) {
+      await ctx.runMutation(internal.farms.setModelMeta, {
+        id: args.id,
+        modelStatus: "failed",
+      });
       throw new Error("Meshy did not return a task_id.");
     }
 
@@ -126,6 +145,87 @@ export const generateFromFarmPhoto = action({
       modelStatus: "processing",
       meshyTaskId: taskId,
     });
-    return { success: true, pending: true, taskId };
+    return { success: true, pending: true, taskId, note: "Timed out while polling; still processing" };
+  },
+});
+
+// Add: Single-shot status checker to recover from "failed to generate"/long waits
+export const checkStatus: any = action({
+  args: { id: v.id("farms") },
+  handler: async (ctx, args) => {
+    const apiKey = process.env.MESHY_API_KEY;
+    if (!apiKey) {
+      throw new Error("Meshy API key not configured. Please set MESHY_API_KEY in Integrations.");
+    }
+
+    const farm = await ctx.runQuery(internal.farms.ownedFarm, { id: args.id });
+    const taskId = farm.meshyTaskId;
+
+    if (!taskId) {
+      return {
+        success: true,
+        status: farm.modelStatus ?? "unknown",
+        note: "No existing task id; generate again if needed",
+      };
+    }
+
+    const statusResp = await fetch(`https://api.meshy.ai/v2/tasks/${taskId}`, {
+      headers: { Authorization: `Bearer ${apiKey}` },
+    });
+
+    if (!statusResp.ok) {
+      const txt = await statusResp.text().catch(() => "");
+      return {
+        success: false,
+        error: `Status check failed: ${statusResp.status} ${txt || statusResp.statusText}`,
+      };
+    }
+
+    const statusJson: any = await statusResp.json();
+    const status: string =
+      statusJson?.status || statusJson?.task_status || statusJson?.data?.status;
+
+    if (status === "succeeded" || status === "completed" || status === "success") {
+      const result = statusJson?.result || statusJson?.output || statusJson?.data || {};
+      const urls = result?.model_urls || {};
+      const modelUrl = urls?.glb || urls?.gltf || urls?.usdz;
+      const previewUrl =
+        result?.preview_image ||
+        result?.preview_url ||
+        result?.preview ||
+        result?.image;
+
+      await ctx.runMutation(internal.farms.setModelMeta, {
+        id: args.id,
+        modelStatus: "ready",
+        modelUrl,
+        modelPreviewUrl: previewUrl,
+        meshyTaskId: taskId,
+      });
+
+      return { success: true, status: "ready", modelUrl, previewUrl, taskId };
+    }
+
+    if (status === "failed" || status === "error") {
+      const reason =
+        statusJson?.error ||
+        statusJson?.message ||
+        statusJson?.data?.error ||
+        "Generation failed";
+      await ctx.runMutation(internal.farms.setModelMeta, {
+        id: args.id,
+        modelStatus: "failed",
+        meshyTaskId: taskId,
+      });
+      return { success: false, status: "failed", error: reason, taskId };
+    }
+
+    // Still queued/processing
+    await ctx.runMutation(internal.farms.setModelMeta, {
+      id: args.id,
+      modelStatus: "processing",
+      meshyTaskId: taskId,
+    });
+    return { success: true, status, taskId };
   },
 });
