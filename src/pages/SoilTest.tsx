@@ -216,8 +216,8 @@ export default function SoilTest() {
             >
               {/* Grid to fill side space on large screens */}
               <div className="grid gap-4 lg:grid-cols-3">
-                {/* Left side panel (hidden on small screens) */}
-                <div className="hidden lg:block">
+                {/* Left side panel (sticky on large screens) */}
+                <div className="hidden lg:block lg:sticky lg:top-24">
                   <Card className="overflow-hidden backdrop-blur supports-[backdrop-filter]:bg-card/70">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm">Why test soil?</CardTitle>
@@ -233,8 +233,8 @@ export default function SoilTest() {
                   </Card>
                 </div>
 
-                {/* Center main card */}
-                <div className="lg:col-span-2">
+                {/* Center main card explicitly spans cols 1-2 */}
+                <div className="lg:col-span-2 lg:col-start-1">
                   <Card className="overflow-hidden backdrop-blur supports-[backdrop-filter]:bg-card/70">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-base">Soil Health Check</CardTitle>
@@ -264,7 +264,7 @@ export default function SoilTest() {
                       </div>
                       <div className="flex justify-center">
                         <Button
-                          className="gap-2"
+                          className="gap-2 px-6 py-6 text-base sm:text-lg rounded-xl w-full sm:w-auto min-w-[200px] bg-amber-600 hover:bg-amber-500 text-white shadow-md"
                           onClick={() => {
                             setErrorMsg(null);
                             setResult(null);
@@ -279,8 +279,8 @@ export default function SoilTest() {
                   </Card>
                 </div>
 
-                {/* Right side panel (hidden on small screens) */}
-                <div className="hidden lg:block">
+                {/* Right side panel (sticky, forced to top-right of the first row) */}
+                <div className="hidden lg:block lg:sticky lg:top-24 lg:col-start-3 lg:row-start-1">
                   <Card className="overflow-hidden backdrop-blur supports-[backdrop-filter]:bg-card/70">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm">Sample insights</CardTitle>
@@ -458,29 +458,6 @@ export default function SoilTest() {
 
                       {/* Hidden canvas for capture */}
                       <canvas ref={canvasRef} className="hidden" />
-
-                      {/* Keep the bottom upload as an alternate path too */}
-                      <div className="text-center">
-                        <label className="inline-flex items-center gap-2">
-                          <input
-                            type="file"
-                            accept="image/*"
-                            capture="environment"
-                            onChange={onSelectFile}
-                            className="hidden"
-                          />
-                          <Button
-                            variant="default"
-                            className="gap-2 px-6 py-6 text-base sm:text-lg rounded-xl w-full sm:w-auto min-w-[200px] bg-amber-600 hover:bg-amber-500 text-white shadow-md"
-                            asChild
-                          >
-                            <span>
-                              <Upload className="h-4 w-4" />
-                              Upload Photo
-                            </span>
-                          </Button>
-                        </label>
-                      </div>
                     </CardContent>
                   </Card>
                 </div>
