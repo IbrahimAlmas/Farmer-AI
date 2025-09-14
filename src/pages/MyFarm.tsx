@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { api } from "@/convex/_generated/api";
 import { useMutation, useQuery } from "convex/react";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { Link, useNavigate } from "react-router";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -39,6 +39,49 @@ export default function MyFarm() {
   // Derived: active farm + sim state
   const activeFarm = (farms ?? []).find((ff: any) => (ff._id as any) === simFarmId) as any | undefined;
   const sim = useQuery(api.sims.get, simFarmId ? ({ farmId: simFarmId as any } as any) : "skip") as any;
+
+  const [angle, setAngle] = useState<{ x: number; y: number }>({ x: 25, y: -30 });
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const isDraggingRef = useRef(false);
+  const lastRef = useRef<{ x: number; y: number } | null>(null);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const onPointerDown = (e: PointerEvent) => {
+      isDraggingRef.current = true;
+      lastRef.current = { x: e.clientX, y: e.clientY };
+      (e.target as Element).setPointerCapture?.(e.pointerId);
+    };
+    const onPointerMove = (e: PointerEvent) => {
+      if (!isDraggingRef.current || !lastRef.current) return;
+      const dx = e.clientX - lastRef.current.x;
+      const dy = e.clientY - lastRef.current.y;
+      lastRef.current = { x: e.clientX, y: e.clientY };
+      setAngle((prev) => ({
+        x: Math.max(-85, Math.min(85, prev.x - dy * 0.4)),
+        y: prev.y + dx * 0.5,
+      }));
+    };
+    const onPointerUp = () => {
+      isDraggingRef.current = false;
+      lastRef.current = null;
+    };
+    el.addEventListener("pointerdown", onPointerDown);
+    window.addEventListener("pointermove", onPointerMove);
+    window.addEventListener("pointerup", onPointerUp);
+    return () => {
+      el.removeEventListener("pointerdown", onPointerDown);
+      window.removeEventListener("pointermove", onPointerMove);
+      window.removeEventListener("pointerup", onPointerUp);
+    };
+  }, []);
+
+  const photoId = (activeFarm?.cornerPhotos?.[0] as any) ?? null;
+  const photoUrl = useQuery(
+    api.soil_upload.getFileUrl,
+    photoId ? ({ fileId: photoId as any } as any) : "skip"
+  ) as string | null;
 
   const add = async () => {
     if (!name.trim()) return;
@@ -174,67 +217,131 @@ export default function MyFarm() {
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="font-medium">{f.name}</div>
-                      <div className="text-xs text-muted-foreground">
-                        {(f.crops ?? []).join(", ") || "No crops yet"}
-                      </div>
-                      {/* Show size and previous crops */}
-                      <div className="text-xs text-muted-foreground mt-1">
-                        {typeof (f as any).size === "number" ? `Size: ${(f as any).size} acres • ` : ""}
-                        {Array.isArray((f as any).previousCrops) && (f as any).previousCrops.length > 0
-                          ? `Previous: ${(f as any).previousCrops.join(", ")}`
-                          : "Previous: —"}
-                      </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="text-xs">
-                        {f.modelReady ? (
-                          <span className="text-green-600">3D model ready</span>
-                        ) : (
-                          <span className="text-amber-600">3D model not ready</span>
-                        )}
-                      </div>
                       <Button size="sm" onClick={() => openSim(f._id as any)} disabled={!auth?.authenticated}>
                         Enter Simulation
                       </Button>
                     </div>
                   </div>
 
-                  {/* 3D Capture Section */}
+                  {/* 3D Capture Section — removed per request */}
+
+                  {/* Inline Simulation Section — removed per request */}
+
+                  {/* Embedded 3D mini-viewer */}
                   <div className="rounded-md border p-3">
-                    <div className="text-sm font-medium mb-2">3D Capture</div>
-                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                      <div className="text-xs text-muted-foreground">
-                        {/* Simplified test mode stat */}
-                        Field photo: {(f.cornerPhotos?.length ?? 0)}/1
-                      </div>
-                      <div className="flex gap-2 flex-wrap">
-                        {/* Replace label-wrapper with Button asChild + htmlFor for reliable file picker */}
-                        <input
-                          id={uploadId}
-                          type="file"
-                          accept="image/*"
-                          className="sr-only"
-                          onChange={(e) => uploadCornerPhotos(f._id as any, e.target.files)}
-                        />
-                        <Button asChild variant="outline" size="sm">
-                          <label htmlFor={uploadId}>Upload Field Photo</label>
-                        </Button>
-                        <Button
-                          size="sm"
-                          onClick={async () => {
-                            try {
-                              await finalizeModel({ id: f._id as any });
-                              toast.success("3D model generated");
-                              navigate(`/farm/${f._id as any}/model`);
-                            } catch (e: any) {
-                              toast.error(e?.message ?? "Failed to generate model");
-                            }
+                    <div className="text-sm font-medium mb-2">Field 3D View</div>
+                    <div className="w-full grid place-items-center">
+                      <div
+                        ref={containerRef}
+                        className="relative"
+                        style={{
+                          width: 520,
+                          height: 360,
+                          perspective: "1000px",
+                          cursor: "grab",
+                        }}
+                      >
+                        <div
+                          style={{
+                            position: "absolute",
+                            inset: 0,
+                            transformStyle: "preserve-3d",
+                            transform: `rotateX(${angle.x}deg) rotateY(${angle.y}deg) translateZ(-60px)`,
+                            transition: isDraggingRef.current ? "none" : "transform 0.08s ease-out",
                           }}
-                          disabled={(f.cornerPhotos?.length ?? 0) < 1}
                         >
-                          Generate 3D Model
-                        </Button>
+                          {(() => {
+                            const size = 260;
+                            return (
+                              <>
+                                <div
+                                  style={{
+                                    position: "absolute",
+                                    width: size,
+                                    height: size,
+                                    left: "50%",
+                                    top: "50%",
+                                    transform: `translate(-50%, -50%) rotateX(90deg) translateZ(${size / 2}px)`,
+                                    backgroundImage: photoUrl
+                                      ? `url(${photoUrl})`
+                                      : "linear-gradient(135deg, #dcedc8, #a5d6a7)",
+                                    backgroundSize: "cover",
+                                    backgroundPosition: "center",
+                                    border: "1px solid rgba(0,0,0,0.1)",
+                                    boxShadow: "inset 0 0 80px rgba(0,0,0,0.15)",
+                                  }}
+                                />
+                                <div
+                                  style={{
+                                    position: "absolute",
+                                    width: size,
+                                    height: size,
+                                    left: "50%",
+                                    top: "50%",
+                                    transform: `translate(-50%, -50%) rotateX(-90deg) translateZ(${size / 2}px)`,
+                                    background: "#795548",
+                                  }}
+                                />
+                                <div
+                                  style={{
+                                    position: "absolute",
+                                    width: size,
+                                    height: size / 3,
+                                    left: "50%",
+                                    top: "50%",
+                                    transform: `translate(-50%, -50%) translateZ(${size / 2}px)`,
+                                    background: "linear-gradient(to bottom, #795548, #5d4037)",
+                                    border: "1px solid rgba(0,0,0,0.08)",
+                                  }}
+                                />
+                                <div
+                                  style={{
+                                    position: "absolute",
+                                    width: size,
+                                    height: size / 3,
+                                    left: "50%",
+                                    top: "50%",
+                                    transform: `translate(-50%, -50%) rotateY(180deg) translateZ(${size / 2}px)`,
+                                    background: "linear-gradient(to bottom, #795548, #5d4037)",
+                                    border: "1px solid rgba(0,0,0,0.08)",
+                                  }}
+                                />
+                                <div
+                                  style={{
+                                    position: "absolute",
+                                    width: size,
+                                    height: size / 3,
+                                    left: "50%",
+                                    top: "50%",
+                                    transform: `translate(-50%, -50%) rotateY(-90deg) translateZ(${size / 2}px)`,
+                                    background: "linear-gradient(to bottom, #795548, #5d4037)",
+                                    border: "1px solid rgba(0,0,0,0.08)",
+                                  }}
+                                />
+                                <div
+                                  style={{
+                                    position: "absolute",
+                                    width: size,
+                                    height: size / 3,
+                                    left: "50%",
+                                    top: "50%",
+                                    transform: `translate(-50%, -50%) rotateY(90deg) translateZ(${size / 2}px)`,
+                                    background: "linear-gradient(to bottom, #795548, #5d4037)",
+                                    border: "1px solid rgba(0,0,0,0.08)",
+                                  }}
+                                />
+                              </>
+                            );
+                          })()}
+                        </div>
                       </div>
+                      {!photoUrl && (
+                        <div className="text-xs text-muted-foreground mt-2 text-center">
+                          Upload a field photo on My Farm to texture the model.
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -335,55 +442,165 @@ export default function MyFarm() {
             </DialogHeader>
 
             <div className="space-y-4">
-              {!sim ? (
-                <div className="text-sm text-muted-foreground">Loading simulation…</div>
-              ) : (
-                <>
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    <div className="rounded-md border p-3">
-                      <div className="text-xs text-muted-foreground mb-1">Stage</div>
-                      <div className="text-lg font-semibold">{sim.stage}</div>
-                    </div>
-                    <div className="rounded-md border p-3">
-                      <div className="text-xs text-muted-foreground mb-1">Weather</div>
-                      <div className="text-lg font-semibold">{sim.weather}</div>
-                    </div>
-                    <div className="rounded-md border p-3">
-                      <div className="text-xs text-muted-foreground mb-1">Soil Moisture</div>
-                      <div className="text-lg font-semibold">{sim.soilMoisture}%</div>
-                    </div>
-                    <div className="rounded-md border p-3">
-                      <div className="text-xs text-muted-foreground mb-1">Balance</div>
-                      <div className="text-lg font-semibold">₹{sim.balance}</div>
-                    </div>
-                    <div className="rounded-md border p-3 sm:col-span-2">
-                      <div className="text-xs text-muted-foreground mb-1">Current Crop</div>
-                      <div className="text-lg font-semibold">{sim.crop ?? "—"}</div>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2">
-                    <Button onClick={() => advance({ farmId: simFarmId as any })}>Advance Day</Button>
-                    <Button variant="outline" onClick={() => water({ farmId: simFarmId as any })}>Water Field</Button>
-                    <Button variant="secondary" onClick={() => plant({ crop: "rice", farmId: simFarmId as any })}>Plant Rice (₹200)</Button>
-                    <Button variant="secondary" onClick={() => plant({ crop: "wheat", farmId: simFarmId as any })}>Plant Wheat (₹200)</Button>
-                    <Button
-                      className="col-span-2"
-                      onClick={async () => {
-                        try {
-                          const res = await harvest({ farmId: simFarmId as any });
-                          const gained = (res as any)?.payout ?? 0;
-                          toast.success(`Harvested! Earned ₹${gained}`);
-                        } catch (e: any) {
-                          toast.error(e?.message ?? "Failed to harvest");
-                        }
+              {/* Embedded 3D mini-viewer */}
+              <div className="rounded-md border p-3">
+                <div className="text-sm font-medium mb-2">Field 3D View</div>
+                <div className="w-full grid place-items-center">
+                  <div
+                    ref={containerRef}
+                    className="relative"
+                    style={{
+                      width: 520,
+                      height: 360,
+                      perspective: "1000px",
+                      cursor: "grab",
+                    }}
+                  >
+                    <div
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        transformStyle: "preserve-3d",
+                        transform: `rotateX(${angle.x}deg) rotateY(${angle.y}deg) translateZ(-60px)`,
+                        transition: isDraggingRef.current ? "none" : "transform 0.08s ease-out",
                       }}
                     >
-                      Harvest
-                    </Button>
+                      {(() => {
+                        const size = 260;
+                        return (
+                          <>
+                            <div
+                              style={{
+                                position: "absolute",
+                                width: size,
+                                height: size,
+                                left: "50%",
+                                top: "50%",
+                                transform: `translate(-50%, -50%) rotateX(90deg) translateZ(${size / 2}px)`,
+                                backgroundImage: photoUrl
+                                  ? `url(${photoUrl})`
+                                  : "linear-gradient(135deg, #dcedc8, #a5d6a7)",
+                                backgroundSize: "cover",
+                                backgroundPosition: "center",
+                                border: "1px solid rgba(0,0,0,0.1)",
+                                boxShadow: "inset 0 0 80px rgba(0,0,0,0.15)",
+                              }}
+                            />
+                            <div
+                              style={{
+                                position: "absolute",
+                                width: size,
+                                height: size,
+                                left: "50%",
+                                top: "50%",
+                                transform: `translate(-50%, -50%) rotateX(-90deg) translateZ(${size / 2}px)`,
+                                background: "#795548",
+                              }}
+                            />
+                            <div
+                              style={{
+                                position: "absolute",
+                                width: size,
+                                height: size / 3,
+                                left: "50%",
+                                top: "50%",
+                                transform: `translate(-50%, -50%) translateZ(${size / 2}px)`,
+                                background: "linear-gradient(to bottom, #795548, #5d4037)",
+                                border: "1px solid rgba(0,0,0,0.08)",
+                              }}
+                            />
+                            <div
+                              style={{
+                                position: "absolute",
+                                width: size,
+                                height: size / 3,
+                                left: "50%",
+                                top: "50%",
+                                transform: `translate(-50%, -50%) rotateY(180deg) translateZ(${size / 2}px)`,
+                                background: "linear-gradient(to bottom, #795548, #5d4037)",
+                                border: "1px solid rgba(0,0,0,0.08)",
+                              }}
+                            />
+                            <div
+                              style={{
+                                position: "absolute",
+                                width: size,
+                                height: size / 3,
+                                left: "50%",
+                                top: "50%",
+                                transform: `translate(-50%, -50%) rotateY(-90deg) translateZ(${size / 2}px)`,
+                                background: "linear-gradient(to bottom, #795548, #5d4037)",
+                                border: "1px solid rgba(0,0,0,0.08)",
+                              }}
+                            />
+                            <div
+                              style={{
+                                position: "absolute",
+                                width: size,
+                                height: size / 3,
+                                left: "50%",
+                                top: "50%",
+                                transform: `translate(-50%, -50%) rotateY(90deg) translateZ(${size / 2}px)`,
+                                background: "linear-gradient(to bottom, #795548, #5d4037)",
+                                border: "1px solid rgba(0,0,0,0.08)",
+                              }}
+                            />
+                          </>
+                        );
+                      })()}
+                    </div>
                   </div>
-                </>
-              )}
+                </div>
+                {!photoUrl && (
+                  <div className="text-xs text-muted-foreground mt-2 text-center">
+                    Upload a field photo on My Farm to texture the model.
+                  </div>
+                )}
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="rounded-md border p-3">
+                  <div className="text-xs text-muted-foreground mb-1">Stage</div>
+                  <div className="text-lg font-semibold">{sim.stage}</div>
+                </div>
+                <div className="rounded-md border p-3">
+                  <div className="text-xs text-muted-foreground mb-1">Weather</div>
+                  <div className="text-lg font-semibold">{sim.weather}</div>
+                </div>
+                <div className="rounded-md border p-3">
+                  <div className="text-xs text-muted-foreground mb-1">Soil Moisture</div>
+                  <div className="text-lg font-semibold">{sim.soilMoisture}%</div>
+                </div>
+                <div className="rounded-md border p-3">
+                  <div className="text-xs text-muted-foreground mb-1">Balance</div>
+                  <div className="text-lg font-semibold">₹{sim.balance}</div>
+                </div>
+                <div className="rounded-md border p-3 sm:col-span-2">
+                  <div className="text-xs text-muted-foreground mb-1">Current Crop</div>
+                  <div className="text-lg font-semibold">{sim.crop ?? "—"}</div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <Button onClick={() => advance({ farmId: simFarmId as any })}>Advance Day</Button>
+                <Button variant="outline" onClick={() => water({ farmId: simFarmId as any })}>Water Field</Button>
+                <Button variant="secondary" onClick={() => plant({ crop: "rice", farmId: simFarmId as any })}>Plant Rice (₹200)</Button>
+                <Button variant="secondary" onClick={() => plant({ crop: "wheat", farmId: simFarmId as any })}>Plant Wheat (₹200)</Button>
+                <Button
+                  className="col-span-2"
+                  onClick={async () => {
+                    try {
+                      const res = await harvest({ farmId: simFarmId as any });
+                      const gained = (res as any)?.payout ?? 0;
+                      toast.success(`Harvested! Earned ₹${gained}`);
+                    } catch (e: any) {
+                      toast.error(e?.message ?? "Failed to harvest");
+                    }
+                  }}
+                >
+                  Harvest
+                </Button>
+              </div>
             </div>
 
             <DialogFooter className="justify-between sm:justify-end">
