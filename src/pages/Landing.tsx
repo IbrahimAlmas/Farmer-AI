@@ -340,9 +340,9 @@ export default function Landing() {
           {/* Logo + Title */}
           <div className="text-center">
             <img
-              src="/logo.svg"
+              src="https://harmless-tapir-303.convex.cloud/api/storage/a4af3a5d-e126-420d-b31d-c1929a3c833b"
               alt="Root AI"
-              className="mx-auto h-32 w-32 drop-shadow-[0_0_10px_oklch(0.8_0.16_85)/40%] animate-pulse"
+              className="mx-auto h-32 w-32 drop-shadow-[0_0_10px_oklch(0.8_0.16_85)/40%] animate-pulse rounded-full object-cover"
               onError={(e) => {
                 const t = e.currentTarget as HTMLImageElement;
                 if (t.src !== '/logo_bg.svg') t.src = '/logo_bg.svg';
@@ -441,7 +441,16 @@ export default function Landing() {
             className="text-center"
           >
             <div className="flex justify-center">
-              <img src="/logo.svg" alt="Root AI" className="h-14 w-14 rounded-full object-cover shadow" />
+              <img
+                src="https://harmless-tapir-303.convex.cloud/api/storage/a4af3a5d-e126-420d-b31d-c1929a3c833b"
+                alt="Root AI"
+                className="h-14 w-14 rounded-full object-cover shadow"
+                onError={(e) => {
+                  const t = e.currentTarget as HTMLImageElement;
+                  if (t.src !== '/logo.svg') t.src = '/logo.svg';
+                  t.onerror = null;
+                }}
+              />
             </div>
             <h1 className="mt-6 text-4xl md:text-5xl font-extrabold tracking-tight leading-[1.1]">
               {tr("Root AI — Intelligent Agriculture Companion")}

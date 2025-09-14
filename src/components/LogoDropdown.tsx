@@ -34,7 +34,7 @@ export function LogoDropdown() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="h-10 w-10">
           <img
-            src="https://harmless-tapir-303.convex.cloud/api/storage/f3242bc3-cc14-44cb-bf20-dc6e3f827048"
+            src="https://harmless-tapir-303.convex.cloud/api/storage/a4af3a5d-e126-420d-b31d-c1929a3c833b"
             alt="Root AI Logo"
             width={32}
             height={32}
