@@ -13,6 +13,7 @@ import type {
   FilterApi,
   FunctionReference,
 } from "convex/server";
+import type * as agro from "../agro.js";
 import type * as auth_emailOtp from "../auth/emailOtp.js";
 import type * as auth from "../auth.js";
 import type * as community from "../community.js";
@@ -42,6 +43,7 @@ import type * as voice from "../voice.js";
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  agro: typeof agro;
   "auth/emailOtp": typeof auth_emailOtp;
   auth: typeof auth;
   community: typeof community;

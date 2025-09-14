@@ -7,6 +7,7 @@ import { useAction, useMutation, useQuery } from "convex/react";
 import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { Link, useNavigate } from "react-router";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function MyFarm() {
   const farms = useQuery(api.farms.list);
@@ -24,6 +25,9 @@ export default function MyFarm() {
 
   const generate3D = useAction((api as any).meshy.generateFromFarmPhoto as any);
   const checkStatus = useAction((api as any).meshy.checkStatus as any);
+
+  const updateFarm = useMutation(api.farms.update);
+  const getIrrigation = useAction(api.agro.getIrrigationRecommendation);
 
   const [name, setName] = useState("");
   const [size, setSize] = useState<string>("");
@@ -43,6 +47,65 @@ export default function MyFarm() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const isDraggingRef = useRef(false);
   const lastRef = useRef<{ x: number; y: number } | null>(null);
+
+  const [selectedCrop, setSelectedCrop] = useState<string>("wheat");
+  const [advisor, setAdvisor] = useState<any | null>(null);
+  const [advisorLoading, setAdvisorLoading] = useState(false);
+
+  useEffect(() => {
+    if (sim?.crop) setSelectedCrop(sim.crop);
+  }, [sim?.crop]);
+
+  const requestGeo = () =>
+    new Promise<GeolocationPosition>((resolve, reject) =>
+      navigator.geolocation.getCurrentPosition(resolve, reject, {
+        enableHighAccuracy: true,
+        timeout: 10000,
+      }),
+    );
+
+  const saveMyLocation = async () => {
+    try {
+      if (!activeFarm) return;
+      const pos = await requestGeo();
+      await updateFarm({
+        id: activeFarm._id as any,
+        location: {
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+        } as any,
+      });
+      toast.success("Location saved to farm");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed to save location");
+    }
+  };
+
+  const runAdvisor = async () => {
+    try {
+      setAdvisorLoading(true);
+      let lat = activeFarm?.location?.lat ?? null;
+      let lng = activeFarm?.location?.lng ?? null;
+      if (lat == null || lng == null) {
+        const pos = await requestGeo();
+        lat = pos.coords.latitude;
+        lng = pos.coords.longitude;
+      }
+      const res = await getIrrigation({
+        lat: lat as number,
+        lng: lng as number,
+        crop: selectedCrop || "wheat",
+        stage: sim?.stage || "vegetative",
+        areaAcres: (activeFarm?.size as any) ?? undefined,
+      });
+      setAdvisor(res as any);
+      toast.success("Irrigation plan updated");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Could not fetch recommendation");
+    } finally {
+      setAdvisorLoading(false);
+    }
+  };
 
   useEffect(() => {
     const el = containerRef.current;
@@ -390,6 +453,58 @@ export default function MyFarm() {
                   {!photoUrl && (
                     <div className="text-xs text-muted-foreground mt-2 text-center">
                       Upload a field photo on My Farm to texture the model.
+                    </div>
+                  )}
+                </div>
+
+                {/* Irrigation Advisor (Real Weather) */}
+                <div className="rounded-md border p-3 space-y-3">
+                  <div className="text-sm font-medium">Irrigation Advisor (Real Weather)</div>
+                  <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-end">
+                    <div className="w-full sm:w-48">
+                      <div className="text-xs text-muted-foreground mb-1">Crop</div>
+                      <Select value={selectedCrop} onValueChange={setSelectedCrop}>
+                        <SelectTrigger><SelectValue placeholder="Select crop" /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="wheat">Wheat</SelectItem>
+                          <SelectItem value="rice">Rice</SelectItem>
+                          <SelectItem value="maize">Maize</SelectItem>
+                          <SelectItem value="corn">Corn</SelectItem>
+                          <SelectItem value="soybean">Soybean</SelectItem>
+                          <SelectItem value="cotton">Cotton</SelectItem>
+                          <SelectItem value="canola">Canola</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button variant="outline" onClick={saveMyLocation} disabled={!activeFarm || advisorLoading}>
+                        Use My Location
+                      </Button>
+                      <Button onClick={runAdvisor} disabled={advisorLoading}>
+                        {advisorLoading ? "Fetching..." : "Get Recommendation"}
+                      </Button>
+                    </div>
+                  </div>
+                  {activeFarm?.location ? (
+                    <div className="text-xs text-muted-foreground">
+                      Using location: {activeFarm.location.lat.toFixed(3)}, {activeFarm.location.lng.toFixed(3)}
+                    </div>
+                  ) : (
+                    <div className="text-xs text-muted-foreground">
+                      Location not saved yet. Use "Use My Location" to save precise GPS.
+                    </div>
+                  )}
+                  {advisor && (
+                    <div className="grid gap-2 sm:grid-cols-3">
+                      {advisor.days?.map((d: any, i: number) => (
+                        <div key={i} className="rounded-md border p-2">
+                          <div className="text-xs text-muted-foreground">{new Date(d.date).toLocaleDateString()}</div>
+                          <div className="text-sm">Water need: {Math.round(d.water_mm)} mm</div>
+                          {"liters" in d && d.liters != null ? (
+                            <div className="text-sm">≈ {Math.round(d.liters).toLocaleString()} L</div>
+                          ) : null}
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>
