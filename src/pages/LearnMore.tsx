@@ -9,7 +9,7 @@ export default function LearnMore() {
   const navigate = useNavigate();
 
   return (
-    <AppShell title="About Root AI">
+    <AppShell>
       <div className="pb-24">
         {/* Hero */}
         <div className="relative">

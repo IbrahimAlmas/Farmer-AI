@@ -113,9 +113,39 @@ export function AppShell({ children, title }: AppShellProps) {
             <div className="rounded-b-3xl border-b bg-card/70 backdrop-blur-xl supports-[backdrop-filter]:bg-card/60 shadow-[0_6px_30px_-10px_rgba(0,0,0,0.25)]">
               <div className="flex items-center justify-between px-4 py-3">
                 <LogoDropdown />
-                <h1 className="text-base font-semibold truncate flex-1 text-center">
-                  {title || "KrishiMitra"}
-                </h1>
+                {/* Replace title with contextual nav for Learn More section pages */}
+                {["/learn-more", "/our-team", "/our-mission", "/future-plan"].includes(location.pathname) ? (
+                  <div className="flex-1 flex items-center justify-center gap-2">
+                    <Button
+                      variant={location.pathname === "/our-team" ? "secondary" : "ghost"}
+                      size="sm"
+                      className="rounded-xl px-3 py-2"
+                      onClick={() => navigate("/our-team")}
+                    >
+                      Our Team
+                    </Button>
+                    <Button
+                      variant={location.pathname === "/our-mission" ? "secondary" : "ghost"}
+                      size="sm"
+                      className="rounded-xl px-3 py-2"
+                      onClick={() => navigate("/our-mission")}
+                    >
+                      Our Mission
+                    </Button>
+                    <Button
+                      variant={location.pathname === "/future-plan" ? "secondary" : "ghost"}
+                      size="sm"
+                      className="rounded-xl px-3 py-2"
+                      onClick={() => navigate("/future-plan")}
+                    >
+                      Future Plan
+                    </Button>
+                  </div>
+                ) : (
+                  <h1 className="text-base font-semibold truncate flex-1 text-center">
+                    {title || "KrishiMitra"}
+                  </h1>
+                )}
                 <div className="w-auto">
                   <LanguageSelect size="sm" />
                 </div>
