@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 type Analysis = {
   ph: number;
@@ -29,6 +30,7 @@ export default function SoilTest() {
   const [loading, setLoading] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [cameraOn, setCameraOn] = useState(false);
@@ -62,10 +64,12 @@ export default function SoilTest() {
     setCameraOn(false);
     setCameraReady(false);
     setStep("capture"); // ensure step resets if camera is stopped
+    setErrorMsg(null);
   };
 
   const startCamera = async () => {
     try {
+      setErrorMsg(null);
       if (!navigator.mediaDevices?.getUserMedia) {
         setCameraError("Live camera isn't supported by this browser. Use 'Upload Photo' instead.");
         setCameraOn(false);
@@ -106,6 +110,7 @@ export default function SoilTest() {
 
   const capturePhoto = async () => {
     if (!videoRef.current || !canvasRef.current) return;
+    setErrorMsg(null);
     const video = videoRef.current;
     const canvas = canvasRef.current;
     const width = video.videoWidth || 1280;
@@ -137,6 +142,7 @@ export default function SoilTest() {
   const onSelectFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
     if (!f) return;
+    setErrorMsg(null);
     setFile(f);
     const url = URL.createObjectURL(f);
     setPreview(url);
@@ -147,6 +153,7 @@ export default function SoilTest() {
     if (!file) return;
     setLoading(true);
     setResult(null);
+    setErrorMsg(null);
     try {
       const uploadUrl = await getUploadUrl({});
       const res = await fetch(uploadUrl, {
@@ -160,7 +167,12 @@ export default function SoilTest() {
       setStep("results");
     } catch (e: any) {
       setResult(null);
-      toast.error(e?.message ?? "AI analysis failed. Please retake or try again.");
+      const raw = e?.message ?? "";
+      let msg = "Unable to analyze this image. Please upload a clear photo of soil.";
+      if (typeof raw === "string" && raw.toLowerCase().includes("photo of soil")) {
+        msg = "Please upload a clear photo of soil.";
+      }
+      setErrorMsg(msg);
     } finally {
       setLoading(false);
     }
@@ -345,6 +357,12 @@ export default function SoilTest() {
                       </div>
                     )}
                   </div>
+                  {errorMsg && (
+                    <Alert variant="destructive" className="rounded-lg">
+                      <AlertTitle>Error</AlertTitle>
+                      <AlertDescription>{errorMsg}</AlertDescription>
+                    </Alert>
+                  )}
                 </CardContent>
               </Card>
             </motion.div>
@@ -425,6 +443,13 @@ export default function SoilTest() {
                     <CardTitle className="text-base">Analysis Results</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
+                    {errorMsg && (
+                      <Alert variant="destructive" className="rounded-lg">
+                        <AlertTitle>Error</AlertTitle>
+                        <AlertDescription>{errorMsg}</AlertDescription>
+                      </Alert>
+                    )}
+
                     {!result && (
                       <div className="text-sm text-muted-foreground">
                         No results available. Analyze the photo to see results here.
