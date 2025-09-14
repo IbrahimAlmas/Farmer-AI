@@ -89,7 +89,7 @@ export default function MyFarm() {
         ids.push(storageId);
       }
       await setCornerPhotos({ id: farmId as any, photoIds: ids as any });
-      toast.success("Corner photos saved");
+      toast.success("Field photo saved");
     } catch (e: any) {
       toast.error(e?.message ?? "Failed to upload photos");
     }
@@ -219,7 +219,7 @@ export default function MyFarm() {
                     <div className="text-sm font-medium mb-2">3D Capture</div>
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <div className="text-xs text-muted-foreground">
-                        Corner photos: {(f.cornerPhotos?.length ?? 0)}/4 • Walk points: {points || (f.walkPath?.length ?? 0)}
+                        Field photo: {(f.cornerPhotos?.length ?? 0)}/1 • Walk points: {points || (f.walkPath?.length ?? 0)}
                       </div>
                       <div className="flex gap-2 flex-wrap">
                         <label>
@@ -227,11 +227,10 @@ export default function MyFarm() {
                             type="file"
                             accept="image/*"
                             capture="environment"
-                            multiple
                             className="hidden"
                             onChange={(e) => uploadCornerPhotos(f._id as any, e.target.files)}
                           />
-                          <Button variant="outline" size="sm">Add Corner Photos</Button>
+                          <Button variant="outline" size="sm">Upload Field Photo</Button>
                         </label>
                         {!isRec ? (
                           <Button variant="secondary" size="sm" onClick={() => startRecording(f._id as any)}>

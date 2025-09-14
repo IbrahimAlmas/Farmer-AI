@@ -95,7 +95,8 @@ export const setCornerPhotos = mutation({
     const farm = await ctx.db.get(args.id);
     if (!farm || farm.userId !== userId) throw new Error("Farm not found or access denied");
 
-    await ctx.db.patch(args.id, { cornerPhotos: args.photoIds.slice(0, 4) });
+    // Store only one photo in test mode
+    await ctx.db.patch(args.id, { cornerPhotos: args.photoIds.slice(0, 1) });
     return { success: true };
   },
 });
@@ -127,12 +128,12 @@ export const finalizeModel = mutation({
     if (!userId) throw new Error("Not authenticated");
     const farm = await ctx.db.get(args.id);
     if (!farm || farm.userId !== userId) throw new Error("Farm not found or access denied");
-    if (!farm.cornerPhotos || farm.cornerPhotos.length < 4) {
-      throw new Error("Please add 4 corner photos first");
+
+    // Test mode: Require only a single field photo; GPS walk is optional
+    if (!farm.cornerPhotos || farm.cornerPhotos.length < 1) {
+      throw new Error("Please add a field photo first");
     }
-    if (!farm.walkPath || farm.walkPath.length < 10) {
-      throw new Error("Please record a short GPS walk around the field");
-    }
+
     await ctx.db.patch(args.id, { modelReady: true });
     return { success: true };
   },
