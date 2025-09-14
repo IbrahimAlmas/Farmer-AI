@@ -49,6 +49,7 @@ export function AppShell({ children, title }: AppShellProps) {
   const hideTopBar = location.pathname === "/dashboard";
   const isLearnMoreSection = ["/learn-more", "/our-team", "/our-mission", "/future-plan"].includes(location.pathname);
   const isOurTeam = location.pathname === "/our-team";
+  const isCommunity = location.pathname === "/community";
 
   const handleVoiceCommand = (text: string) => {
     const command = text.toLowerCase().trim();
@@ -149,7 +150,7 @@ export function AppShell({ children, title }: AppShellProps) {
                   </h1>
                 )}
                 <div className="w-auto">
-                  {/* Show Home button on Learn More pages; otherwise show language selector */}
+                  {/* Show Home button on Learn More pages; otherwise show language selector + optional community action */}
                   {isLearnMoreSection ? (
                     <Button
                       variant="outline"
@@ -162,7 +163,22 @@ export function AppShell({ children, title }: AppShellProps) {
                       Home
                     </Button>
                   ) : (
-                    <LanguageSelect size="sm" />
+                    <div className="flex items-center gap-2">
+                      {isCommunity && (
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          className="rounded-xl px-3 py-2"
+                          onClick={() => {
+                            toast.info("Community creation is handled in a dedicated flow.");
+                          }}
+                          aria-label="Create Community"
+                        >
+                          Create Community
+                        </Button>
+                      )}
+                      <LanguageSelect size="sm" />
+                    </div>
                   )}
                 </div>
               </div>
