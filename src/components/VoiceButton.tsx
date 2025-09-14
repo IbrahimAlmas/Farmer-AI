@@ -26,9 +26,32 @@ export default function VoiceButton({
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<BlobPart[]>([]);
   const mimeRef = useRef<string | null>(null);
+  const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
+  const isDraggingRef = useRef(false);
 
   useEffect(() => {
     setSupported(typeof MediaRecorder !== "undefined" && !!navigator.mediaDevices?.getUserMedia);
+  }, []);
+
+  // Initialize position from localStorage or sensible default (bottom-center)
+  useEffect(() => {
+    const saved = localStorage.getItem("voiceButtonPos");
+    if (saved) {
+      try {
+        const p = JSON.parse(saved) as { x: number; y: number };
+        setPos(p);
+        return;
+      } catch {
+        // ignore
+      }
+    }
+    const pad = 16;
+    const size = 56; // approx button size
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const x = Math.max(pad, Math.min(vw - size - pad, vw / 2 - size / 2));
+    const y = Math.max(pad, Math.min(vh - size - pad, vh - 120));
+    setPos({ x, y });
   }, []);
 
   function getSupportedMime(): string | null {
@@ -49,6 +72,8 @@ export default function VoiceButton({
   }
 
   async function start() {
+    // Prevent recording if this interaction is a drag
+    if (isDraggingRef.current) return;
     if (!supported || disabled) {
       toast.error("Voice recording is not supported on this device/browser.");
       return;
@@ -92,6 +117,7 @@ export default function VoiceButton({
   }
 
   function stop() {
+    if (isDraggingRef.current) return;
     try {
       mediaRecorderRef.current?.stop();
     } catch {
@@ -102,6 +128,7 @@ export default function VoiceButton({
   }
 
   const toggle = () => {
+    if (isDraggingRef.current) return;
     if (!recording) start();
     else stop();
   };
@@ -111,7 +138,39 @@ export default function VoiceButton({
       initial={{ scale: 0.9, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{ duration: 0.2 }}
-      className={`fixed bottom-6 left-1/2 -translate-x-1/2 ${className ?? ""}`}
+      drag
+      dragMomentum
+      onDragStart={() => {
+        isDraggingRef.current = true;
+      }}
+      onDragEnd={(_, info) => {
+        // Compute absolute top/left by adding delta to current pos
+        setPos((prev) => {
+          const pad = 8;
+          const size = 56;
+          const vw = window.innerWidth;
+          const vh = window.innerHeight;
+          const base = prev ?? { x: 0, y: 0 };
+          const next = {
+            x: Math.max(pad, Math.min(vw - size - pad, base.x + info.delta.x)),
+            y: Math.max(pad, Math.min(vh - size - pad, base.y + info.delta.y)),
+          };
+          localStorage.setItem("voiceButtonPos", JSON.stringify(next));
+          return next;
+        });
+        // small delay to avoid tap triggering after drag
+        setTimeout(() => {
+          isDraggingRef.current = false;
+        }, 50);
+      }}
+      style={{
+        position: "fixed",
+        left: (pos?.x ?? 0) + "px",
+        top: (pos?.y ?? 0) + "px",
+        zIndex: 50,
+      }}
+      className={className ?? ""}
+      aria-label="Drag to reposition the voice button"
     >
       <Button
         variant="default"
