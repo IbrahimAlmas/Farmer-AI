@@ -225,9 +225,9 @@ export default function SoilTest() {
                     <CardContent className="space-y-4">
                       <div className="rounded-xl border overflow-hidden bg-muted">
                         <img
-                          src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=1600&auto=format&fit=crop"
-                          alt="Soil illustration"
-                          className="w-full h-48 object-cover"
+                          src="https://images.unsplash.com/photo-1442512595331-e89e73853f31?q=80&w=2000&auto=format&fit=crop"
+                          alt="Wide farmland with clearly visible soil rows"
+                          className="w-full h-56 sm:h-64 object-cover"
                           onError={(e) => {
                             const t = e.currentTarget as HTMLImageElement;
                             if (t.src !== '/logo_bg.png') t.src = '/logo_bg.png';
