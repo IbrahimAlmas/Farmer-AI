@@ -226,7 +226,7 @@ export default function SoilTest() {
                     <CardContent className="space-y-3">
                       <div className="rounded-xl border overflow-hidden bg-muted">
                         <img
-                          src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=2000&auto=format&fit=crop"
+                          src="/assets/Fild.jpeg"
                           alt="Wide farmland with clearly visible soil rows"
                           className="w-full h-56 sm:h-60 object-cover"
                           onError={(e) => {
