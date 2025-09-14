@@ -64,7 +64,7 @@ export default function Dashboard() {
           {/* Right: CTA */}
           <Button
             className="rounded-full px-5 py-3 text-sm md:text-base bg-[oklch(0.42_0.12_130)] hover:bg-[oklch(0.42_0.12_130_/_90%)] text-white"
-            onClick={() => navigate("/learn")}
+            onClick={() => navigate("/learn-more")}
           >
             Learn More →
           </Button>
