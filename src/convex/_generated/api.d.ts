@@ -22,6 +22,7 @@ import type * as http from "../http.js";
 import type * as location from "../location.js";
 import type * as market from "../market.js";
 import type * as market_prices from "../market_prices.js";
+import type * as meshy from "../meshy.js";
 import type * as profiles from "../profiles.js";
 import type * as resources from "../resources.js";
 import type * as seed from "../seed.js";
@@ -50,6 +51,7 @@ declare const fullApi: ApiFromModules<{
   location: typeof location;
   market: typeof market;
   market_prices: typeof market_prices;
+  meshy: typeof meshy;
   profiles: typeof profiles;
   resources: typeof resources;
   seed: typeof seed;

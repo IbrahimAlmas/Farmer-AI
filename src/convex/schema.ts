@@ -82,6 +82,12 @@ const schema = defineSchema(
       // Added fields: size (e.g., acres) and user's previous crops
       size: v.optional(v.number()),
       previousCrops: v.optional(v.array(v.string())),
+
+      // Meshy integration fields
+      modelStatus: v.optional(v.string()),            // "queued" | "processing" | "ready" | "failed"
+      modelUrl: v.optional(v.string()),               // GLB URL from Meshy
+      modelPreviewUrl: v.optional(v.string()),        // preview image URL from Meshy
+      meshyTaskId: v.optional(v.string()),            // Meshy task id
     }).index("by_userId", ["userId"]),
 
     // Tasks for users

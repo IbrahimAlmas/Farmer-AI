@@ -1,6 +1,7 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
+import { internalMutation, internalQuery } from "./_generated/server";
 
 export const list = query({
   args: {},
@@ -155,5 +156,33 @@ export const getById = query({
     const farm = await ctx.db.get(args.id);
     if (!farm || farm.userId !== userId) throw new Error("Farm not found or access denied");
     return farm;
+  },
+});
+
+// Internal: fetch a farm and ensure the current user owns it
+export const ownedFarm = internalQuery({
+  args: { id: v.id("farms") },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const farm = await ctx.db.get(args.id);
+    if (!farm || farm.userId !== userId) throw new Error("Farm not found or access denied");
+    return farm;
+  },
+});
+
+// Internal: set Meshy model metadata/status on a farm
+export const setModelMeta = internalMutation({
+  args: {
+    id: v.id("farms"),
+    modelStatus: v.optional(v.string()),
+    modelUrl: v.optional(v.string()),
+    modelPreviewUrl: v.optional(v.string()),
+    meshyTaskId: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const { id, ...patch } = args;
+    await ctx.db.patch(id, patch);
+    return { success: true };
   },
 });
