@@ -558,35 +558,43 @@ export default function MyFarm() {
                 )}
               </div>
 
+              {/* Add: show preparing message while sim initializes */}
+              {!sim && (
+                <div className="text-sm text-muted-foreground">
+                  Preparing simulation...
+                </div>
+              )}
+
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="rounded-md border p-3">
                   <div className="text-xs text-muted-foreground mb-1">Stage</div>
-                  <div className="text-lg font-semibold">{sim.stage}</div>
+                  <div className="text-lg font-semibold">{sim?.stage ?? "—"}</div>
                 </div>
                 <div className="rounded-md border p-3">
                   <div className="text-xs text-muted-foreground mb-1">Weather</div>
-                  <div className="text-lg font-semibold">{sim.weather}</div>
+                  <div className="text-lg font-semibold">{sim?.weather ?? "—"}</div>
                 </div>
                 <div className="rounded-md border p-3">
                   <div className="text-xs text-muted-foreground mb-1">Soil Moisture</div>
-                  <div className="text-lg font-semibold">{sim.soilMoisture}%</div>
+                  <div className="text-lg font-semibold">{sim ? `${sim.soilMoisture}%` : "—"}</div>
                 </div>
                 <div className="rounded-md border p-3">
                   <div className="text-xs text-muted-foreground mb-1">Balance</div>
-                  <div className="text-lg font-semibold">₹{sim.balance}</div>
+                  <div className="text-lg font-semibold">{sim ? `₹${sim.balance}` : "—"}</div>
                 </div>
                 <div className="rounded-md border p-3 sm:col-span-2">
                   <div className="text-xs text-muted-foreground mb-1">Current Crop</div>
-                  <div className="text-lg font-semibold">{sim.crop ?? "—"}</div>
+                  <div className="text-lg font-semibold">{sim?.crop ?? "—"}</div>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-2">
-                <Button onClick={() => advance({ farmId: simFarmId as any })}>Advance Day</Button>
-                <Button variant="outline" onClick={() => water({ farmId: simFarmId as any })}>Water Field</Button>
-                <Button variant="secondary" onClick={() => plant({ crop: "rice", farmId: simFarmId as any })}>Plant Rice (₹200)</Button>
-                <Button variant="secondary" onClick={() => plant({ crop: "wheat", farmId: simFarmId as any })}>Plant Wheat (₹200)</Button>
+                <Button disabled={!sim} onClick={() => advance({ farmId: simFarmId as any })}>Advance Day</Button>
+                <Button disabled={!sim} variant="outline" onClick={() => water({ farmId: simFarmId as any })}>Water Field</Button>
+                <Button disabled={!sim} variant="secondary" onClick={() => plant({ crop: "rice", farmId: simFarmId as any })}>Plant Rice (₹200)</Button>
+                <Button disabled={!sim} variant="secondary" onClick={() => plant({ crop: "wheat", farmId: simFarmId as any })}>Plant Wheat (₹200)</Button>
                 <Button
+                  disabled={!sim}
                   className="col-span-2"
                   onClick={async () => {
                     try {
