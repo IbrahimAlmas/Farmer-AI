@@ -292,7 +292,7 @@ export function AppShell({ children, title }: AppShellProps) {
                     <div
                       className={`grid place-items-center size-16 rounded-3xl transition-all duration-150
                       ${isActive ? "bg-primary/20 text-primary shadow-[0_0_36px_-6px_theme(colors.primary/55)] ring-2 ring-primary/30" : "text-foreground/80 hover:text-foreground"}
-                      hover:scale-110 active:scale-95 hover:shadow-[0_16px_40px_-12px_rgba(0,0,0,0.55)] ring-0 active:ring-2 active:ring-primary/50`}
+                      hover:scale-125 active:scale-95 hover:shadow-[0_16px_40px_-12px_rgba(0,0,0,0.55)] ring-0 active:ring-2 active:ring-primary/50`}
                     >
                       <Icon className="h-7 w-7" />
                       {isActive && (
@@ -310,7 +310,7 @@ export function AppShell({ children, title }: AppShellProps) {
               })}
 
               {/* Left Divider */}
-              <div className="h-10 w-px bg-border/40 mx-2 shrink-0" aria-hidden />
+              <div className="h-16 w-px bg-border/40 mx-2 shrink-0" aria-hidden />
 
               {/* Embedded Voice Button centered */}
               <div
@@ -318,7 +318,7 @@ export function AppShell({ children, title }: AppShellProps) {
                 aria-label="Voice"
                 title="Voice"
               >
-                <div className="grid place-items-center size-16 rounded-3xl transition-all duration-150 text-foreground/80 hover:text-foreground hover:scale-110 active:scale-95 hover:shadow-[0_16px_40px_-12px_rgba(0,0,0,0.55)]">
+                <div className="grid place-items-center size-16 rounded-3xl transition-all duration-150 text-foreground/80 hover:text-foreground hover:scale-125 active:scale-95 hover:shadow-[0_16px_40px_-12px_rgba(0,0,0,0.55)]">
                   <VoiceButton
                     embedInDock
                     className="relative"
@@ -335,7 +335,7 @@ export function AppShell({ children, title }: AppShellProps) {
               </div>
 
               {/* Right Divider */}
-              <div className="h-10 w-px bg-border/40 mx-2 shrink-0" aria-hidden />
+              <div className="h-16 w-px bg-border/40 mx-2 shrink-0" aria-hidden />
 
               {/* Right side items */}
               {rightItems.map((item) => {
@@ -352,7 +352,7 @@ export function AppShell({ children, title }: AppShellProps) {
                     <div
                       className={`grid place-items-center size-16 rounded-3xl transition-all duration-150
                       ${isActive ? "bg-primary/20 text-primary shadow-[0_0_36px_-6px_theme(colors.primary/55)] ring-2 ring-primary/30" : "text-foreground/80 hover:text-foreground"}
-                      hover:scale-110 active:scale-95 hover:shadow-[0_16px_40px_-12px_rgba(0,0,0,0.55)] ring-0 active:ring-2 active:ring-primary/50`}
+                      hover:scale-125 active:scale-95 hover:shadow-[0_16px_40px_-12px_rgba(0,0,0,0.55)] ring-0 active:ring-2 active:ring-primary/50`}
                     >
                       <Icon className="h-7 w-7" />
                       {isActive && (
