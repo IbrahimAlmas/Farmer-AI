@@ -59,6 +59,11 @@ export function AppShell({ children, title }: AppShellProps) {
   const [dockVisible, setDockVisible] = useState(false);
   const dockItems = [...navItems, ...moreItems];
 
+  // Add: split dock items so the Voice button is exactly centered
+  const mid = Math.ceil(dockItems.length / 2);
+  const leftItems: Array<{ path: string; icon: any; label: string }> = dockItems.slice(0, mid);
+  const rightItems: Array<{ path: string; icon: any; label: string }> = dockItems.slice(mid);
+
   useEffect(() => {
     const onScroll = () => {
       const doc = document.documentElement;
@@ -272,7 +277,8 @@ export function AppShell({ children, title }: AppShellProps) {
             }`}
           >
             <div className="flex items-end gap-4 rounded-[22px] border bg-card/80 backdrop-blur-xl supports-[backdrop-filter]:bg-card/70 shadow-[0_28px_80px_-20px_rgba(0,0,0,0.6)] px-5 py-3">
-              {dockItems.map((item) => {
+              {/* Left side items */}
+              {leftItems.map((item) => {
                 const isActive = location.pathname === item.path;
                 const Icon = item.icon;
                 return (
@@ -302,11 +308,13 @@ export function AppShell({ children, title }: AppShellProps) {
                   </button>
                 );
               })}
-              {/* Divider before voice */}
-              <div className="h-10 w-px bg-border/40 mx-2" aria-hidden />
-              {/* Embedded Voice Button inside Dock */}
+
+              {/* Left Divider */}
+              <div className="h-10 w-px bg-border/40 mx-2 shrink-0" aria-hidden />
+
+              {/* Embedded Voice Button centered */}
               <div
-                className="group relative grid place-items-center"
+                className="group relative grid place-items-center shrink-0"
                 aria-label="Voice"
                 title="Voice"
               >
@@ -325,6 +333,41 @@ export function AppShell({ children, title }: AppShellProps) {
                   Voice
                 </span>
               </div>
+
+              {/* Right Divider */}
+              <div className="h-10 w-px bg-border/40 mx-2 shrink-0" aria-hidden />
+
+              {/* Right side items */}
+              {rightItems.map((item) => {
+                const isActive = location.pathname === item.path;
+                const Icon = item.icon;
+                return (
+                  <button
+                    key={item.path}
+                    onClick={() => navigate(item.path)}
+                    aria-label={tr(item.label)}
+                    aria-current={isActive ? "page" : undefined}
+                    className="group relative grid place-items-center"
+                  >
+                    <div
+                      className={`grid place-items-center size-16 rounded-3xl transition-all duration-150
+                      ${isActive ? "bg-primary/20 text-primary shadow-[0_0_36px_-6px_theme(colors.primary/55)] ring-2 ring-primary/30" : "text-foreground/80 hover:text-foreground"}
+                      hover:scale-110 active:scale-95 hover:shadow-[0_16px_40px_-12px_rgba(0,0,0,0.55)] ring-0 active:ring-2 active:ring-primary/50`}
+                    >
+                      <Icon className="h-7 w-7" />
+                      {isActive && (
+                        <span
+                          className="absolute -bottom-1 h-1.5 w-1.5 rounded-full bg-primary/90 shadow-[0_0_12px_theme(colors.primary/60)]"
+                          aria-hidden
+                        />
+                      )}
+                    </div>
+                    <span className="pointer-events-none absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black/70 px-2 py-0.5 text-[11px] text-white opacity-0 transition-opacity duration-150 group-hover:opacity-100">
+                      {tr(item.label)}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </div>
         </>
