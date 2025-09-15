@@ -17,7 +17,6 @@ import { useLocation, useNavigate } from "react-router";
 import { motion } from "framer-motion";
 import { localeFromLang, type LangKey } from "@/lib/i18n";
 import { toast } from "sonner";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal } from "lucide-react";
 import LanguageSelect from "@/components/LanguageSelect";
 import { useEffect, useState } from "react";
@@ -55,6 +54,10 @@ export function AppShell({ children, title }: AppShellProps) {
   const isCommunityCreate = location.pathname === "/community/create";
 
   const [scrollProgress, setScrollProgress] = useState<number>(0);
+
+  // Add: Mac-style Dock visibility and items (desktop)
+  const [dockVisible, setDockVisible] = useState(false);
+  const dockItems = [...navItems, ...moreItems];
 
   useEffect(() => {
     const onScroll = () => {
@@ -253,81 +256,55 @@ export function AppShell({ children, title }: AppShellProps) {
         {children}
       </main>
 
-      {/* Bottom Navigation (mobile-first) */}
+      {/* Mac-style Dock (desktop) */}
       {!isOurTeam && (
-        <nav className="fixed bottom-0 left-0 right-0 z-30">
-          <div className="pb-[calc(env(safe-area-inset-bottom))]" />
-          <div className="mx-auto w-full max-w-md px-3">
-            {/* Updated glass nav */}
-            <div className="rounded-3xl border bg-card/80 backdrop-blur-xl supports-[backdrop-filter]:bg-card/70 shadow-[0_-10px_35px_-15px_rgba(0,0,0,0.4)]">
-              <div className="flex items-center justify-between px-2 py-2">
-                {navItems.map((item) => {
-                  const isActive = location.pathname === item.path;
-                  const Icon = item.icon;
-                  return (
-                    <Button
-                      key={item.path}
-                      variant="ghost"
-                      size="sm"
-                      className={`relative flex flex-col items-center gap-1 h-auto py-2 px-3 min-w-16 rounded-2xl transition-[background,transform,color] ${
-                        isActive ? "text-primary bg-primary/10 shadow-sm" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                      } hover:scale-[1.02]`}
-                      onClick={() => navigate(item.path)}
-                      aria-label={tr(item.label)}
-                      aria-current={isActive ? "page" : undefined}
+        <>
+          {/* Reveal zone to pop the dock when cursor hits bottom */}
+          <div
+            className="fixed inset-x-0 bottom-0 h-3 z-40 hidden md:block"
+            onMouseEnter={() => setDockVisible(true)}
+          />
+          <div
+            onMouseEnter={() => setDockVisible(true)}
+            onMouseLeave={() => setDockVisible(false)}
+            className={`fixed left-1/2 -translate-x-1/2 z-40 hidden md:block transition-all duration-300 ${
+              dockVisible ? "opacity-100 translate-y-0 bottom-5" : "opacity-0 translate-y-6 pointer-events-none bottom-3"
+            }`}
+          >
+            <div className="flex items-end gap-2 rounded-3xl border bg-card/80 backdrop-blur-xl supports-[backdrop-filter]:bg-card/70 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.45)] px-3 py-2">
+              {dockItems.map((item) => {
+                const isActive = location.pathname === item.path;
+                const Icon = item.icon;
+                return (
+                  <button
+                    key={item.path}
+                    onClick={() => navigate(item.path)}
+                    aria-label={tr(item.label)}
+                    aria-current={isActive ? "page" : undefined}
+                    className="group relative grid place-items-center"
+                  >
+                    <div
+                      className={`grid place-items-center size-12 rounded-2xl transition-all duration-150
+                      ${isActive ? "bg-primary/15 text-primary shadow-[0_0_20px_-4px_theme(colors.primary/40)]" : "text-foreground/80 hover:text-foreground"}
+                      hover:scale-110 active:scale-95 hover:shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] ring-0 active:ring-2 active:ring-primary/50`}
                     >
-                      <Icon className="h-[22px] w-[22px]" />
-                      <span className="text-[11px] leading-none">{tr(item.label)}</span>
-                      {/* Active indicator: animated underline */}
+                      <Icon className="h-6 w-6" />
                       {isActive && (
-                        <span className="mt-1 h-1 w-6 rounded-full bg-primary/80 animate-pulse" aria-hidden />
+                        <span
+                          className="absolute -bottom-1 h-1.5 w-1.5 rounded-full bg-primary/90 shadow-[0_0_12px_theme(colors.primary/60)]"
+                          aria-hidden
+                        />
                       )}
-                    </Button>
-                  );
-                })}
-
-                {/* More menu */}
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className={`flex flex-col items-center gap-1 h-auto py-2 px-3 min-w-16 rounded-2xl ${
-                        moreItems.some((m) => m.path === location.pathname)
-                          ? "text-primary bg-primary/10 shadow-sm"
-                          : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                      } hover:scale-[1.02]`}
-                      aria-label={tr("More")}
-                      aria-haspopup="menu"
-                    >
-                      <MoreHorizontal className="h-[22px] w-[22px]" />
-                      <span className="text-[11px] leading-none">{tr("More")}</span>
-                      {moreItems.some((m) => m.path === location.pathname) && (
-                        <span className="mt-1 h-1 w-6 rounded-full bg-primary/80 animate-pulse" aria-hidden />
-                      )}
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-44" align="end" side="top">
-                    {moreItems.map((m) => {
-                      const Icon = m.icon;
-                      const isActive = location.pathname === m.path;
-                      return (
-                        <DropdownMenuItem
-                          key={m.path}
-                          onClick={() => navigate(m.path)}
-                          className={isActive ? "text-primary" : undefined}
-                        >
-                          <Icon className="mr-2 h-4 w-4" />
-                          {tr(m.label)}
-                        </DropdownMenuItem>
-                      );
-                    })}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
+                    </div>
+                    <span className="pointer-events-none absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black/70 px-2 py-0.5 text-[11px] text-white opacity-0 transition-opacity duration-150 group-hover:opacity-100">
+                      {tr(item.label)}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </div>
-        </nav>
+        </>
       )}
 
       {/* Voice Button (floats above nav safely) */}
