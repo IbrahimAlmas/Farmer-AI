@@ -131,7 +131,7 @@ export function AppShell({ children, title }: AppShellProps) {
       {!hideTopBar && (
         <header className="sticky top-0 z-40">
           <div className="px-4 pt-[env(safe-area-inset-top)]" />
-          <div className="mx-auto w-full max-w-2xl">
+          <div className="mx-auto w-full max-w-6xl">
             {/* Updated glass header - cleaner, floating pill */}
             <div className="mx-3 md:mx-0 rounded-2xl border bg-card/80 backdrop-blur-xl supports-[backdrop-filter]:bg-card/70 shadow-[0_12px_40px_-12px_rgba(0,0,0,0.35)] ring-1 ring-black/5">
               <div className="flex items-center justify-between px-4 py-3">
@@ -261,17 +261,17 @@ export function AppShell({ children, title }: AppShellProps) {
         <>
           {/* Reveal zone to pop the dock when cursor hits bottom */}
           <div
-            className="fixed inset-x-0 bottom-0 h-3 z-40 hidden md:block"
+            className="fixed inset-x-0 bottom-0 h-12 z-40 hidden md:block"
             onMouseEnter={() => setDockVisible(true)}
           />
           <div
             onMouseEnter={() => setDockVisible(true)}
             onMouseLeave={() => setDockVisible(false)}
             className={`fixed left-1/2 -translate-x-1/2 z-40 hidden md:block transition-all duration-300 ${
-              dockVisible ? "opacity-100 translate-y-0 bottom-5" : "opacity-0 translate-y-6 pointer-events-none bottom-3"
+              dockVisible ? "opacity-100 translate-y-0 bottom-10" : "opacity-0 translate-y-6 pointer-events-none bottom-6"
             }`}
           >
-            <div className="flex items-end gap-2 rounded-3xl border bg-card/80 backdrop-blur-xl supports-[backdrop-filter]:bg-card/70 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.45)] px-3 py-2">
+            <div className="flex items-end gap-4 rounded-[22px] border bg-card/80 backdrop-blur-xl supports-[backdrop-filter]:bg-card/70 shadow-[0_28px_80px_-20px_rgba(0,0,0,0.6)] px-5 py-3">
               {dockItems.map((item) => {
                 const isActive = location.pathname === item.path;
                 const Icon = item.icon;
@@ -284,11 +284,11 @@ export function AppShell({ children, title }: AppShellProps) {
                     className="group relative grid place-items-center"
                   >
                     <div
-                      className={`grid place-items-center size-12 rounded-2xl transition-all duration-150
-                      ${isActive ? "bg-primary/15 text-primary shadow-[0_0_20px_-4px_theme(colors.primary/40)]" : "text-foreground/80 hover:text-foreground"}
-                      hover:scale-110 active:scale-95 hover:shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] ring-0 active:ring-2 active:ring-primary/50`}
+                      className={`grid place-items-center size-16 rounded-3xl transition-all duration-150
+                      ${isActive ? "bg-primary/20 text-primary shadow-[0_0_36px_-6px_theme(colors.primary/55)] ring-2 ring-primary/30" : "text-foreground/80 hover:text-foreground"}
+                      hover:scale-110 active:scale-95 hover:shadow-[0_16px_40px_-12px_rgba(0,0,0,0.55)] ring-0 active:ring-2 active:ring-primary/50`}
                     >
-                      <Icon className="h-6 w-6" />
+                      <Icon className="h-7 w-7" />
                       {isActive && (
                         <span
                           className="absolute -bottom-1 h-1.5 w-1.5 rounded-full bg-primary/90 shadow-[0_0_12px_theme(colors.primary/60)]"
