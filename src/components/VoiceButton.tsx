@@ -11,6 +11,9 @@ type Props = {
   className?: string;
   transcribe: (args: { audio: ArrayBuffer; language?: string; contentType?: string; filename?: string }) => Promise<string>;
   language?: string;
+  // Add: optional docking behavior controls
+  draggable?: boolean; // defaults to true; when false, renders inline without drag/positioning
+  pressAndHold?: boolean; // defaults to true; when false, click toggles start/stop
 };
 
 export default function VoiceButton({
@@ -20,6 +23,9 @@ export default function VoiceButton({
   className,
   transcribe,
   language,
+  // Add defaults for new props
+  draggable = true,
+  pressAndHold = true,
 }: Props) {
   const [recording, setRecording] = useState(false);
   const [supported, setSupported] = useState(false);
@@ -35,6 +41,7 @@ export default function VoiceButton({
 
   // Initialize position from localStorage or sensible default (bottom-center)
   useEffect(() => {
+    if (!draggable) return; // Skip when embedded in dock
     const saved = localStorage.getItem("voiceButtonPos");
     if (saved) {
       try {
@@ -52,7 +59,7 @@ export default function VoiceButton({
     const x = Math.max(pad, Math.min(vw - size - pad, vw / 2 - size / 2));
     const y = Math.max(pad, Math.min(vh - size - pad, vh - 120));
     setPos({ x, y });
-  }, []);
+  }, [draggable]);
 
   function getSupportedMime(): string | null {
     const candidates: Array<string> = [
@@ -138,55 +145,71 @@ export default function VoiceButton({
       initial={{ scale: 0.9, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{ duration: 0.2 }}
-      drag
-      dragMomentum
-      onDragStart={() => {
-        isDraggingRef.current = true;
-      }}
-      onDragEnd={(_, info) => {
-        // Compute absolute top/left by adding delta to current pos
-        setPos((prev) => {
-          const pad = 8;
-          const size = 56;
-          const vw = window.innerWidth;
-          const vh = window.innerHeight;
-          const base = prev ?? { x: 0, y: 0 };
-          const next = {
-            x: Math.max(pad, Math.min(vw - size - pad, base.x + info.delta.x)),
-            y: Math.max(pad, Math.min(vh - size - pad, base.y + info.delta.y)),
-          };
-          localStorage.setItem("voiceButtonPos", JSON.stringify(next));
-          return next;
-        });
-        // small delay to avoid tap triggering after drag
-        setTimeout(() => {
-          isDraggingRef.current = false;
-        }, 50);
-      }}
-      style={{
-        position: "fixed",
-        left: (pos?.x ?? 0) + "px",
-        top: (pos?.y ?? 0) + "px",
-        zIndex: 50,
-      }}
-      className={className ?? ""}
+      // Only enable drag when draggable
+      drag={draggable ? true : undefined}
+      dragMomentum={draggable ? true : undefined}
+      onDragStart={draggable ? () => { isDraggingRef.current = true; } : undefined}
+      onDragEnd={
+        draggable
+          ? (_, info) => {
+              // Compute absolute top/left by adding delta to current pos
+              setPos((prev) => {
+                const pad = 8;
+                const size = 56;
+                const vw = window.innerWidth;
+                const vh = window.innerHeight;
+                const base = prev ?? { x: 0, y: 0 };
+                const next = {
+                  x: Math.max(pad, Math.min(vw - size - pad, base.x + info.delta.x)),
+                  y: Math.max(pad, Math.min(vh - size - pad, base.y + info.delta.y)),
+                };
+                localStorage.setItem("voiceButtonPos", JSON.stringify(next));
+                return next;
+              });
+              // small delay to avoid tap triggering after drag
+              setTimeout(() => {
+                isDraggingRef.current = false;
+              }, 50);
+            }
+          : undefined
+      }
+      style={
+        draggable
+          ? {
+              position: "fixed",
+              left: (pos?.x ?? 0) + "px",
+              top: (pos?.y ?? 0) + "px",
+              zIndex: 50,
+            }
+          : undefined
+      }
+      className={`${className ?? ""} relative`}
       aria-label="Drag to reposition the voice button"
     >
       <Button
         variant="default"
         size="icon"
         className={`h-14 w-14 rounded-full ${recording ? "bg-red-600 text-white" : ""}`}
-        onMouseDown={start}
-        onMouseUp={stop}
-        onTouchStart={(e) => {
-          e.preventDefault();
-          start();
-        }}
-        onTouchEnd={(e) => {
-          e.preventDefault();
-          stop();
-        }}
-        onClick={toggle}
+        // In dock mode, use click-to-toggle; in floating mode, keep press-and-hold behavior
+        onMouseDown={pressAndHold ? start : undefined}
+        onMouseUp={pressAndHold ? stop : undefined}
+        onTouchStart={
+          pressAndHold
+            ? (e) => {
+                e.preventDefault();
+                start();
+              }
+            : undefined
+        }
+        onTouchEnd={
+          pressAndHold
+            ? (e) => {
+                e.preventDefault();
+                stop();
+              }
+            : undefined
+        }
+        onClick={!pressAndHold ? toggle : undefined}
         disabled={disabled || !supported}
       >
         {recording ? <MicOff className="h-6 w-6" /> : <Mic className="h-6 w-6" />}

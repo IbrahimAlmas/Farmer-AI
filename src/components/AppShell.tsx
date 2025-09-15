@@ -302,20 +302,30 @@ export function AppShell({ children, title }: AppShellProps) {
                   </button>
                 );
               })}
+              {/* Embedded Voice Button in Dock */}
+              <div className="group relative grid place-items-center">
+                <div
+                  className="grid place-items-center size-16 rounded-3xl transition-all duration-150 text-foreground/80 hover:text-foreground hover:scale-110 active:scale-95 hover:shadow-[0_16px_40px_-12px_rgba(0,0,0,0.55)]"
+                  title="Voice Assistant"
+                  aria-label="Voice Assistant"
+                >
+                  <VoiceButton
+                    draggable={false}
+                    pressAndHold={false}
+                    onTranscript={handleVoiceCommand}
+                    transcribe={({ audio, language, contentType, filename }) =>
+                      transcribe({ audio, language: language ?? localeFromLang(currentLang), contentType, filename })
+                    }
+                    language={localeFromLang(currentLang)}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </>
       )}
 
-      {/* Voice Button (floats above nav safely) */}
-      <VoiceButton
-        className="z-50 !bottom-[92px] sm:!bottom-[92px]"
-        onTranscript={handleVoiceCommand}
-        transcribe={({ audio, language, contentType, filename }) =>
-          transcribe({ audio, language: language ?? localeFromLang(currentLang), contentType, filename })
-        }
-        language={localeFromLang(currentLang)}
-      />
+      {/* Voice Button moved into the dock; floating button removed */}
     </div>
   );
 }
