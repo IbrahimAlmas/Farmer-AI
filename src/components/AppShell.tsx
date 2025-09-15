@@ -302,16 +302,18 @@ export function AppShell({ children, title }: AppShellProps) {
                   </button>
                 );
               })}
-              {/* Embedded Voice Button in Dock */}
-              <div className="group relative grid place-items-center">
-                <div
-                  className="grid place-items-center size-16 rounded-3xl transition-all duration-150 text-foreground/80 hover:text-foreground hover:scale-110 active:scale-95 hover:shadow-[0_16px_40px_-12px_rgba(0,0,0,0.55)]"
-                  title="Voice Assistant"
-                  aria-label="Voice Assistant"
-                >
+              {/* Divider before voice */}
+              <div className="h-10 w-px bg-border/40 mx-2" aria-hidden />
+              {/* Embedded Voice Button inside Dock */}
+              <div
+                className="group relative grid place-items-center"
+                aria-label="Voice"
+                title="Voice"
+              >
+                <div className="grid place-items-center size-16 rounded-3xl transition-all duration-150 text-foreground/80 hover:text-foreground hover:scale-110 active:scale-95 hover:shadow-[0_16px_40px_-12px_rgba(0,0,0,0.55)]">
                   <VoiceButton
-                    draggable={false}
-                    pressAndHold={false}
+                    embedInDock
+                    className="relative"
                     onTranscript={handleVoiceCommand}
                     transcribe={({ audio, language, contentType, filename }) =>
                       transcribe({ audio, language: language ?? localeFromLang(currentLang), contentType, filename })
@@ -319,13 +321,14 @@ export function AppShell({ children, title }: AppShellProps) {
                     language={localeFromLang(currentLang)}
                   />
                 </div>
+                <span className="pointer-events-none absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black/70 px-2 py-0.5 text-[11px] text-white opacity-0 transition-opacity duration-150 group-hover:opacity-100">
+                  Voice
+                </span>
               </div>
             </div>
           </div>
         </>
       )}
-
-      {/* Voice Button moved into the dock; floating button removed */}
     </div>
   );
 }
