@@ -459,46 +459,29 @@ export default function Landing() {
               {tr("Speak in your language, manage farms, test soil with camera, and track market prices — all in a simple, mobile‑first app.")}
             </p>
             <div className="mt-6 flex items-center justify-center gap-3">
-              {postGate ? (
-                <>
-                  <Button
-                    variant="outline"
-                    className="rounded-2xl px-5 py-5 text-base"
-                    onClick={() => {
-                      // Go back to language selection page
-                      try {
-                        localStorage.removeItem("km.lang");
-                      } catch {
-                        // ignore storage errors
-                      }
-                      setGuestLang(null);
-                      setSelectedLang("en");
-                      setPostGate(false);
-                      setGateOpen(true);
-                    }}
-                  >
-                    Change Language
-                  </Button>
-                  <Button
-                    className="rounded-2xl px-5 py-5 text-base"
-                    onClick={() => navigate("/dashboard")}
-                  >
-                    Continue to App <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Button className="rounded-2xl px-5 py-5 text-base" onClick={() => navigate("/dashboard")}>
-                    {tr("Open App")} <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                  <Button variant="secondary" className="rounded-2xl px-5 py-5 text-base" onClick={() => navigate("/market")}>
-                    {tr("See Market Prices")}
-                  </Button>
-                  <Button variant="outline" className="rounded-2xl px-5 py-5 text-base" onClick={playIntro}>
-                    Intro Voice
-                  </Button>
-                </>
-              )}
+              <Button
+                variant="outline"
+                className="rounded-2xl px-5 py-5 text-base"
+                onClick={() => {
+                  try {
+                    localStorage.removeItem("km.lang");
+                  } catch {
+                    // ignore storage errors
+                  }
+                  setGuestLang(null);
+                  setSelectedLang("en");
+                  setPostGate(false);
+                  setGateOpen(true);
+                }}
+              >
+                Change Language
+              </Button>
+              <Button
+                className="rounded-2xl px-5 py-5 text-base"
+                onClick={() => navigate("/dashboard")}
+              >
+                {tr("Open App")} <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
             </div>
             <div className="mt-8 inline-flex items-center gap-2 rounded-2xl border bg-card/70 backdrop-blur px-3 py-2 text-sm">
               <ShieldCheck className="h-4 w-4 text-primary" />
