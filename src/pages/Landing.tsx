@@ -309,6 +309,13 @@ export default function Landing() {
     { label: "ଓଡ଼ିଆ", value: "or" },
     { label: "অসমীয়া", value: "as" },
     { label: "भोजपुरी", value: "bho" },
+    { label: "اردو", value: "ur" },
+    { label: "नेपाली", value: "ne" },
+    { label: "සිංහල", value: "si" },
+    { label: "मैथिली", value: "mai" },
+    { label: "कोंकणी", value: "kok" },
+    { label: "سنڌي (Sindhi)", value: "sd" },
+    { label: "کٲشُر (Kashmiri)", value: "ks" },
   ];
 
   // Confirm selected language: save to profile if signed in, else to localStorage
@@ -330,72 +337,91 @@ export default function Landing() {
 
   if (gateOpen) {
     return (
-      <div className="min-h-screen relative overflow-hidden bg-[#0D0715] text-[color:oklch(0.97_0.02_260)] flex items-center justify-center px-4">
-        {/* Background gradients to subtly glow */}
-        <div className="pointer-events-none absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-[radial-gradient(60rem_60rem_at_20%_0%,oklch(0.74_0.2_320)/12%,transparent),radial-gradient(50rem_50rem_at_100%_10%,oklch(0.78_0.18_300)/10%,transparent)]" />
+      <div className="min-h-screen relative overflow-hidden bg-background text-foreground flex items-center justify-center px-4">
+        {/* Patterned background to match landing */}
+        <div className="absolute inset-0 z-0">
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "repeating-linear-gradient(135deg, color-mix(in oklab, var(--color-secondary) 70%, white 30%) 0 14px, color-mix(in oklab, var(--color-secondary) 85%, black 15%) 14px 28px)",
+            }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/70 to-background z-10" />
         </div>
 
-        <div className="relative z-10 w-full max-w-md space-y-5">
-          {/* Logo + Title */}
-          <div className="text-center">
+        <div className="relative z-20 w-full max-w-3xl">
+          {/* Header */}
+          <div className="flex items-center gap-3 justify-center mb-6">
             <img
               src="https://harmless-tapir-303.convex.cloud/api/storage/a4af3a5d-e126-420d-b31d-c1929a3c833b"
               alt="Root AI"
-              className="mx-auto h-32 w-32 drop-shadow-[0_0_10px_oklch(0.8_0.16_85)/40%] animate-pulse rounded-full object-cover"
+              className="h-12 w-12 rounded-lg object-cover border"
               onError={(e) => {
                 const t = e.currentTarget as HTMLImageElement;
-                if (t.src !== '/logo_bg.svg') t.src = '/logo_bg.svg';
+                if (t.src !== '/logo.svg') t.src = '/logo.svg';
                 t.onerror = null;
               }}
             />
-            <h1 className="mt-4 text-3xl font-extrabold tracking-[0.15em] text-accent">
-              ROOT AI
-            </h1>
-            <p className="mt-1 text-sm tracking-wider text-white/70">
-              Intelligent Agriculture
-            </p>
+            <div className="text-xs uppercase tracking-widest text-muted-foreground">Choose your language</div>
           </div>
 
           {/* Card */}
-          <div className="rounded-2xl border border-[oklch(0.24_0.04_260)/35%] bg-[oklch(0.2_0.04_250)/55%] backdrop-blur p-5 shadow-[0_10px_40px_rgba(0,0,0,0.35)]">
-            <div className="text-center">
-              <h2 className="text-lg font-semibold">Choose your preferred language</h2>
-            </div>
+          <div className="rounded-2xl border bg-card shadow-none">
+            <div className="p-5 md:p-6">
+              <h2 className="text-xl font-extrabold">Select your preferred language</h2>
+              <p className="text-muted-foreground text-sm mt-1">
+                You can change this anytime from Settings.
+              </p>
 
-            {/* Language grid (2 x 3 on mobile) */}
-            <div className="mt-4 grid grid-cols-2 gap-2">
-              {langOptions.slice(0, 6).map((opt) => (
+              {/* Grid with scroll to accommodate 18+ languages */}
+              <div className="mt-5">
+                <div className="max-h-[360px] overflow-auto pr-1">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    {langOptions.map((opt) => (
+                      <button
+                        key={opt.value}
+                        onClick={() => setSelectedLang(opt.value)}
+                        className={`rounded-xl border px-3 py-3 text-sm text-left transition-all
+                          ${
+                            selectedLang === opt.value
+                              ? "border-primary bg-primary/10 ring-2 ring-primary/30"
+                              : "hover:bg-muted/60"
+                          }`}
+                        aria-pressed={selectedLang === opt.value}
+                        aria-label={`Select ${opt.label}`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="mt-5 flex items-center justify-between gap-3">
                 <button
-                  key={opt.value}
-                  onClick={() => setSelectedLang(opt.value)}
-                  className={`rounded-lg border-2 px-3 py-3 text-sm transition-all ${
-                    selectedLang === opt.value
-                      ? 'border-accent bg-[oklch(0.3_0.09_85/25%)] shadow-[0_0_12px_oklch(0.8_0.16_85)/30%]'
-                      : 'border-[oklch(0.24_0.04_260)/45%] hover:border-primary hover:bg-[oklch(0.3_0.09_85/15%)]'
-                  }`}
-                  aria-pressed={selectedLang === opt.value}
-                  aria-label={`Select ${opt.label}`}
+                  className="rounded-xl border px-4 py-3 text-sm hover:bg-muted/60"
+                  onClick={() => {
+                    // go back to landing without saving
+                    setGateOpen(false);
+                  }}
                 >
-                  {opt.label}
+                  Back
                 </button>
-              ))}
+                <Button
+                  className="rounded-xl px-5 py-5 text-base bg-primary text-primary-foreground hover:opacity-95"
+                  onClick={confirmLanguage}
+                >
+                  Continue
+                </Button>
+              </div>
             </div>
 
-            {/* Next CTA */}
-            <div className="mt-5">
-              <Button
-                className="w-full rounded-full py-6 text-base font-bold bg-accent text-[oklch(0.16_0.03_260)] hover:opacity-95"
-                onClick={confirmLanguage}
-              >
-                Next
-              </Button>
+            {/* Footer note */}
+            <div className="border-t px-5 py-3 text-center text-xs text-muted-foreground">
+              Private & secure. You control your data.
             </div>
-          </div>
-
-          {/* Footer note */}
-          <div className="text-center text-xs text-white/50">
-            Private & secure. You control your data.
           </div>
         </div>
       </div>
