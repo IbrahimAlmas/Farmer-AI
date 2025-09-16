@@ -269,11 +269,22 @@ export default function VoiceButton({
           {recording ? <MicOff className="h-6 w-6" /> : <Mic className="h-6 w-6" />}
         </Button>
         {recording && (
-          <motion.div
-            className="absolute inset-0 rounded-3xl bg-red-600/15"
-            animate={{ scale: [1, 1.18, 1], opacity: [0.55, 0.15, 0.55] }}
-            transition={{ duration: 1.2, repeat: Infinity }}
-          />
+          <>
+            {/* Soft overlay pulse with pointer-events disabled so clicks still hit the button */}
+            <motion.div
+              className="pointer-events-none absolute inset-0 rounded-3xl bg-red-600/15"
+              animate={{ scale: [1, 1.18, 1], opacity: [0.55, 0.15, 0.55] }}
+              transition={{ duration: 1.2, repeat: Infinity }}
+              aria-hidden
+            />
+            {/* Extra glow ring for richer visual while recording */}
+            <motion.span
+              className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 size-[4.75rem] rounded-full ring-2 ring-red-500/35 shadow-[0_0_36px_-8px_rgba(239,68,68,0.45)]"
+              animate={{ scale: [1, 1.12, 1], opacity: [0.5, 0.25, 0.5] }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut', delay: 0.1 }}
+              aria-hidden
+            />
+          </>
         )}
       </div>
     );
