@@ -209,6 +209,27 @@ const schema = defineSchema(
       .index("by_userId", ["userId"])
       .index("by_communityId", ["communityId"])
       .index("by_communityId_and_userId", ["communityId", "userId"]),
+
+    // Community messages (per community room chat)
+    community_messages: defineTable({
+      communityId: v.id("communities"),
+      userId: v.id("users"),
+      body: v.string(),
+    })
+      .index("by_communityId", ["communityId"])
+      .index("by_userId", ["userId"]),
+
+    // Community job posts (resume/job-seeking)
+    community_jobs: defineTable({
+      communityId: v.id("communities"),
+      userId: v.id("users"),
+      name: v.string(),
+      contact: v.string(), // phone/email/whatsapp
+      role: v.string(), // desired role or type of work
+      details: v.optional(v.string()), // resume/skills/notes
+    })
+      .index("by_communityId", ["communityId"])
+      .index("by_userId", ["userId"]),
   },
   {
     schemaValidation: false,

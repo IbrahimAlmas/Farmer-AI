@@ -7,7 +7,10 @@ import { useMutation, useQuery } from "convex/react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useAction } from "convex/react";
-/* removed unused Textarea import */
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function Community() {
   const posts = useQuery(api.community.list);
@@ -17,8 +20,16 @@ export default function Community() {
   const reverseGeocode = useAction(api.location.reverseGeocode);
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [area, setArea] = useState<{ state: string; district?: string } | null>(null);
-// Post composer state
-const [body, setBody] = useState("");
+  const [selected, setSelected] = useState<any | null>(null);
+  const [msg, setMsg] = useState("");
+  const sendMessage = useMutation(api.community.sendMessage);
+  const addJob = useMutation(api.community.addJob);
+
+  const [body, setBody] = useState("");
+  const [jobName, setJobName] = useState("");
+  const [jobContact, setJobContact] = useState("");
+  const [jobRole, setJobRole] = useState("");
+  const [jobDetails, setJobDetails] = useState("");
 
   // Mutations/queries for groups
   const my = useQuery(api.community_groups.myMembership);
@@ -28,8 +39,15 @@ const [body, setBody] = useState("");
   );
   const join = useMutation(api.community_groups.join);
 
-  /* removed create-community local state */
-  /* removed create-community local state */
+  // Add: queries for selected community room
+  const messages = useQuery(
+    api.community.listMessages,
+    selected ? { communityId: selected._id } : "skip"
+  );
+  const jobs = useQuery(
+    api.community.listJobs,
+    selected ? { communityId: selected._id } : "skip"
+  );
 
   // Acquire location -> state/district once
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -70,6 +88,42 @@ const [body, setBody] = useState("");
       toast.success("Joined community");
     } catch (e: any) {
       toast.error(e?.message ?? "Failed to join");
+    }
+  };
+
+  const submitMessage = async () => {
+    if (!selected) return;
+    const bodyTrim = msg.trim();
+    if (!bodyTrim) return;
+    try {
+      await sendMessage({ communityId: selected._id, body: bodyTrim });
+      setMsg("");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed to send");
+    }
+  };
+
+  const submitJob = async () => {
+    if (!selected) return;
+    if (!jobName.trim() || !jobContact.trim() || !jobRole.trim()) {
+      toast.error("Please fill name, contact, and role.");
+      return;
+    }
+    try {
+      await addJob({
+        communityId: selected._id,
+        name: jobName.trim(),
+        contact: jobContact.trim(),
+        role: jobRole.trim(),
+        details: jobDetails.trim() || undefined,
+      });
+      setJobName("");
+      setJobContact("");
+      setJobRole("");
+      setJobDetails("");
+      toast.success("Posted to job board");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed to post");
     }
   };
 
@@ -128,7 +182,11 @@ const [body, setBody] = useState("");
 
         {/* Current membership spotlight */}
         {my?.community && (
-          <div className="rounded-3xl border bg-card/70 p-4 flex items-center gap-4 shadow-sm">
+          <div
+            className="rounded-3xl border bg-card/70 p-4 flex items-center gap-4 shadow-sm cursor-pointer"
+            onClick={() => setSelected(my.community)}
+            role="button"
+          >
             <img
               src={my.community.image ?? "/assets/Logo_.png"}
               className="h-12 w-12 rounded-2xl object-cover"
@@ -157,7 +215,12 @@ const [body, setBody] = useState("");
           <CardContent className="p-4">
             <div className="grid sm:grid-cols-2 gap-4">
               {(nearby ?? []).map((c: any) => (
-                <div key={c._id} className="group relative rounded-2xl border overflow-hidden">
+                <div
+                  key={c._id}
+                  className="group relative rounded-2xl border overflow-hidden cursor-pointer"
+                  onClick={() => setSelected(c)}
+                  role="button"
+                >
                   <div className="h-28 w-full relative">
                     <img
                       src={c.image ?? "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1400&auto=format&fit=crop"}
@@ -181,7 +244,14 @@ const [body, setBody] = useState("");
                   <div className="p-3 flex items-center justify-between">
                     <div className="text-xs text-muted-foreground">Local group</div>
                     {!my?.community && (
-                      <Button className="rounded-xl" size="sm" onClick={() => handleJoin(c._id as any)}>
+                      <Button
+                        className="rounded-xl"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleJoin(c._id as any);
+                        }}
+                      >
                         Join
                       </Button>
                     )}
@@ -227,6 +297,121 @@ const [body, setBody] = useState("");
           </CardContent>
         </Card>
       </div>
+
+      {/* Community Room Dialog */}
+      <Dialog open={!!selected} onOpenChange={(open) => !open && setSelected(null)}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-3">
+              <img
+                src={selected?.image ?? "/assets/Logo_.png"}
+                alt={selected?.name ?? "Community"}
+                className="h-8 w-8 rounded-lg object-cover"
+                onError={(e) => {
+                  const t = e.currentTarget as HTMLImageElement;
+                  if (t.src !== '/logo.png') t.src = '/logo.png';
+                  t.onerror = null;
+                }}
+              />
+              <span>{selected?.name ?? "Community"}</span>
+              <span className="text-xs text-muted-foreground">
+                {selected?.district ? `${selected.district}, ` : ""}{selected?.state}
+              </span>
+            </DialogTitle>
+          </DialogHeader>
+
+          <Tabs defaultValue="chat" className="w-full">
+            <TabsList className="grid grid-cols-2 mb-3">
+              <TabsTrigger value="chat">Chat</TabsTrigger>
+              <TabsTrigger value="jobs">Job Board</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="chat" className="space-y-3">
+              <div className="rounded-xl border bg-card/70">
+                <ScrollArea className="h-72 p-3">
+                  <div className="space-y-3">
+                    {(messages ?? []).map((m: any) => (
+                      <div key={m._id} className="flex items-start gap-2">
+                        <img
+                          src={m.user?.image ?? "/logo.png"}
+                          alt={m.user?.name ?? "User"}
+                          className="h-7 w-7 rounded-lg object-cover"
+                          onError={(e) => {
+                            const t = e.currentTarget as HTMLImageElement;
+                            if (t.src !== '/logo.png') t.src = '/logo.png';
+                            t.onerror = null;
+                          }}
+                        />
+                        <div className="flex-1">
+                          <div className="text-xs text-muted-foreground">{m.user?.name ?? "Anonymous"}</div>
+                          <div className="text-sm">{m.body}</div>
+                        </div>
+                      </div>
+                    ))}
+                    {!messages?.length && (
+                      <div className="text-sm text-muted-foreground">No messages yet. Say hello!</div>
+                    )}
+                  </div>
+                </ScrollArea>
+                <div className="p-3 border-t flex items-center gap-2">
+                  <Input
+                    placeholder="Type a message…"
+                    value={msg}
+                    onChange={(e) => setMsg(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        submitMessage();
+                      }
+                    }}
+                  />
+                  <Button onClick={submitMessage}>Send</Button>
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="jobs" className="space-y-4">
+              <div className="rounded-xl border bg-card/70 p-3">
+                <div className="grid sm:grid-cols-2 gap-3">
+                  <Input placeholder="Your name" value={jobName} onChange={(e) => setJobName(e.target.value)} />
+                  <Input placeholder="Contact (phone/email)" value={jobContact} onChange={(e) => setJobContact(e.target.value)} />
+                  <Input placeholder="Desired role/work" value={jobRole} onChange={(e) => setJobRole(e.target.value)} className="sm:col-span-2" />
+                  <Textarea placeholder="Resume / skills / note (optional)" value={jobDetails} onChange={(e) => setJobDetails(e.target.value)} className="sm:col-span-2" />
+                </div>
+                <div className="mt-3 flex justify-end">
+                  <Button onClick={submitJob}>Post</Button>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                {(jobs ?? []).map((j: any) => (
+                  <div key={j._id} className="rounded-xl border p-3 bg-card/70">
+                    <div className="flex items-center gap-2 mb-1">
+                      <img
+                        src={j.user?.image ?? "/logo.png"}
+                        alt={j.user?.name ?? "User"}
+                        className="h-6 w-6 rounded-lg object-cover"
+                        onError={(e) => {
+                          const t = e.currentTarget as HTMLImageElement;
+                          if (t.src !== '/logo.png') t.src = '/logo.png';
+                          t.onerror = null;
+                        }}
+                      />
+                      <div className="text-sm font-medium">{j.name}</div>
+                      <div className="text-xs text-muted-foreground">• {j.role}</div>
+                    </div>
+                    <div className="text-xs text-muted-foreground">Contact: {j.contact}</div>
+                    {j.details && <div className="text-sm mt-1 whitespace-pre-wrap">{j.details}</div>}
+                  </div>
+                ))}
+                {!jobs?.length && (
+                  <div className="text-sm text-muted-foreground">No postings yet.</div>
+                )}
+              </div>
+            </TabsContent>
+          </Tabs>
+        </DialogContent>
+      </Dialog>
     </AppShell>
   );
 }

@@ -107,6 +107,90 @@ export const addComment = mutation({
   },
 });
 
+export const listMessages = query({
+  args: { communityId: v.id("communities") },
+  handler: async (ctx, args) => {
+    const rows = await ctx.db
+      .query("community_messages")
+      .withIndex("by_communityId", (q) => q.eq("communityId", args.communityId))
+      .order("desc")
+      .take(50);
+
+    const withUsers = await Promise.all(
+      rows.map(async (m) => {
+        const user = await ctx.db.get(m.userId);
+        return {
+          ...m,
+          user: user ? { name: user.name || "Anonymous", image: user.image } : null,
+        };
+      })
+    );
+
+    // Return ascending by creation time for display (reverse the taken desc)
+    return withUsers.reverse();
+  },
+});
+
+export const sendMessage = mutation({
+  args: { communityId: v.id("communities"), body: v.string() },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    if (!args.body.trim()) throw new Error("Message cannot be empty");
+
+    return await ctx.db.insert("community_messages", {
+      communityId: args.communityId,
+      userId,
+      body: args.body,
+    });
+  },
+});
+
+export const listJobs = query({
+  args: { communityId: v.id("communities") },
+  handler: async (ctx, args) => {
+    const rows = await ctx.db
+      .query("community_jobs")
+      .withIndex("by_communityId", (q) => q.eq("communityId", args.communityId))
+      .order("desc")
+      .collect();
+
+    const withUsers = await Promise.all(
+      rows.map(async (j) => {
+        const user = await ctx.db.get(j.userId);
+        return {
+          ...j,
+          user: user ? { name: user.name || "Anonymous", image: user.image } : null,
+        };
+      })
+    );
+    return withUsers;
+  },
+});
+
+export const addJob = mutation({
+  args: {
+    communityId: v.id("communities"),
+    name: v.string(),
+    contact: v.string(),
+    role: v.string(),
+    details: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
+    return await ctx.db.insert("community_jobs", {
+      communityId: args.communityId,
+      userId,
+      name: args.name,
+      contact: args.contact,
+      role: args.role,
+      details: args.details,
+    });
+  },
+});
+
 export const groupListNearby = query({
   args: { state: v.string(), district: v.optional(v.string()) },
   handler: async (ctx, args) => {
