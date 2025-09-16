@@ -52,11 +52,17 @@ export const myMembership = query({
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
-    const membership = await ctx.db
+
+    // Fetch the most recent membership instead of requiring unique()
+    const memberships = await ctx.db
       .query("community_members")
       .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .unique();
+      .order("desc")
+      .take(1);
+
+    const membership = memberships[0];
     if (!membership) return null;
+
     const community = await ctx.db.get(membership.communityId);
     return community ? { membershipId: membership._id, community } : null;
   },
