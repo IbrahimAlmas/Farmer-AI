@@ -129,16 +129,23 @@ export const stt = action({
     parts.push(Buffer.from(`${ending}\r\n`));
     const body = Buffer.concat(parts);
 
-    const res = await sarvamFetch(`/speech/stt`, {
-      method: "POST",
-      body,
-      headers: {
-        "Content-Type": `multipart/form-data; boundary=${formDataBoundary}`,
-      },
-    });
+    // Add: graceful fallback if provider errors (e.g., 404 Not Found)
+    try {
+      const res = await sarvamFetch(`/speech/stt`, {
+        method: "POST",
+        body,
+        headers: {
+          "Content-Type": `multipart/form-data; boundary=${formDataBoundary}`,
+        },
+      });
 
-    const json = (await res.json()) as { text?: string; transcript?: string };
-    const text = json.text ?? json.transcript ?? "";
-    return text;
+      const json = (await res.json()) as { text?: string; transcript?: string };
+      const text = json.text ?? json.transcript ?? "";
+      return text;
+    } catch (err) {
+      console.warn("Sarvam STT failed, returning empty transcription fallback:", err);
+      // Return an empty string so the client can still respond gracefully (e.g., guidance TTS).
+      return "";
+    }
   },
 });
