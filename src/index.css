@@ -47,72 +47,90 @@
 
 /* CHANGE VALUES FOR THEME */
 :root {
-  --radius: 0.625rem;
-  --background: oklch(0.985 0.01 270);
-  --foreground: oklch(0.16 0.01 260);
-  --card: oklch(1 0 0 / 60%);
-  --card-foreground: oklch(0.549 0.264 309.8);
-  --popover: oklch(1 0 0 / 65%);
-  --popover-foreground: oklch(0.16 0.01 260);
-  --primary: oklch(0.52 0.24 300);
-  --primary-foreground: oklch(0.98 0.01 260);
-  --secondary: oklch(0.92 0.08 85 / 70%);
-  --secondary-foreground: oklch(0.22 0.03 300);
-  --muted: oklch(0.96 0.015 280 / 60%);
-  --muted-foreground: oklch(0.48 0.03 300);
-  --accent: oklch(0.752 0.146 86.4);
-  --accent-foreground: oklch(0.452 0.163 299.5);
+  --radius: 0.5rem;
+
+  /* Neobrutalism — Light Earthy Green theme */
+  --background: oklch(0.98 0.02 130);          /* paper off-white with a hint of green */
+  --foreground: oklch(0.22 0.04 130);          /* deep charcoal green */
+  --card: oklch(0.985 0.01 130);               /* solid card paper */
+  --card-foreground: oklch(0.22 0.04 130);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.22 0.04 130);
+
+  --primary: oklch(0.66 0.18 140);             /* vibrant leaf green */
+  --primary-foreground: oklch(0.14 0.02 130);  /* nearly black green */
+
+  --secondary: oklch(0.9 0.04 95);             /* warm sand */
+  --secondary-foreground: oklch(0.2 0.03 95);
+
+  --muted: oklch(0.94 0.02 120);
+  --muted-foreground: oklch(0.42 0.03 130);
+
+  --accent: oklch(0.78 0.14 95);               /* yellow-green accent */
+  --accent-foreground: oklch(0.22 0.05 130);
+
   --destructive: oklch(0.62 0.25 25);
-  --border: oklch(0.9 0.02 280 / 50%);
-  --input: oklch(0.9 0.02 280 / 50%);
-  --ring: oklch(0.7 0.12 300);
-  --chart-1: oklch(0.64 0.20 300);
-  --chart-2: oklch(0.66 0.18 260);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(1 0 0 / 60%);
-  --sidebar-foreground: oklch(0.16 0.01 260);
-  --sidebar-primary: oklch(0.52 0.24 300);
-  --sidebar-primary-foreground: oklch(0.98 0.01 260);
-  --sidebar-accent: oklch(0.92 0.08 85 / 70%);
-  --sidebar-accent-foreground: oklch(0.22 0.03 300);
-  --sidebar-border: oklch(0.9 0.02 280 / 50%);
-  --sidebar-ring: oklch(0.7 0.12 300);
+  --border: oklch(0.78 0.03 120);              /* darker border for thick outlines */
+  --input: oklch(0.9 0.02 120);
+  --ring: oklch(0.66 0.18 140);
+
+  --chart-1: oklch(0.66 0.18 140);
+  --chart-2: oklch(0.72 0.12 90);
+  --chart-3: oklch(0.5 0.07 190);
+  --chart-4: oklch(0.78 0.14 95);
+  --chart-5: oklch(0.7 0.15 60);
+
+  --sidebar: oklch(0.985 0.01 130);
+  --sidebar-foreground: oklch(0.22 0.04 130);
+  --sidebar-primary: oklch(0.66 0.18 140);
+  --sidebar-primary-foreground: oklch(0.14 0.02 130);
+  --sidebar-accent: oklch(0.9 0.04 95);
+  --sidebar-accent-foreground: oklch(0.22 0.04 130);
+  --sidebar-border: oklch(0.78 0.03 120);
+  --sidebar-ring: oklch(0.66 0.18 140);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* Neobrutalism — Dark Forest theme */
+  --background: oklch(0.16 0.03 130);
+  --foreground: oklch(0.97 0.02 130);
+
+  --card: oklch(0.2 0.03 130);
+  --card-foreground: oklch(0.97 0.02 130);
+  --popover: oklch(0.2 0.03 130);
+  --popover-foreground: oklch(0.97 0.02 130);
+
+  --primary: oklch(0.72 0.18 140);
+  --primary-foreground: oklch(0.16 0.03 130);
+
+  --secondary: oklch(0.28 0.03 95);
+  --secondary-foreground: oklch(0.97 0.02 130);
+
+  --muted: oklch(0.24 0.02 120);
+  --muted-foreground: oklch(0.78 0.04 120);
+
+  --accent: oklch(0.7 0.14 95);
+  --accent-foreground: oklch(0.12 0.02 130);
+
+  --destructive: oklch(0.62 0.25 25);
+  --border: oklch(0.36 0.02 120);
+  --input: oklch(0.3 0.02 120);
+  --ring: oklch(0.72 0.18 140);
+
+  --chart-1: oklch(0.72 0.18 140);
+  --chart-2: oklch(0.66 0.12 90);
+  --chart-3: oklch(0.56 0.08 190);
+  --chart-4: oklch(0.7 0.14 95);
+  --chart-5: oklch(0.64 0.15 60);
+
+  --sidebar: oklch(0.2 0.03 130);
+  --sidebar-foreground: oklch(0.97 0.02 130);
+  --sidebar-primary: oklch(0.72 0.18 140);
+  --sidebar-primary-foreground: oklch(0.16 0.03 130);
+  --sidebar-accent: oklch(0.28 0.03 95);
+  --sidebar-accent-foreground: oklch(0.97 0.02 130);
+  --sidebar-border: oklch(0.36 0.02 120);
+  --sidebar-ring: oklch(0.72 0.18 140);
 }
 
 @layer base {
@@ -123,6 +141,17 @@
   body {
     @apply bg-background text-foreground;
     font-family: Helvetica Neue, system-ui, sans-serif;
+  }
+
+  /* Neobrutalist outlines — thicker default border feel */
+  .border,
+  .border-b,
+  .border-t,
+  .border-l,
+  .border-r,
+  .ring-1,
+  .ring-2 {
+    border-width: 2px !important;
   }
   .font-sans {
     font-family: Helvetica Neue, system-ui, sans-serif;

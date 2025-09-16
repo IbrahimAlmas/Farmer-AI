@@ -11,10 +11,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
+import { Heart, MessageCircle } from "lucide-react";
 
 export default function Community() {
   const posts = useQuery(api.community.list);
   const create = useMutation(api.community.create);
+  const like = useMutation(api.community.like);
 
   const nearbyEnabled = useState<boolean>(false)[0]; // hint: no-op to keep hooks order stable
   const reverseGeocode = useAction(api.location.reverseGeocode);
@@ -48,6 +50,20 @@ export default function Community() {
     api.community.listJobs,
     selected ? { communityId: selected._id } : "skip"
   );
+
+  // Add: simple relative time helper (uses Convex system _creationTime)
+  const timeAgo = (ts?: number) => {
+    if (!ts) return "";
+    const diff = Date.now() - ts;
+    const s = Math.floor(diff / 1000);
+    if (s < 60) return `${s}s`;
+    const m = Math.floor(s / 60);
+    if (m < 60) return `${m}m`;
+    const h = Math.floor(m / 60);
+    if (h < 24) return `${h}h`;
+    const d = Math.floor(h / 24);
+    return `${d}d`;
+  };
 
   // Acquire location -> state/district once
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -135,6 +151,14 @@ export default function Community() {
       toast.success("Posted");
     } catch {
       toast.error("Failed to post");
+    }
+  };
+
+  const onLike = async (id: string) => {
+    try {
+      await like({ id: id as any });
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed to like");
     }
   };
 
@@ -265,9 +289,31 @@ export default function Community() {
         {/* Existing Post Composer */}
         <Card className="border shadow-sm">
           <CardHeader><CardTitle>Create Post</CardTitle></CardHeader>
-          <CardContent className="flex gap-2">
-            <Input placeholder="Share your update..." value={body} onChange={(e) => setBody(e.target.value)} />
-            <Button onClick={submit}>Post</Button>
+          <CardContent>
+            <div className="flex gap-3">
+              <img
+                src="/logo.png"
+                alt="You"
+                className="h-10 w-10 rounded-xl object-cover"
+                onError={(e) => {
+                  const t = e.currentTarget as HTMLImageElement;
+                  if (t.src !== '/logo.png') t.src = '/logo.png';
+                  t.onerror = null;
+                }}
+              />
+              <div className="flex-1 space-y-2">
+                <Textarea
+                  placeholder="Share your update…"
+                  value={body}
+                  onChange={(e) => setBody(e.target.value)}
+                  rows={3}
+                  className="resize-none"
+                />
+                <div className="flex items-center justify-end">
+                  <Button onClick={submit}>Post</Button>
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
 
@@ -277,21 +323,43 @@ export default function Community() {
           <CardContent className="space-y-3">
             {posts?.length ? posts.map((p) => (
               <div key={p._id} className="border rounded-2xl p-3 bg-card/70">
-                <div className="flex items-center gap-2 mb-1">
+                {/* Header */}
+                <div className="flex items-center gap-2 mb-2">
                   <img
                     src={p.user?.image ?? "/logo.png"}
                     alt={p.user?.name ?? "User"}
-                    className="h-6 w-6 rounded-lg object-cover"
+                    className="h-9 w-9 rounded-xl object-cover"
                     onError={(e) => {
                       const t = e.currentTarget as HTMLImageElement;
                       if (t.src !== '/logo.png') t.src = '/logo.png';
                       t.onerror = null;
                     }}
                   />
-                  <div className="text-sm text-muted-foreground">{p.user?.name ?? "Anonymous"}</div>
+                  <div className="flex items-center gap-2">
+                    <div className="text-sm font-medium">{p.user?.name ?? "Anonymous"}</div>
+                    <div className="text-xs text-muted-foreground">• {timeAgo((p as any)?._creationTime)}</div>
+                  </div>
                 </div>
-                <div className="font-medium">{p.body}</div>
-                <div className="text-xs text-muted-foreground mt-1">❤️ {p.likes} • 💬 {p.commentsCount}</div>
+
+                {/* Body */}
+                <div className="text-[15px] leading-relaxed whitespace-pre-wrap">{p.body}</div>
+
+                {/* Actions */}
+                <div className="mt-3 flex items-center gap-4 text-sm text-muted-foreground">
+                  <button
+                    className="inline-flex items-center gap-1 hover:text-foreground transition-colors"
+                    onClick={() => onLike(p._id as any)}
+                    aria-label="Like"
+                    title="Like"
+                  >
+                    <Heart className="h-4 w-4" />
+                    <span>{p.likes}</span>
+                  </button>
+                  <div className="inline-flex items-center gap-1">
+                    <MessageCircle className="h-4 w-4" />
+                    <span>{p.commentsCount}</span>
+                  </div>
+                </div>
               </div>
             )) : <div className="text-sm text-muted-foreground">No posts yet.</div>}
           </CardContent>

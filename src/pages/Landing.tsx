@@ -405,204 +405,199 @@ export default function Landing() {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Hero */}
-      <section className="relative overflow-hidden">
-        {/* REPLACED: static background image with rotating live background */}
+      <section className="relative overflow-hidden border-b">
+        {/* Neobrutalist patterned background */}
         <div className="absolute inset-0 z-0">
-          {/* Cross-fade rotating images */}
-          <div className="absolute inset-0">
-            {bgImages.map((src, i) => (
-              <img
-                key={src}
-                src={src}
-                alt="Hero background"
-                className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-700 ${bgIndex === i ? "opacity-100" : "opacity-0"}`}
-                loading={i === 0 ? "eager" : "lazy"}
-                onError={(e) => {
-                  const t = e.currentTarget as HTMLImageElement;
-                  if (t.src !== "/logo_bg.svg") t.src = "/logo_bg.svg";
-                  t.onerror = null;
-                }}
-              />
-            ))}
-          </div>
-          {/* Vignette + gradient overlays */}
-          <div className="absolute inset-0 z-10 bg-black/40" />
-          <div className="absolute inset-0 z-20 bg-gradient-to-b from-background/50 via-background/70 to-background" />
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "repeating-linear-gradient(135deg, color-mix(in oklab, var(--color-secondary) 70%, white 30%) 0 14px, color-mix(in oklab, var(--color-secondary) 85%, black 15%) 14px 28px)",
+            }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/70 to-background z-10" />
         </div>
-        <div className="relative z-30 mx-auto w-full max-w-5xl px-4 pt-24 pb-16">
+
+        <div className="relative z-20 mx-auto w-full max-w-6xl px-4 pt-16 pb-16">
           {/* Top-right language selector for landing */}
           <div className="flex justify-end">
             <LanguageSelect size="sm" />
           </div>
-          <motion.div
-            initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-center"
-          >
-            <div className="flex justify-center">
-              <img
-                src="https://harmless-tapir-303.convex.cloud/api/storage/a4af3a5d-e126-420d-b31d-c1929a3c833b"
-                alt="Root AI"
-                className="h-14 w-14 rounded-full object-cover shadow"
-                onError={(e) => {
-                  const t = e.currentTarget as HTMLImageElement;
-                  if (t.src !== '/logo.svg') t.src = '/logo.svg';
-                  t.onerror = null;
-                }}
-              />
+
+          <div className="mt-6 grid md:grid-cols-[1.25fr_1fr] gap-6 items-stretch">
+            {/* Left: Title + CTAs */}
+            <div className="rounded-2xl bg-card border p-6 md:p-8 shadow-none">
+              <div className="flex items-center gap-3">
+                <img
+                  src="https://harmless-tapir-303.convex.cloud/api/storage/a4af3a5d-e126-420d-b31d-c1929a3c833b"
+                  alt="Root AI"
+                  className="h-12 w-12 rounded-lg object-cover"
+                  onError={(e) => {
+                    const t = e.currentTarget as HTMLImageElement;
+                    if (t.src !== '/logo.svg') t.src = '/logo.svg';
+                    t.onerror = null;
+                  }}
+                />
+                <div className="text-xs uppercase tracking-widest text-muted-foreground">Farming Companion</div>
+              </div>
+
+              <h1 className="mt-5 text-4xl md:text-5xl font-extrabold leading-[1.1]">
+                Root AI — Farming, Simplified.
+              </h1>
+              <p className="mt-3 text-base md:text-lg text-muted-foreground max-w-2xl">
+                Speak in your language, manage farms, test soil with camera, and track market prices — all in a simple, fast experience.
+              </p>
+
+              <div className="mt-6 flex flex-wrap items-center gap-3">
+                <Button
+                  variant="outline"
+                  className="rounded-xl px-5 py-5 text-base bg-secondary hover:bg-secondary/80"
+                  onClick={() => {
+                    try { localStorage.removeItem("km.lang"); } catch {}
+                    setGuestLang(null);
+                    setSelectedLang("en");
+                    setPostGate(false);
+                    setGateOpen(true);
+                  }}
+                >
+                  Change Language
+                </Button>
+                <Button
+                  className="rounded-xl px-5 py-5 text-base bg-primary text-primary-foreground hover:opacity-95"
+                  onClick={() => navigate("/dashboard")}
+                >
+                  Open App
+                </Button>
+              </div>
+
+              <div className="mt-6 inline-flex items-center gap-2 rounded-xl border bg-muted/50 px-3 py-2 text-sm">
+                <span className="inline-block h-3 w-3 rounded-[4px] bg-primary" />
+                Private & secure. You control your data.
+              </div>
             </div>
-            <h1 className="mt-6 text-4xl md:text-5xl font-extrabold tracking-tight leading-[1.1]">
-              {tr("Root AI — Intelligent Agriculture Companion")}
-            </h1>
-            <p className="mt-4 text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
-              {tr("Speak in your language, manage farms, test soil with camera, and track market prices — all in a simple, mobile‑first app.")}
-            </p>
-            <div className="mt-6 flex items-center justify-center gap-3">
-              <Button
-                variant="outline"
-                className="rounded-2xl px-5 py-5 text-base"
-                onClick={() => {
-                  try {
-                    localStorage.removeItem("km.lang");
-                  } catch {
-                    // ignore storage errors
-                  }
-                  setGuestLang(null);
-                  setSelectedLang("en");
-                  setPostGate(false);
-                  setGateOpen(true);
-                }}
-              >
-                Change Language
-              </Button>
-              <Button
-                className="rounded-2xl px-5 py-5 text-base"
-                onClick={() => navigate("/dashboard")}
-              >
-                {tr("Open App")} <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
+
+            {/* Right: Visual card with texture */}
+            <div className="rounded-2xl border bg-card p-0 overflow-hidden">
+              <div className="h-full min-h-[260px] relative">
+                <img
+                  src="/assets/Fild.jpeg"
+                  alt="Fields"
+                  className="absolute inset-0 h-full w-full object-cover"
+                  loading="lazy"
+                  onError={(e) => {
+                    const t = e.currentTarget as HTMLImageElement;
+                    if (t.src !== '/logo_bg.png') t.src = '/logo_bg.png';
+                    t.onerror = null;
+                  }}
+                />
+                <div className="absolute inset-0 bg-[linear-gradient(0deg,rgba(0,0,0,0.35),transparent_40%)]" />
+                <div className="absolute bottom-0 left-0 right-0 p-4">
+                  <div className="inline-flex items-center gap-2 rounded-lg bg-background/90 border px-3 py-2 text-xs">
+                    <span className="font-semibold">Live Tools</span> — Voice, Soil Test, Market
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="mt-8 inline-flex items-center gap-2 rounded-2xl border bg-card/70 backdrop-blur px-3 py-2 text-sm">
-              <ShieldCheck className="h-4 w-4 text-primary" />
-              {tr("Private & secure. You control your data.")}
-            </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
-      {/* Feature Cards */}
-      <section className="mx-auto w-full max-w-5xl px-4 -mt-12 pb-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="rounded-3xl border bg-card/70 backdrop-blur">
-            <CardContent className="p-5">
-              <div className="h-12 w-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-3">
-                <Mic className="h-6 w-6" />
-              </div>
-              <div className="font-semibold">{tr("Voice‑First & Multilingual")}</div>
-              <p className="text-sm text-muted-foreground mt-1">
-                {tr("Navigate, add tasks, and get answers with your voice in Telugu, Hindi, English, and more.")}
-              </p>
-            </CardContent>
-          </Card>
+      {/* Feature Blocks — neobrutalist cards */}
+      <section className="mx-auto w-full max-w-6xl px-4 py-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="rounded-2xl border bg-card p-5 md:p-6">
+            <div className="inline-flex items-center justify-center h-12 w-12 rounded-[10px] bg-primary text-primary-foreground mb-3 border">
+              <span className="text-lg font-bold">A</span>
+            </div>
+            <div className="font-semibold">Voice‑First & Multilingual</div>
+            <p className="text-sm text-muted-foreground mt-1">
+              Navigate, add tasks, and get answers with your voice in Telugu, Hindi, English, and more.
+            </p>
+          </div>
 
-          <Card className="rounded-3xl border bg-card/70 backdrop-blur">
-            <CardContent className="p-5">
-              <div className="h-12 w-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-3">
-                <Camera className="h-6 w-6" />
-              </div>
-              <div className="font-semibold">{tr("Camera‑Powered Soil Test")}</div>
-              <p className="text-sm text-muted-foreground mt-1">
-                {tr("Click or upload soil photos for instant AI insights and actionable recommendations.")}
-              </p>
-            </CardContent>
-          </Card>
+          <div className="rounded-2xl border bg-card p-5 md:p-6">
+            <div className="inline-flex items-center justify-center h-12 w-12 rounded-[10px] bg-primary text-primary-foreground mb-3 border">
+              <span className="text-lg font-bold">B</span>
+            </div>
+            <div className="font-semibold">Camera‑Powered Soil Test</div>
+            <p className="text-sm text-muted-foreground mt-1">
+              Click or upload soil photos for instant AI insights and actionable recommendations.
+            </p>
+          </div>
 
-          <Card className="rounded-3xl border bg-card/70 backdrop-blur">
-            <CardContent className="p-5">
-              <div className="h-12 w-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-3">
-                <ShoppingCart className="h-6 w-6" />
-              </div>
-              <div className="font-semibold">{tr("Region‑Aware Market Prices")}</div>
-              <p className="text-sm text-muted-foreground mt-1">
-                {tr("See indicative local retail prices (₹/kg) for vegetables in your state.")}
-              </p>
-            </CardContent>
-          </Card>
+          <div className="rounded-2xl border bg-card p-5 md:p-6">
+            <div className="inline-flex items-center justify-center h-12 w-12 rounded-[10px] bg-primary text-primary-foreground mb-3 border">
+              <span className="text-lg font-bold">C</span>
+            </div>
+            <div className="font-semibold">Region‑Aware Market Prices</div>
+            <p className="text-sm text-muted-foreground mt-1">
+              See indicative local retail prices (₹/kg) for vegetables in your state.
+            </p>
+          </div>
         </div>
       </section>
 
       {/* Split Section */}
-      <section className="mx-auto w-full max-w-5xl px-4 pb-20">
-        <div className="grid md:grid-cols-2 gap-6">
-          <Card className="rounded-3xl border bg-card/70 backdrop-blur">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
-                  <Sprout className="h-5 w-5" />
-                </div>
-                <div className="font-semibold">{tr("Manage Farms & Simulate Growth")}</div>
+      <section className="mx-auto w-full max-w-6xl px-4 pb-16">
+        <div className="grid md:grid-cols-2 gap-5">
+          <div className="rounded-2xl border bg-card p-6">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-[10px] bg-primary text-primary-foreground grid place-items-center border">
+                <span className="font-bold">1</span>
               </div>
-              <p className="text-sm text-muted-foreground mt-2">
-                {tr("Add farms, capture 3D context (corner photos + GPS walk), and run simple per‑farm simulations: plant, water, advance, harvest.")}
-              </p>
-              {!postGate && (
-                <div className="mt-4">
-                  <Button variant="outline" className="rounded-2xl" onClick={() => navigate("/my-farm")}>
-                    {tr("Go to My Farm")}
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+              <div className="font-semibold">Manage Farms & Simulate Growth</div>
+            </div>
+            <p className="text-sm text-muted-foreground mt-2">
+              Add farms, capture 3D context, and run per‑farm simulations: plant, water, advance, harvest.
+            </p>
+            {!postGate && (
+              <div className="mt-4">
+                <Button variant="outline" className="rounded-xl" onClick={() => navigate("/my-farm")}>
+                  Go to My Farm
+                </Button>
+              </div>
+            )}
+          </div>
 
-          <Card className="rounded-3xl border bg-card/70 backdrop-blur">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
-                  <Languages className="h-5 w-5" />
-                </div>
-                <div className="font-semibold">{tr("Local Language Experience")}</div>
+          <div className="rounded-2xl border bg-card p-6">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-[10px] bg-primary text-primary-foreground grid place-items-center border">
+                <span className="font-bold">2</span>
               </div>
-              <p className="text-sm text-muted-foreground mt-2">
-                {tr("Choose your preferred language from Settings. The app adapts navigation and key screens automatically.")}
-              </p>
-              {!postGate && (
-                <div className="mt-4">
-                  <Button variant="outline" className="rounded-2xl" onClick={() => navigate("/settings")}>
-                    {tr("Set Language")}
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+              <div className="font-semibold">Local Language Experience</div>
+            </div>
+            <p className="text-sm text-muted-foreground mt-2">
+              Choose your preferred language from Settings. Navigation adapts automatically.
+            </p>
+            {!postGate && (
+              <div className="mt-4">
+                <Button variant="outline" className="rounded-xl" onClick={() => navigate("/settings")}>
+                  Set Language
+                </Button>
+              </div>
+            )}
+          </div>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="mx-auto w-full max-w-5xl px-4 pb-24">
-        <motion.div
-          initial={{ opacity: 0, y: 14 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.4 }}
-          transition={{ duration: 0.5 }}
-          className="rounded-3xl border bg-card/70 backdrop-blur p-8 text-center"
-        >
-          <h2 className="text-2xl md:text-3xl font-bold">{tr("Start with your voice")}</h2>
+      <section className="mx-auto w-full max-w-6xl px-4 pb-24">
+        <div className="rounded-2xl border bg-card p-8 text-center">
+          <h2 className="text-2xl md:text-3xl font-extrabold">Start with your voice</h2>
           <p className="text-muted-foreground mt-2">
-            {tr("Say \"Open Market\", \"Add Task\", or \"Test Soil\" — it's that simple.")}
+            Say "Open Market", "Add Task", or "Test Soil" — it's that simple.
           </p>
           {!postGate && (
             <div className="mt-6 flex items-center justify-center gap-3">
-              <Button className="rounded-2xl px-5 py-5 text-base" onClick={() => navigate("/dashboard")}>
-                {tr("Get Started")} <ArrowRight className="ml-2 h-5 w-5" />
+              <Button className="rounded-xl px-5 py-5 text-base" onClick={() => navigate("/dashboard")}>
+                Get Started
               </Button>
-              <Button variant="secondary" className="rounded-2xl px-5 py-5 text-base" onClick={() => navigate("/soil-test")}>
-                {tr("Try Soil Test")}
+              <Button variant="secondary" className="rounded-xl px-5 py-5 text-base" onClick={() => navigate("/soil-test")}>
+                Try Soil Test
               </Button>
             </div>
           )}
-        </motion.div>
+        </div>
       </section>
     </div>
   );
