@@ -34,6 +34,8 @@ export default function VoiceButton({
   const isDraggingRef = useRef(false);
   // Add: quick burst ripple on click
   const [burst, setBurst] = useState<number>(0);
+  // Add: guard to prevent concurrent start() calls which can cause permission prompts to fail
+  const [isStarting, setIsStarting] = useState(false);
 
   useEffect(() => {
     setSupported(typeof MediaRecorder !== "undefined" && !!navigator.mediaDevices?.getUserMedia);
@@ -85,6 +87,8 @@ export default function VoiceButton({
       toast.error("Voice recording is not supported on this device/browser.");
       return;
     }
+    if (isStarting || recording) return; // prevent double starts
+    setIsStarting(true);
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const chosen = getSupportedMime();
@@ -118,8 +122,21 @@ export default function VoiceButton({
       setRecording(true);
       onRecordingChange?.(true);
     } catch (err: any) {
-      toast.error(err?.message ?? "Microphone permission denied");
+      const name = err?.name || "";
+      if (name === "NotAllowedError") {
+        toast.error("Microphone access was blocked. Please allow mic permission and try again.");
+      } else if (name === "NotFoundError") {
+        toast.error("No microphone found. Please connect a mic and try again.");
+      } else if (name === "NotReadableError") {
+        toast.error("Microphone is in use by another app. Close it and try again.");
+      } else if (name === "SecurityError") {
+        toast.error("Microphone requires a secure context (HTTPS).");
+      } else {
+        toast.error(err?.message ?? "Failed to access microphone");
+      }
       console.error("Failed to start recording", err);
+    } finally {
+      setIsStarting(false);
     }
   }
 
@@ -135,7 +152,7 @@ export default function VoiceButton({
   }
 
   const toggle = () => {
-    if (isDraggingRef.current) return;
+    if (isDraggingRef.current || isStarting) return;
     // Add: trigger click burst ripple
     setBurst(Date.now());
     if (!recording) start();
@@ -150,27 +167,49 @@ export default function VoiceButton({
         {burst !== 0 && (
           <motion.span
             key={burst}
-            className="pointer-events-none absolute inset-0 rounded-3xl bg-primary/20"
+            className="pointer-events-none absolute inset-0 rounded-3xl bg-primary/25"
             initial={{ scale: 0.6, opacity: 0.6 }}
-            animate={{ scale: 1.6, opacity: 0 }}
-            transition={{ duration: 0.55, ease: "easeOut" }}
+            animate={{ scale: 1.75, opacity: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
             aria-hidden
           />
         )}
 
-        {/* Concentric rings while recording */}
+        {/* Enhanced recording aura */}
         {recording && (
           <>
+            {/* Soft inner pulse */}
             <motion.span
-              className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 size-20 rounded-full border-2 border-red-500/40"
-              animate={{ scale: [1, 1.15, 1], opacity: [0.6, 0.2, 0.6] }}
+              className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 size-16 rounded-full bg-red-500/15 blur-sm"
+              animate={{ scale: [1, 1.08, 1], opacity: [0.5, 0.35, 0.5] }}
+              transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
+              aria-hidden
+            />
+            {/* Concentric rings */}
+            <motion.span
+              className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 size-20 rounded-full ring-2 ring-red-500/45"
+              animate={{ scale: [1, 1.15, 1], opacity: [0.6, 0.25, 0.6] }}
               transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
               aria-hidden
             />
             <motion.span
-              className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 size-28 rounded-full border-2 border-red-500/20"
-              animate={{ scale: [1, 1.25, 1], opacity: [0.45, 0.12, 0.45] }}
+              className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 size-28 rounded-full ring-2 ring-red-500/30"
+              animate={{ scale: [1, 1.25, 1], opacity: [0.45, 0.15, 0.45] }}
               transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut", delay: 0.15 }}
+              aria-hidden
+            />
+            {/* Rotating dashed ring */}
+            <motion.span
+              className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 size-32 rounded-full border-2 border-dashed border-red-400/40"
+              animate={{ rotate: 360 }}
+              transition={{ repeat: Infinity, ease: "linear", duration: 6 }}
+              aria-hidden
+            />
+            {/* Outer glow pulse */}
+            <motion.span
+              className="pointer-events-none absolute inset-0 rounded-3xl shadow-[0_0_48px_0_rgba(239,68,68,0.35)]"
+              animate={{ opacity: [0.35, 0.15, 0.35] }}
+              transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
               aria-hidden
             />
           </>
@@ -181,14 +220,15 @@ export default function VoiceButton({
           size="icon"
           className={`h-14 w-14 rounded-3xl transition-all duration-150 ${recording ? "bg-red-600 text-white ring-2 ring-red-400/50 shadow-[0_0_36px_-6px_rgba(239,68,68,0.55)]" : ""}`}
           onClick={toggle}
-          disabled={disabled || !supported}
+          disabled={disabled || !supported || isStarting}
+          aria-busy={isStarting || undefined}
         >
           {recording ? <MicOff className="h-6 w-6" /> : <Mic className="h-6 w-6" />}
         </Button>
         {recording && (
           <motion.div
-            className="absolute inset-0 rounded-3xl bg-red-600/20"
-            animate={{ scale: [1, 1.2, 1], opacity: [0.6, 0.2, 0.6] }}
+            className="absolute inset-0 rounded-3xl bg-red-600/15"
+            animate={{ scale: [1, 1.18, 1], opacity: [0.55, 0.15, 0.55] }}
             transition={{ duration: 1.2, repeat: Infinity }}
           />
         )}
@@ -255,31 +295,41 @@ export default function VoiceButton({
         {recording ? <MicOff className="h-6 w-6" /> : <Mic className="h-6 w-6" />}
       </Button>
 
-      {/* Click burst ripple (floating) */}
-      {burst !== 0 && (
-        <motion.span
-          key={burst}
-          className="pointer-events-none absolute inset-0 rounded-full bg-primary/20"
-          initial={{ scale: 0.6, opacity: 0.6 }}
-          animate={{ scale: 1.7, opacity: 0 }}
-          transition={{ duration: 0.55, ease: "easeOut" }}
-          aria-hidden
-        />
-      )}
-
       {/* Concentric rings while recording (floating) */}
       {recording && (
         <>
+          {/* Soft inner pulse */}
           <motion.span
-            className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 size-24 rounded-full border-2 border-red-500/40"
-            animate={{ scale: [1, 1.15, 1], opacity: [0.6, 0.2, 0.6] }}
+            className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 size-20 rounded-full bg-red-500/15 blur-sm"
+            animate={{ scale: [1, 1.08, 1], opacity: [0.5, 0.35, 0.5] }}
+            transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
+            aria-hidden
+          />
+          {/* Concentric rings */}
+          <motion.span
+            className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 size-24 rounded-full ring-2 ring-red-500/45"
+            animate={{ scale: [1, 1.15, 1], opacity: [0.6, 0.25, 0.6] }}
             transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
             aria-hidden
           />
           <motion.span
-            className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 size-32 rounded-full border-2 border-red-500/20"
-            animate={{ scale: [1, 1.25, 1], opacity: [0.45, 0.12, 0.45] }}
+            className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 size-32 rounded-full ring-2 ring-red-500/30"
+            animate={{ scale: [1, 1.25, 1], opacity: [0.45, 0.15, 0.45] }}
             transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut", delay: 0.15 }}
+            aria-hidden
+          />
+          {/* Rotating dashed ring */}
+          <motion.span
+            className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 size-36 rounded-full border-2 border-dashed border-red-400/40"
+            animate={{ rotate: -360 }}
+            transition={{ repeat: Infinity, ease: "linear", duration: 7 }}
+            aria-hidden
+          />
+          {/* Outer glow pulse */}
+          <motion.span
+            className="pointer-events-none absolute inset-0 rounded-full shadow-[0_0_48px_0_rgba(239,68,68,0.35)]"
+            animate={{ opacity: [0.35, 0.15, 0.35] }}
+            transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
             aria-hidden
           />
         </>
