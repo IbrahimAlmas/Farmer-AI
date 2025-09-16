@@ -30,6 +30,8 @@ export default function VoiceButton({
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<BlobPart[]>([]);
   const mimeRef = useRef<string | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const finalizedRef = useRef(false);
   const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
   const isDraggingRef = useRef(false);
   // Add: quick burst ripple on click
@@ -91,18 +93,27 @@ export default function VoiceButton({
     setIsStarting(true);
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      // Save stream for later cleanup
+      streamRef.current = stream;
+
       const chosen = getSupportedMime();
       mimeRef.current = chosen;
       const mr = chosen ? new MediaRecorder(stream, { mimeType: chosen }) : new MediaRecorder(stream);
       chunksRef.current = [];
+
+      // Reset finalize guard
+      finalizedRef.current = false;
+
       mr.ondataavailable = (e) => {
         if (e.data && e.data.size > 0) chunksRef.current.push(e.data);
       };
+
       mr.onstop = async () => {
+        if (finalizedRef.current) return;
+        finalizedRef.current = true;
         const blobType = mimeRef.current ?? "audio/webm";
         const blob = new Blob(chunksRef.current, { type: blobType });
         const buf = await blob.arrayBuffer();
-        // derive filename extension
         const ext =
           blobType.includes("mp4") ? "mp4" :
           blobType.includes("mpeg") ? "mp3" :
@@ -114,9 +125,16 @@ export default function VoiceButton({
         } catch (e: any) {
           toast.error(e?.message ?? "Transcription failed");
           console.error("Transcription failed", e);
+        } finally {
+          // Ensure all tracks are stopped
+          try {
+            (streamRef.current?.getTracks() || []).forEach((t) => t.stop());
+          } catch { /* ignore */ }
+          streamRef.current = null;
+          mediaRecorderRef.current = null;
         }
-        (stream.getTracks() || []).forEach((t) => t.stop());
       };
+
       mediaRecorderRef.current = mr;
       mr.start();
       setRecording(true);
@@ -143,17 +161,42 @@ export default function VoiceButton({
   function stop() {
     if (isDraggingRef.current) return;
     try {
-      mediaRecorderRef.current?.stop();
+      const mr = mediaRecorderRef.current;
+      // If the recorder is active, request stop
+      if (mr && (mr.state === "recording" || mr.state === "paused")) {
+        mr.stop();
+      } else {
+        // Fallback finalization if already inactive
+        if (!finalizedRef.current) {
+          finalizedRef.current = true;
+          try {
+            (streamRef.current?.getTracks() || []).forEach((t) => t.stop());
+          } catch { /* ignore */ }
+          streamRef.current = null;
+          mediaRecorderRef.current = null;
+        }
+      }
     } catch {
       // ignore
     }
     setRecording(false);
     onRecordingChange?.(false);
+
+    // Safety: If onstop doesn't fire quickly, force cleanup
+    setTimeout(() => {
+      if (!finalizedRef.current) {
+        finalizedRef.current = true;
+        try {
+          (streamRef.current?.getTracks() || []).forEach((t) => t.stop());
+        } catch { /* ignore */ }
+        streamRef.current = null;
+        mediaRecorderRef.current = null;
+      }
+    }, 1500);
   }
 
   const toggle = () => {
     if (isDraggingRef.current || isStarting) return;
-    // Add: trigger click burst ripple
     setBurst(Date.now());
     if (!recording) start();
     else stop();
@@ -289,7 +332,6 @@ export default function VoiceButton({
           e.preventDefault();
           stop();
         }}
-        onClick={toggle}
         disabled={disabled || !supported}
       >
         {recording ? <MicOff className="h-6 w-6" /> : <Mic className="h-6 w-6" />}
