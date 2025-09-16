@@ -46,6 +46,7 @@ export function AppShell({ children, title }: AppShellProps) {
   const transcribe = useAction(api.voice.stt);
   const profile = useQuery(api.profiles.get);
   const myCommunity = useQuery(api.community_groups.myMembership);
+  const tts = useAction(api.voice.tts);
 
   const hideTopBar = location.pathname === "/dashboard";
   const isLearnMoreSection = ["/learn-more", "/our-team", "/our-mission", "/future-plan"].includes(location.pathname);
@@ -76,36 +77,54 @@ export function AppShell({ children, title }: AppShellProps) {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const handleVoiceCommand = (text: string) => {
+  // Make voice handler async to speak responses
+  const handleVoiceCommand = async (text: string) => {
     const command = text.toLowerCase().trim();
-    
-    // Simple voice navigation commands
+    const speak = async (msg: string) => {
+      try {
+        const base64 = await tts({ text: msg, language: localeFromLang(currentLang) });
+        const audio = new Audio(`data:audio/mp3;base64,${base64}`);
+        await audio.play();
+      } catch (e: any) {
+        // non-blocking
+      }
+    };
+
     if (command.includes("home") || command.includes("dashboard")) {
       navigate("/dashboard");
       toast.success("Navigating to dashboard");
+      await speak("Opening dashboard");
     } else if (command.includes("farm")) {
       navigate("/my-farm");
       toast.success("Navigating to farm");
+      await speak("Opening your farm");
     } else if (command.includes("task")) {
       navigate("/tasks");
       toast.success("Navigating to tasks");
+      await speak("Opening tasks");
     } else if (command.includes("market")) {
       navigate("/market");
       toast.success("Navigating to market");
+      await speak("Opening market");
     } else if (command.includes("learn")) {
       navigate("/learn");
       toast.success("Navigating to learn");
+      await speak("Opening learn");
     } else if (command.includes("community")) {
       navigate("/community");
       toast.success("Navigating to community");
+      await speak("Opening community");
     } else if (command.includes("soil") || command.includes("test")) {
       navigate("/soil-test");
       toast.success("Navigating to soil test");
+      await speak("Opening soil test");
     } else if (command.includes("settings")) {
       navigate("/settings");
       toast.success("Navigating to settings");
+      await speak("Opening settings");
     } else {
       toast.info(`Voice command: "${text}"`);
+      await speak("I heard you. Please say a command like open market, my farm, tasks, or soil test.");
     }
   };
 
