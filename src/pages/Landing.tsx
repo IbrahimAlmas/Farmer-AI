@@ -8,6 +8,7 @@ import { api } from "@/convex/_generated/api";
 import LanguageSelect from "@/components/LanguageSelect";
 import { useAction, useMutation, useQuery } from "convex/react";
 import { toast } from "sonner";
+import { ui, type LangKey } from "@/lib/i18n";
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -335,6 +336,8 @@ export default function Landing() {
     }
   };
 
+  const activeLang: LangKey = (String(profile?.preferredLang || guestLang || selectedLang || "en") as LangKey);
+
   if (gateOpen) {
     return (
       <div className="min-h-screen relative overflow-hidden bg-background text-foreground flex items-center justify-center px-4">
@@ -464,15 +467,15 @@ export default function Landing() {
                     t.onerror = null;
                   }}
                 />
-                <div className="text-xs uppercase tracking-widest text-muted-foreground">Farming Companion</div>
+                <div className="text-xs uppercase tracking-widest text-muted-foreground">{ui(activeLang, "Farming Companion")}</div>
               </div>
 
-              <h1 className="mt-5 text-4xl md:text-5xl font-extrabold leading-[1.1]">
-                Root AI — Farming, Simplified.
-              </h1>
-              <p className="mt-3 text-base md:text-lg text-muted-foreground max-w-2xl">
-                Speak in your language, manage farms, test soil with camera, and track market prices — all in a simple, fast experience.
-              </p>
+<h1 className="mt-5 text-4xl md:text-5xl font-extrabold leading-[1.1]">
+  {ui(activeLang, "AppTitle")}
+</h1>
+<p className="mt-3 text-base md:text-lg text-muted-foreground max-w-2xl">
+  {ui(activeLang, "AppTagline")}
+</p>
 
               <div className="mt-6 flex flex-wrap items-center gap-3">
                 <Button
@@ -486,7 +489,7 @@ export default function Landing() {
                     setGateOpen(true);
                   }}
                 >
-                  Change Language
+                  {ui(activeLang, "Change Language")}
                 </Button>
                 <Button
                   className="rounded-xl px-5 py-5 text-base bg-primary text-primary-foreground hover:opacity-95"
@@ -498,7 +501,7 @@ export default function Landing() {
 
               <div className="mt-6 inline-flex items-center gap-2 rounded-xl border bg-muted/50 px-3 py-2 text-sm">
                 <span className="inline-block h-3 w-3 rounded-[4px] bg-primary" />
-                Private & secure. You control your data.
+                {ui(activeLang, "SecurityNote")}
               </div>
             </div>
 
@@ -519,7 +522,7 @@ export default function Landing() {
                 <div className="absolute inset-0 bg-[linear-gradient(0deg,rgba(0,0,0,0.35),transparent_40%)]" />
                 <div className="absolute bottom-0 left-0 right-0 p-4">
                   <div className="inline-flex items-center gap-2 rounded-lg bg-background/90 border px-3 py-2 text-xs">
-                    <span className="font-semibold">Live Tools</span> — Voice, Soil Test, Market
+                    <span className="font-semibold">{ui(activeLang, "Live Tools")}</span>
                   </div>
                 </div>
               </div>
@@ -571,11 +574,11 @@ export default function Landing() {
               <div className="h-10 w-10 rounded-[10px] bg-primary text-primary-foreground grid place-items-center border">
                 <span className="font-bold">1</span>
               </div>
-              <div className="font-semibold">Manage Farms & Simulate Growth</div>
+              <div className="font-semibold">{ui(activeLang, "Manage Farms & Simulate Growth")}</div>
             </div>
-            <p className="text-sm text-muted-foreground mt-2">
-              Add farms, capture 3D context, and run per‑farm simulations: plant, water, advance, harvest.
-            </p>
+<p className="text-sm text-muted-foreground mt-2">
+  {ui(activeLang, "Manage Farms Desc")}
+</p>
             {!postGate && (
               <div className="mt-4">
                 <Button variant="outline" className="rounded-xl" onClick={() => navigate("/my-farm")}>
@@ -590,11 +593,11 @@ export default function Landing() {
               <div className="h-10 w-10 rounded-[10px] bg-primary text-primary-foreground grid place-items-center border">
                 <span className="font-bold">2</span>
               </div>
-              <div className="font-semibold">Local Language Experience</div>
+              <div className="font-semibold">{ui(activeLang, "Local Language Experience")}</div>
             </div>
-            <p className="text-sm text-muted-foreground mt-2">
-              Choose your preferred language from Settings. Navigation adapts automatically.
-            </p>
+<p className="text-sm text-muted-foreground mt-2">
+  {ui(activeLang, "Local Language Desc")}
+</p>
             {!postGate && (
               <div className="mt-4">
                 <Button variant="outline" className="rounded-xl" onClick={() => navigate("/settings")}>
@@ -609,10 +612,10 @@ export default function Landing() {
       {/* CTA */}
       <section className="mx-auto w-full max-w-6xl px-4 pb-24">
         <div className="rounded-2xl border bg-card p-8 text-center">
-          <h2 className="text-2xl md:text-3xl font-extrabold">Start with your voice</h2>
-          <p className="text-muted-foreground mt-2">
-            Say "Open Market", "Add Task", or "Test Soil" — it's that simple.
-          </p>
+          <h2 className="text-2xl md:text-3xl font-extrabold">{ui(activeLang, "Start with your voice")}</h2>
+<p className="text-muted-foreground mt-2">
+  {ui(activeLang, "Voice CTA")}
+</p>
           {!postGate && (
             <div className="mt-6 flex items-center justify-center gap-3">
               <Button className="rounded-xl px-5 py-5 text-base" onClick={() => navigate("/dashboard")}>

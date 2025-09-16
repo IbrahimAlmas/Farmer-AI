@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router";
 import { motion } from "framer-motion";
-import { localeFromLang, type LangKey } from "@/lib/i18n";
+import { localeFromLang, type LangKey, ui } from "@/lib/i18n";
 import { toast } from "sonner";
 import { MoreHorizontal } from "lucide-react";
 import LanguageSelect from "@/components/LanguageSelect";
@@ -130,25 +130,6 @@ export function AppShell({ children, title }: AppShellProps) {
 
   const currentLang = (profile?.preferredLang as LangKey) || "en";
 
-  // Add: tiny translator for nav labels (extend as needed)
-  const tr = (s: string) => {
-    if (currentLang.startsWith("te")) {
-      const te: Record<string, string> = {
-        Home: "హోమ్",
-        Farm: "పంటభూమి",
-        Tasks: "పనులు",
-        Soil: "మట్టి",
-        Market: "మార్కెట్",
-        Learn: "నేర్చుకోండి",
-        Community: "సమాజం",
-        Settings: "సెట్టింగ్స్",
-        More: "మరిన్ని",
-      };
-      return te[s] ?? s;
-    }
-    return s;
-  };
-
   return (
     <div className="min-h-screen flex flex-col bg-background">
       {/* Top Bar - hidden on dashboard */}
@@ -204,7 +185,7 @@ export function AppShell({ children, title }: AppShellProps) {
                       aria-label="Home"
                     >
                       <Home className="h-4 w-4 mr-2" />
-                      Home
+                      {ui(currentLang, "Home")}
                     </Button>
                   ) : (
                     <div className="flex items-center gap-2">
@@ -241,7 +222,7 @@ export function AppShell({ children, title }: AppShellProps) {
                           }}
                           aria-label="Create Community"
                         >
-                          Create Community
+                          {ui(currentLang, "Create Community")}
                         </Button>
                       )}
                       {/* New: Show a back-to-community button on the Create page */}
@@ -253,7 +234,7 @@ export function AppShell({ children, title }: AppShellProps) {
                           onClick={() => navigate("/community")}
                           aria-label="Back to Community"
                         >
-                          Community
+                          {ui(currentLang, "Community")}
                         </Button>
                       )}
                       <LanguageSelect size="sm" />
@@ -304,7 +285,7 @@ export function AppShell({ children, title }: AppShellProps) {
                   <button
                     key={item.path}
                     onClick={() => navigate(item.path)}
-                    aria-label={tr(item.label)}
+                    aria-label={ui(currentLang, item.label as any)}
                     aria-current={isActive ? "page" : undefined}
                     className="group relative grid place-items-center"
                   >
@@ -322,7 +303,7 @@ export function AppShell({ children, title }: AppShellProps) {
                       )}
                     </div>
                     <span className="pointer-events-none absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black/70 px-2 py-0.5 text-[11px] text-white opacity-0 transition-opacity duration-150 group-hover:opacity-100">
-                      {tr(item.label)}
+                      {ui(currentLang, item.label as any)}
                     </span>
                   </button>
                 );
@@ -349,7 +330,7 @@ export function AppShell({ children, title }: AppShellProps) {
                   />
                 </div>
                 <span className="pointer-events-none absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black/70 px-2 py-0.5 text-[11px] text-white opacity-0 transition-opacity duration-150 group-hover:opacity-100">
-                  Voice
+                  {ui(currentLang, "Voice")}
                 </span>
               </div>
 
@@ -364,7 +345,7 @@ export function AppShell({ children, title }: AppShellProps) {
                   <button
                     key={item.path}
                     onClick={() => navigate(item.path)}
-                    aria-label={tr(item.label)}
+                    aria-label={ui(currentLang, item.label as any)}
                     aria-current={isActive ? "page" : undefined}
                     className="group relative grid place-items-center"
                   >
@@ -382,7 +363,7 @@ export function AppShell({ children, title }: AppShellProps) {
                       )}
                     </div>
                     <span className="pointer-events-none absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black/70 px-2 py-0.5 text-[11px] text-white opacity-0 transition-opacity duration-150 group-hover:opacity-100">
-                      {tr(item.label)}
+                      {ui(currentLang, item.label as any)}
                     </span>
                   </button>
                 );

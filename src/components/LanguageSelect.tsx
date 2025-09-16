@@ -3,24 +3,14 @@ import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
+import { SupportedLanguages } from "@/lib/i18n";
 
 type Option = { label: string; value: string };
 
-const options: Array<Option> = [
-  { label: "English", value: "en" },
-  { label: "தமிழ் (Tamil)", value: "ta" },
-  { label: "తెలుగు (Telugu)", value: "te" },
-  { label: "മലയാളം (Malayalam)", value: "ml" },
-  { label: "ಕನ್ನಡ (Kannada)", value: "kn" },
-  { label: "हिन्दी (Hindi)", value: "hi" },
-  { label: "বাংলা (Bengali)", value: "bn" },
-  { label: "मराठी (Marathi)", value: "mr" },
-  { label: "ગુજરાતી (Gujarati)", value: "gu" },
-  { label: "ਪੰਜਾਬੀ (Punjabi)", value: "pa" },
-  { label: "ଓଡ଼ିଆ (Odia)", value: "or" },
-  { label: "অসমীয়া (Assamese)", value: "as" },
-  { label: "भोजपुरी (Bhojpuri)", value: "bho" },
-];
+const options: Array<Option> = SupportedLanguages.map((l) => ({
+  label: l.label,
+  value: l.key,
+}));
 
 export default function LanguageSelect({ size = "sm" }: { size?: "sm" | "md" }) {
   const profile = useQuery(api.profiles.get);
@@ -29,10 +19,7 @@ export default function LanguageSelect({ size = "sm" }: { size?: "sm" | "md" }) 
   const [saving, setSaving] = useState(false);
 
   const current = useMemo(() => {
-    const raw = String(profile?.preferredLang || "en").toLowerCase();
-    if (raw.startsWith("te")) return "te";
-    if (raw.startsWith("hi")) return "hi";
-    return "en";
+    return String(profile?.preferredLang || "en").toLowerCase();
   }, [profile?.preferredLang]);
 
   const onChange = async (value: string) => {
