@@ -32,6 +32,8 @@ export default function VoiceButton({
   const mimeRef = useRef<string | null>(null);
   const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
   const isDraggingRef = useRef(false);
+  // Add: quick burst ripple on click
+  const [burst, setBurst] = useState<number>(0);
 
   useEffect(() => {
     setSupported(typeof MediaRecorder !== "undefined" && !!navigator.mediaDevices?.getUserMedia);
@@ -134,6 +136,8 @@ export default function VoiceButton({
 
   const toggle = () => {
     if (isDraggingRef.current) return;
+    // Add: trigger click burst ripple
+    setBurst(Date.now());
     if (!recording) start();
     else stop();
   };
@@ -142,6 +146,36 @@ export default function VoiceButton({
   if (embedInDock) {
     return (
       <div className={`relative ${className ?? ""}`} aria-label="Voice controls in dock">
+        {/* Click burst ripple */}
+        {burst !== 0 && (
+          <motion.span
+            key={burst}
+            className="pointer-events-none absolute inset-0 rounded-3xl bg-primary/20"
+            initial={{ scale: 0.6, opacity: 0.6 }}
+            animate={{ scale: 1.6, opacity: 0 }}
+            transition={{ duration: 0.55, ease: "easeOut" }}
+            aria-hidden
+          />
+        )}
+
+        {/* Concentric rings while recording */}
+        {recording && (
+          <>
+            <motion.span
+              className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 size-20 rounded-full border-2 border-red-500/40"
+              animate={{ scale: [1, 1.15, 1], opacity: [0.6, 0.2, 0.6] }}
+              transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
+              aria-hidden
+            />
+            <motion.span
+              className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 size-28 rounded-full border-2 border-red-500/20"
+              animate={{ scale: [1, 1.25, 1], opacity: [0.45, 0.12, 0.45] }}
+              transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut", delay: 0.15 }}
+              aria-hidden
+            />
+          </>
+        )}
+
         <Button
           variant="default"
           size="icon"
@@ -220,12 +254,35 @@ export default function VoiceButton({
       >
         {recording ? <MicOff className="h-6 w-6" /> : <Mic className="h-6 w-6" />}
       </Button>
-      {recording && (
-        <motion.div
-          className="absolute inset-0 rounded-full bg-red-600/20"
-          animate={{ scale: [1, 1.25, 1], opacity: [0.6, 0.2, 0.6] }}
-          transition={{ duration: 1.2, repeat: Infinity }}
+
+      {/* Click burst ripple (floating) */}
+      {burst !== 0 && (
+        <motion.span
+          key={burst}
+          className="pointer-events-none absolute inset-0 rounded-full bg-primary/20"
+          initial={{ scale: 0.6, opacity: 0.6 }}
+          animate={{ scale: 1.7, opacity: 0 }}
+          transition={{ duration: 0.55, ease: "easeOut" }}
+          aria-hidden
         />
+      )}
+
+      {/* Concentric rings while recording (floating) */}
+      {recording && (
+        <>
+          <motion.span
+            className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 size-24 rounded-full border-2 border-red-500/40"
+            animate={{ scale: [1, 1.15, 1], opacity: [0.6, 0.2, 0.6] }}
+            transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
+            aria-hidden
+          />
+          <motion.span
+            className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 size-32 rounded-full border-2 border-red-500/20"
+            animate={{ scale: [1, 1.25, 1], opacity: [0.45, 0.12, 0.45] }}
+            transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut", delay: 0.15 }}
+            aria-hidden
+          />
+        </>
       )}
     </motion.div>
   );
