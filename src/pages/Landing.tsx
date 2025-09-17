@@ -450,7 +450,7 @@ export default function Landing() {
             className="absolute inset-0"
             style={{
               background:
-                "repeating-linear-gradient(135deg, color-mix(in oklab, var(--color-secondary) 70%, white 30%) 0 14px, color-mix(in oklab, var(--color-secondary) 85%, black 15%) 14px 28px)",
+                "radial-gradient(1000px 600px at 20% 20%, color-mix(in oklab, var(--color-primary) 18%, transparent 82%), transparent 60%), radial-gradient(900px 500px at 80% 80%, color-mix(in oklab, var(--color-accent) 16%, transparent 84%), transparent 60%)",
             }}
           />
           <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/70 to-background z-10" />
