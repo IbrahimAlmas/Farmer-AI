@@ -1,9 +1,9 @@
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform, useInView } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowRight, Mic, Sprout, Camera, ShoppingCart, Languages, ShieldCheck, Loader2, Cloud, Sparkles, MapPin, Leaf, BarChart3, Shield, Users2, Zap } from "lucide-react";
+import { ArrowRight, Mic, Sprout, Camera, ShoppingCart, Languages, ShieldCheck, Loader2, Cloud, Sparkles, MapPin, Leaf, BarChart3, Shield, Users2, Zap, Droplets, Sun, Cpu, Globe, TrendingUp, CheckCircle } from "lucide-react";
 import { useNavigate } from "react-router";
-import { useMemo, useEffect, useState } from "react";
+import { useMemo, useEffect, useState, useRef } from "react";
 import { api } from "@/convex/_generated/api";
 import LanguageSelect from "@/components/LanguageSelect";
 import { useAction, useMutation, useQuery } from "convex/react";
@@ -15,6 +15,8 @@ export default function Landing() {
   const updateProfile = useMutation(api.profiles.update);
   const tts = useAction(api.voice.tts);
   const reverseGeocode = useAction(api.location.reverseGeocode);
+  const heroRef = useRef<HTMLDivElement>(null);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   // Setup progress UI
   const [setupLoading, setSetupLoading] = useState(false);
@@ -27,6 +29,11 @@ export default function Landing() {
   const [postGate, setPostGate] = useState<boolean>(false);
   // New: simple two-step slider for gate (0 = welcome, 1 = language select)
   const [gateSlide, setGateSlide] = useState<number>(0);
+
+  // Scroll-based animations
+  const { scrollYProgress } = useScroll();
+  const heroY = useTransform(scrollYProgress, [0, 0.5], [0, -100]);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0.8]);
 
   // Live background images for the gate (rotating, mobile-first)
   const bgImages: Array<string> = [
@@ -42,6 +49,24 @@ export default function Landing() {
     }, 5000);
     return () => clearInterval(id);
   }, [gateOpen]);
+
+  // Spotlight effect
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!heroRef.current) return;
+    const rect = heroRef.current.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    setMousePosition({ x, y });
+    
+    heroRef.current.style.setProperty('--spot-x', `${x}%`);
+    heroRef.current.style.setProperty('--spot-y', `${y}%`);
+    heroRef.current.style.setProperty('--spot-opacity', '1');
+  };
+
+  const handleMouseLeave = () => {
+    if (!heroRef.current) return;
+    heroRef.current.style.setProperty('--spot-opacity', '0');
+  };
 
   // Map Indian states to regional language codes (fallbacks to Hindi for some)
   const stateToLang = (state?: string): string | null => {
@@ -278,7 +303,7 @@ export default function Landing() {
           "మీ రాష్ట్రంలో కూరగాయల సూచకీయ స్థానిక రిటైల్ ధరలు (₹/kg) చూడండి.",
         "Manage Farms & Simulate Growth": "ఫార్మ్‌లను నిర్వహించండి & పంట పెరుగుదల సిమ్యులేట్ చేయండి",
         "Add farms, capture 3D context (corner photos + GPS walk), and run simple per‑farm simulations: plant, water, advance, harvest.":
-          "ఫార్మ్‌లు జోడించండి, 3D కాంటెక్స్ట్ (కోన ఫొటోలు + GPS వాక్) క్యాప్చర్ చేయండి, మరియు ప్రతీ ఫార్మ్‌కు సింపుల్ సిమ్యులేషన్లు నడపండి: నాటడం, నీరు పెట్టడం, ముందుకు తీసుకెళ్లడం, కోత.",
+          "ఫార్మ్‌లు జోడించండి, 3D కాంటెక్స్ట్ (కోన ఫొటోలు + GPS వాక్) క్యాప్చర్ చేయండి, మరియు ప్రతీ ఫార్మ్‌కు సిమ్పుల్ సిమ్యులేషన్లు నడపండి: నాటడం, నీరు పెట్టడం, ముందుకు తీసుకెళ్లడం, కోత.",
         "Go to My Farm": "నా ఫార్మ్‌కి వెళ్ళండి",
         "Local Language Experience": "స్థానిక భాషా అనుభవం",
         "Choose your preferred language from Settings. The app adapts navigation and key screens automatically.":
@@ -338,6 +363,83 @@ export default function Landing() {
 
   const activeLang: LangKey = (String(profile?.preferredLang || guestLang || selectedLang || "en") as LangKey);
   const langForGate: LangKey = (gateOpen ? (selectedLang as LangKey) : activeLang);
+
+  // Dynamic feature grid data
+  const dynamicFeatures = [
+    {
+      icon: Sparkles,
+      title: "AI-Powered Insights",
+      description: "Smart recommendations powered by machine learning algorithms",
+      gradient: "from-blue-500 to-cyan-500"
+    },
+    {
+      icon: Cloud,
+      title: "Weather Integration",
+      description: "Real-time weather data for precise irrigation timing",
+      gradient: "from-purple-500 to-pink-500"
+    },
+    {
+      icon: Camera,
+      title: "Visual Soil Analysis",
+      description: "Instant soil health assessment through camera technology",
+      gradient: "from-green-500 to-emerald-500"
+    },
+    {
+      icon: BarChart3,
+      title: "Growth Analytics",
+      description: "Track crop performance with detailed metrics and insights",
+      gradient: "from-orange-500 to-red-500"
+    },
+    {
+      icon: Globe,
+      title: "Multi-Language Support",
+      description: "Native language experience across 20+ regional languages",
+      gradient: "from-indigo-500 to-purple-500"
+    },
+    {
+      icon: Shield,
+      title: "Data Privacy",
+      description: "Your farming data stays secure and under your control",
+      gradient: "from-teal-500 to-green-500"
+    },
+    {
+      icon: Zap,
+      title: "Voice Commands",
+      description: "Navigate and control the app using natural voice interactions",
+      gradient: "from-yellow-500 to-orange-500"
+    },
+    {
+      icon: TrendingUp,
+      title: "Yield Optimization",
+      description: "Maximize harvest potential with data-driven recommendations",
+      gradient: "from-rose-500 to-pink-500"
+    },
+    {
+      icon: Droplets,
+      title: "Smart Irrigation",
+      description: "Optimize water usage based on crop needs and weather patterns",
+      gradient: "from-cyan-500 to-blue-500"
+    }
+  ];
+
+  // Live preview tiles data
+  const livePreviewTiles = [
+    { icon: Droplets, label: "Soil Moisture", color: "text-blue-500" },
+    { icon: Sun, label: "Weather", color: "text-yellow-500" },
+    { icon: Sprout, label: "Growth Stage", color: "text-green-500" },
+    { icon: BarChart3, label: "Analytics", color: "text-purple-500" },
+    { icon: Camera, label: "Soil Test", color: "text-orange-500" },
+    { icon: Globe, label: "Market", color: "text-indigo-500" }
+  ];
+
+  // Motion timeline steps
+  const timelineSteps = [
+    { title: "Create Farm", description: "Add your farm details and location" },
+    { title: "Capture Context", description: "Upload photos and GPS data" },
+    { title: "AI Analysis", description: "Get intelligent recommendations" },
+    { title: "Track Progress", description: "Monitor growth and health metrics" },
+    { title: "Optimize Yield", description: "Harvest better results" }
+  ];
 
   if (gateOpen) {
     return (
@@ -434,69 +536,154 @@ export default function Landing() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Hero */}
-      <section className="relative overflow-hidden border-b">
-        {/* Neobrutalist patterned background */}
-        <div className="absolute inset-0 z-0">
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                "repeating-linear-gradient(135deg, color-mix(in oklab, var(--color-secondary) 70%, white 30%) 0 14px, color-mix(in oklab, var(--color-secondary) 85%, black 15%) 14px 28px)",
-            }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/70 to-background z-10" />
-          {/* Animated decorative orbs */}
-          <motion.div
-            className="absolute -top-20 -left-10 size-72 rounded-full bg-primary/10 blur-3xl"
-            initial={{ opacity: 0, y: -20, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 1.2, ease: 'easeOut' }}
-            aria-hidden
-          />
-          <motion.div
-            className="absolute -bottom-28 -right-10 size-80 rounded-full bg-accent/10 blur-3xl"
-            initial={{ opacity: 0, y: 20, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 1.4, ease: 'easeOut' }}
-            aria-hidden
-          />
+      {/* Animated Announcement Ribbon */}
+      <motion.div 
+        initial={{ y: -50, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        className="bg-gradient-to-r from-primary to-accent text-primary-foreground py-2 overflow-hidden"
+      >
+        <div className="animate-marquee whitespace-nowrap">
+          <span className="mx-8">🌱 Welcome to the future of farming</span>
+          <span className="mx-8">🚀 AI-powered agriculture at your fingertips</span>
+          <span className="mx-8">🌍 Supporting 20+ languages</span>
+          <span className="mx-8">💧 Smart irrigation recommendations</span>
+          <span className="mx-8">📱 Voice-first mobile experience</span>
         </div>
+      </motion.div>
+
+      {/* Hero Section with Spotlight Effect */}
+      <section className="relative overflow-hidden border-b">
+        <motion.div 
+          ref={heroRef}
+          className="spotlight-container absolute inset-0 z-0"
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
+          style={{ y: heroY, opacity: heroOpacity }}
+        >
+          {/* Multi-layer animated background */}
+          <div className="absolute inset-0">
+            {/* Base pattern layer */}
+            <div
+              className="absolute inset-0 animate-drift-slower"
+              style={{
+                background:
+                  "repeating-linear-gradient(135deg, color-mix(in oklab, var(--color-secondary) 70%, white 30%) 0 14px, color-mix(in oklab, var(--color-secondary) 85%, black 15%) 14px 28px)",
+              }}
+            />
+            
+            {/* Animated gradient overlay */}
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background/80 to-accent/10 animate-gradient-shift" />
+            
+            {/* Floating particles */}
+            <div className="absolute inset-0">
+              {[...Array(12)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  className="absolute w-2 h-2 bg-primary/30 rounded-full animate-particle-float"
+                  style={{
+                    left: `${Math.random() * 100}%`,
+                    top: `${Math.random() * 100}%`,
+                    animationDelay: `${i * 0.5}s`,
+                  }}
+                  aria-hidden
+                />
+              ))}
+            </div>
+          </div>
+          
+          {/* Animated orbs */}
+          <motion.div
+            className="absolute -top-20 -left-10 size-72 rounded-full bg-primary/10 blur-3xl animate-float-slow"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 2, ease: 'easeOut' }}
+            aria-hidden
+          />
+          <motion.div
+            className="absolute -bottom-28 -right-10 size-80 rounded-full bg-accent/10 blur-3xl animate-drift-slower"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 2.5, ease: 'easeOut', delay: 0.3 }}
+            aria-hidden
+          />
+          <motion.div
+            className="absolute top-1/2 left-1/4 size-40 rounded-full bg-cyan-400/5 blur-2xl animate-float-slow"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 3, delay: 0.8 }}
+            style={{ animationDelay: '2s' }}
+            aria-hidden
+          />
+        </motion.div>
 
         <div className="relative z-20 mx-auto w-full max-w-6xl px-4 pt-16 pb-16">
           {/* Top-right language selector for landing */}
-          <div className="flex justify-end">
+          <motion.div 
+            className="flex justify-end"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.5 }}
+          >
             <LanguageSelect size="sm" />
-          </div>
+          </motion.div>
 
           <div className="mt-6 grid md:grid-cols-[1.25fr_1fr] gap-6 items-stretch">
             {/* Left: Title + CTAs */}
-            <div className="rounded-2xl bg-card border p-6 md:p-8 shadow-none transition-transform duration-200 will-change-transform hover:-translate-y-1 hover:shadow-[0_24px_60px_-28px_rgba(0,0,0,0.45)] hover:ring-2 hover:ring-primary/20">
-              <div className="flex items-center gap-3">
-                <img
+            <motion.div 
+              className="gradient-border rounded-2xl p-6 md:p-8 shadow-none transition-all duration-300 will-change-transform hover:-translate-y-2 hover:shadow-[0_32px_80px_-32px_rgba(0,0,0,0.5)] hover:scale-[1.02] glow-sweep"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
+              <motion.div 
+                className="flex items-center gap-3"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.6 }}
+              >
+                <motion.img
                   src="https://harmless-tapir-303.convex.cloud/api/storage/a4af3a5d-e126-420d-b31d-c1929a3c833b"
                   alt="Root AI"
-                  className="h-12 w-12 rounded-lg object-cover"
+                  className="h-12 w-12 rounded-lg object-cover animate-glow-pulse"
+                  whileHover={{ scale: 1.1, rotate: 5 }}
                   onError={(e) => {
                     const t = e.currentTarget as HTMLImageElement;
                     if (t.src !== '/logo.svg') t.src = '/logo.svg';
                     t.onerror = null;
                   }}
                 />
-                <div className="text-xs uppercase tracking-widest text-muted-foreground">{ui(activeLang, "Farming Companion")}</div>
-              </div>
+                <div className="text-xs uppercase tracking-widest text-muted-foreground animate-shimmer">
+                  {ui(activeLang, "Farming Companion")}
+                </div>
+              </motion.div>
 
-<h1 className="mt-5 text-4xl md:text-5xl font-extrabold leading-[1.1]">
-  {ui(activeLang, "AppTitle")}
-</h1>
-<p className="mt-3 text-base md:text-lg text-muted-foreground max-w-2xl">
-  {ui(activeLang, "AppTagline")}
-</p>
+              <motion.h1 
+                className="mt-5 text-4xl md:text-6xl font-extrabold leading-[1.1] text-gradient-animated"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.8, duration: 0.8 }}
+              >
+                {ui(activeLang, "AppTitle")}
+              </motion.h1>
+              
+              <motion.p 
+                className="mt-3 text-base md:text-lg text-muted-foreground max-w-2xl"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1 }}
+              >
+                {ui(activeLang, "AppTagline")}
+              </motion.p>
 
-              <div className="mt-6 flex flex-wrap items-center gap-3">
+              <motion.div 
+                className="mt-6 flex flex-wrap items-center gap-3"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1.2 }}
+              >
                 <Button
                   variant="outline"
-                  className="rounded-xl px-5 py-5 text-base bg-secondary hover:bg-secondary/80"
+                  className="magnetic-hover rounded-xl px-5 py-5 text-base bg-secondary hover:bg-secondary/80 glow-sweep"
                   onClick={() => {
                     try { localStorage.removeItem("km.lang"); } catch {}
                     setGuestLang(null);
@@ -505,59 +692,91 @@ export default function Landing() {
                     setGateOpen(true);
                   }}
                 >
+                  <Languages className="mr-2 h-4 w-4" />
                   {ui(activeLang, "Change Language")}
                 </Button>
                 <Button
-                  className="rounded-xl px-5 py-5 text-base bg-primary text-primary-foreground hover:opacity-95"
+                  className="magnetic-hover rounded-xl px-5 py-5 text-base bg-primary text-primary-foreground hover:opacity-95 animate-shimmer"
                   onClick={() => navigate("/dashboard")}
                 >
                   {ui(activeLang, "Open App")}
+                  <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
-              </div>
+              </motion.div>
 
-              {/* Proven impact callout */}
-              <div className="mt-6">
-                <div className="rounded-xl border bg-muted/40 p-4">
-                  {/* Reword to avoid unverifiable % claims */}
-                  <div className="text-sm font-semibold">Real Impact, No Hype</div>
+              {/* Enhanced Proven impact callout */}
+              <motion.div 
+                className="mt-6"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.4 }}
+              >
+                <div className="gradient-border rounded-xl p-4 hover-parallax">
+                  <div className="text-sm font-semibold flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-green-500" />
+                    Real Impact, No Hype
+                  </div>
                   <p className="text-sm text-muted-foreground mt-1">
                     Measure your own outcomes over time. Our irrigation guidance uses real weather data and crop profiles to help you make informed decisions. Results vary by farm, soil, and climate.
                   </p>
                 </div>
-              </div>
+              </motion.div>
 
-              {/* Add: Compact stat strip under hero actions */}
-              <div className="mt-6 grid grid-cols-1 gap-3">
-                <div className="rounded-2xl border bg-card p-4">
-                  <div className="text-sm font-semibold mb-2">What you can expect</div>
+              {/* Enhanced stat strip */}
+              <motion.div 
+                className="mt-6 grid grid-cols-1 gap-3"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1.6 }}
+              >
+                <div className="gradient-border rounded-2xl p-4 hover-parallax">
+                  <div className="text-sm font-semibold mb-2 flex items-center gap-2">
+                    <TrendingUp className="h-4 w-4 text-primary" />
+                    What you can expect
+                  </div>
                   <ul className="text-sm text-muted-foreground space-y-2 list-disc pl-5">
                     <li>Weather-informed irrigation suggestions (ET0 and rain) tailored to your chosen crop.</li>
                     <li>Simple per‑farm records to track planting, watering, and harvest actions.</li>
                     <li>Localized experience in your language for key navigation and actions.</li>
                   </ul>
                 </div>
-                <div className="rounded-2xl border bg-card p-4">
-                  <div className="text-sm font-semibold mb-2">Data sources</div>
+                <div className="gradient-border rounded-2xl p-4 hover-parallax">
+                  <div className="text-sm font-semibold mb-2 flex items-center gap-2">
+                    <Shield className="h-4 w-4 text-accent" />
+                    Data sources
+                  </div>
                   <p className="text-sm text-muted-foreground">
                     Uses Open‑Meteo for weather and ET0, plus your farm inputs. No fabricated metrics are shown. You're encouraged to compare before/after outcomes in your own context.
                   </p>
                 </div>
-              </div>
+              </motion.div>
 
-              <div className="mt-6 inline-flex items-center gap-2 rounded-xl border bg-muted/50 px-3 py-2 text-sm">
-                <span className="inline-block h-3 w-3 rounded-[4px] bg-primary" />
+              <motion.div 
+                className="mt-6 inline-flex items-center gap-2 rounded-xl border bg-muted/50 px-3 py-2 text-sm animate-glow-pulse"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.8 }}
+              >
+                <span className="inline-block h-3 w-3 rounded-[4px] bg-primary animate-pulse" />
                 {ui(activeLang, "SecurityNote")}
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
 
-            {/* Right: Visual card with texture */}
-            <div className="rounded-2xl border bg-card p-0 overflow-hidden transition-transform duration-200 will-change-transform hover:-translate-y-1 hover:shadow-[0_24px_60px_-28px_rgba(0,0,0,0.45)]">
+            {/* Right: Enhanced Visual card */}
+            <motion.div 
+              className="gradient-border rounded-2xl p-0 overflow-hidden transition-all duration-300 will-change-transform hover:-translate-y-2 hover:shadow-[0_32px_80px_-32px_rgba(0,0,0,0.5)] hover:scale-[1.02]"
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+            >
               <div className="h-full min-h-[260px] relative">
-                <img
+                <motion.img
                   src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=1600&auto=format&fit=crop"
                   alt="Official meeting photo"
                   className="absolute inset-0 h-full w-full object-cover"
                   loading="lazy"
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ duration: 0.3 }}
                   onError={(e) => {
                     const t = e.currentTarget as HTMLImageElement;
                     if (t.src !== '/logo_bg.png') t.src = '/logo_bg.png';
@@ -565,313 +784,353 @@ export default function Landing() {
                   }}
                 />
                 <div className="absolute inset-0 bg-[linear-gradient(0deg,rgba(0,0,0,0.35),transparent_40%)]" />
-                <div className="absolute bottom-0 left-0 right-0 p-4">
-                  <div className="inline-flex items-center gap-2 rounded-lg bg-background/90 border px-3 py-2 text-xs">
+                <motion.div 
+                  className="absolute bottom-0 left-0 right-0 p-4"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 1 }}
+                >
+                  <div className="inline-flex items-center gap-2 rounded-lg bg-background/90 border px-3 py-2 text-xs animate-glow-pulse">
+                    <Cpu className="h-3 w-3" />
                     <span className="font-semibold">{ui(activeLang, "Live Tools")}</span>
                   </div>
-                </div>
+                </motion.div>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Feature Blocks — neobrutalist cards */}
-      <section className="mx-auto w-full max-w-6xl px-4 py-10">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <div className="rounded-2xl border bg-card p-5 md:p-6 transition-transform duration-200 will-change-transform hover:-translate-y-1 hover:shadow-[0_20px_44px_-24px_rgba(0,0,0,0.4)]">
-            <div className="inline-flex items-center justify-center h-12 w-12 rounded-[10px] bg-primary text-primary-foreground mb-3 border">
-              <Sparkles className="h-6 w-6" />
-            </div>
-            <div className="font-semibold">AI Insights</div>
-            <p className="text-sm text-muted-foreground mt-1">
-              Real-time recommendations for irrigation and planting powered by modern AI.
-            </p>
+      {/* Live Preview Strip */}
+      <section className="mx-auto w-full max-w-6xl px-4 py-8">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <h2 className="text-2xl font-bold text-center mb-6 text-gradient-animated">Live Farm Intelligence</h2>
+          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+            {livePreviewTiles.map((tile, index) => {
+              const Icon = tile.icon;
+              return (
+                <motion.div
+                  key={tile.label}
+                  className="gradient-border min-w-[140px] p-4 rounded-xl hover-parallax glow-sweep"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1, duration: 0.4 }}
+                  whileHover={{ y: -5 }}
+                >
+                  <Icon className={`h-8 w-8 ${tile.color} mb-2 animate-float-slow`} />
+                  <div className="text-sm font-medium">{tile.label}</div>
+                </motion.div>
+              );
+            })}
           </div>
-          <div className="rounded-2xl border bg-card p-5 md:p-6 transition-transform duration-200 will-change-transform hover:-translate-y-1 hover:shadow-[0_20px_44px_-24px_rgba(0,0,0,0.4)]">
-            <div className="inline-flex items-center justify-center h-12 w-12 rounded-[10px] bg-primary text-primary-foreground mb-3 border">
-              <Cloud className="h-6 w-6" />
-            </div>
-            <div className="font-semibold">Weather-Aware</div>
-            <p className="text-sm text-muted-foreground mt-1">
-              ET0 and rainfall integrated to guide watering with precision per field.
-            </p>
-          </div>
-          <div className="rounded-2xl border bg-card p-5 md:p-6 transition-transform duration-200 will-change-transform hover:-translate-y-1 hover:shadow-[0_20px_44px_-24px_rgba(0,0,0,0.4)]">
-            <div className="inline-flex items-center justify-center h-12 w-12 rounded-[10px] bg-primary text-primary-foreground mb-3 border">
-              <MapPin className="h-6 w-6" />
-            </div>
-            <div className="font-semibold">Location Smart</div>
-            <p className="text-sm text-muted-foreground mt-1">
-              Region-specific market info and community discovery near you.
-            </p>
-          </div>
-
-          <div className="rounded-2xl border bg-card p-5 md:p-6 transition-transform duration-200 will-change-transform hover:-translate-y-1 hover:shadow-[0_20px_44px_-24px_rgba(0,0,0,0.4)]">
-            <div className="inline-flex items-center justify-center h-12 w-12 rounded-[10px] bg-primary text-primary-foreground mb-3 border">
-              <Leaf className="h-6 w-6" />
-            </div>
-            <div className="font-semibold">Crop Profiles</div>
-            <p className="text-sm text-muted-foreground mt-1">
-              Seed types, stages, and coefficients modeled for realistic growth.
-            </p>
-          </div>
-          <div className="rounded-2xl border bg-card p-5 md:p-6 transition-transform duration-200 will-change-transform hover:-translate-y-1 hover:shadow-[0_20px_44px_-24px_rgba(0,0,0,0.4)]">
-            <div className="inline-flex items-center justify-center h-12 w-12 rounded-[10px] bg-primary text-primary-foreground mb-3 border">
-              <BarChart3 className="h-6 w-6" />
-            </div>
-            <div className="font-semibold">Track & Improve</div>
-            <p className="text-sm text-muted-foreground mt-1">
-              Growth, health, and soil moisture metrics visualized cleanly.
-            </p>
-          </div>
-          <div className="rounded-2xl border bg-card p-5 md:p-6 transition-transform duration-200 will-change-transform hover:-translate-y-1 hover:shadow-[0_20px_44px_-24px_rgba(0,0,0,0.4)]">
-            <div className="inline-flex items-center justify-center h-12 w-12 rounded-[10px] bg-primary text-primary-foreground mb-3 border">
-              <Shield className="h-6 w-6" />
-            </div>
-            <div className="font-semibold">Private by Design</div>
-            <p className="text-sm text-muted-foreground mt-1">
-              Your data stays yours. Clear controls and transparent storage.
-            </p>
-          </div>
-        </div>
+        </motion.div>
       </section>
 
-      {/* Add: Expanded Feature Grid (denser, 2 rows) */}
-      <section className="mx-auto w-full max-w-6xl px-4 pb-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <div className="rounded-2xl border bg-card p-5 md:p-6 transition-transform duration-200 will-change-transform hover:-translate-y-1 hover:shadow-[0_20px_44px_-24px_rgba(0,0,0,0.4)]">
-            <div className="inline-flex h-12 w-12 items-center justify-center rounded-[10px] bg-primary text-primary-foreground mb-3 border">
-              <Sparkles className="h-6 w-6" />
-            </div>
-            <div className="font-semibold">AI Insights</div>
-            <p className="text-sm text-muted-foreground mt-1">
-              Real-time recommendations for irrigation and planting powered by modern AI.
-            </p>
-          </div>
-          <div className="rounded-2xl border bg-card p-5 md:p-6 transition-transform duration-200 will-change-transform hover:-translate-y-1 hover:shadow-[0_20px_44px_-24px_rgba(0,0,0,0.4)]">
-            <div className="inline-flex h-12 w-12 items-center justify-center rounded-[10px] bg-primary text-primary-foreground mb-3 border">
-              <Cloud className="h-6 w-6" />
-            </div>
-            <div className="font-semibold">Weather-Aware</div>
-            <p className="text-sm text-muted-foreground mt-1">
-              ET0 and rainfall integrated to guide watering with precision per field.
-            </p>
-          </div>
-          <div className="rounded-2xl border bg-card p-5 md:p-6 transition-transform duration-200 will-change-transform hover:-translate-y-1 hover:shadow-[0_20px_44px_-24px_rgba(0,0,0,0.4)]">
-            <div className="inline-flex h-12 w-12 items-center justify-center rounded-[10px] bg-primary text-primary-foreground mb-3 border">
-              <MapPin className="h-6 w-6" />
-            </div>
-            <div className="font-semibold">Location Smart</div>
-            <p className="text-sm text-muted-foreground mt-1">
-              Region-specific market info and community discovery near you.
-            </p>
-          </div>
-
-          <div className="rounded-2xl border bg-card p-5 md:p-6">
-            <div className="inline-flex h-12 w-12 items-center justify-center rounded-[10px] bg-primary text-primary-foreground mb-3 border">
-              <Leaf className="h-6 w-6" />
-            </div>
-            <div className="font-semibold">Crop Profiles</div>
-            <p className="text-sm text-muted-foreground mt-1">
-              Seed types, stages, and coefficients modeled for realistic growth.
-            </p>
-          </div>
-          <div className="rounded-2xl border bg-card p-5 md:p-6">
-            <div className="inline-flex h-12 w-12 items-center justify-center rounded-[10px] bg-primary text-primary-foreground mb-3 border">
-              <BarChart3 className="h-6 w-6" />
-            </div>
-            <div className="font-semibold">Track & Improve</div>
-            <p className="text-sm text-muted-foreground mt-1">
-              Growth, health, and soil moisture metrics visualized cleanly.
-            </p>
-          </div>
-          <div className="rounded-2xl border bg-card p-5 md:p-6">
-            <div className="inline-flex h-12 w-12 items-center justify-center rounded-[10px] bg-primary text-primary-foreground mb-3 border">
-              <Shield className="h-6 w-6" />
-            </div>
-            <div className="font-semibold">Private by Design</div>
-            <p className="text-sm text-muted-foreground mt-1">
-              Your data stays yours. Clear controls and transparent storage.
-            </p>
-          </div>
-        </div>
+      {/* Dynamic Feature Grid */}
+      <section className="mx-auto w-full max-w-6xl px-4 py-12">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <h2 className="text-3xl font-bold text-center mb-8 text-gradient-animated">
+            Powerful Features for Modern Farming
+          </h2>
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-3 gap-6"
+            variants={{
+              hidden: { opacity: 0 },
+              show: {
+                opacity: 1,
+                transition: {
+                  staggerChildren: 0.1
+                }
+              }
+            }}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true }}
+          >
+            {dynamicFeatures.map((feature, index) => {
+              const Icon = feature.icon;
+              return (
+                <motion.div
+                  key={feature.title}
+                  className="gradient-border rounded-2xl p-6 hover-parallax glow-sweep transition-all duration-300"
+                  variants={{
+                    hidden: { opacity: 0, y: 20, scale: 0.9 },
+                    show: { opacity: 1, y: 0, scale: 1 }
+                  }}
+                  whileHover={{ 
+                    scale: 1.05,
+                    rotateY: 5,
+                    rotateX: 5,
+                    transition: { duration: 0.2 }
+                  }}
+                >
+                  <div className={`inline-flex items-center justify-center h-12 w-12 rounded-xl bg-gradient-to-r ${feature.gradient} text-white mb-4 animate-glow-pulse`}>
+                    <Icon className="h-6 w-6" />
+                  </div>
+                  <h3 className="font-semibold text-lg mb-2">{feature.title}</h3>
+                  <p className="text-sm text-muted-foreground">{feature.description}</p>
+                </motion.div>
+              );
+            })}
+          </motion.div>
+        </motion.div>
       </section>
 
-      {/* Add: Partner / Trusted by marquee */}
-      <section className="mx-auto w-full max-w-6xl px-4 pb-12">
-        <div className="rounded-2xl border bg-card p-5 md:p-6 overflow-hidden transition-transform duration-200 will-change-transform hover:-translate-y-1 hover:shadow-[0_20px_44px_-24px_rgba(0,0,0,0.4)]">
-          <div className="flex items-center justify-between">
-            <div className="text-sm font-semibold">Trusted by innovative teams</div>
-            <div className="text-xs text-muted-foreground">Beta</div>
-          </div>
-          <div className="relative mt-4">
-            <div className="flex gap-8 animate-[marquee_24s_linear_infinite] will-change-transform"
-                 style={{ maskImage: "linear-gradient(90deg, transparent 0, black 10%, black 90%, transparent 100%)" as any }}>
-              {[...Array(12)].map((_, i) => (
-                <div key={i} className="h-10 min-w-[160px] grid place-items-center rounded-xl border bg-muted/40 px-4">
-                  <img src="/logo.svg" alt="Partner" className="h-6 opacity-70" />
-                </div>
+      {/* Motion Timeline */}
+      <section className="mx-auto w-full max-w-6xl px-4 py-12">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <h2 className="text-3xl font-bold text-center mb-12 text-gradient-animated">
+            Your Journey to Smart Farming
+          </h2>
+          <div className="relative">
+            {/* Animated connecting line */}
+            <div className="absolute top-8 left-8 right-8 h-0.5 bg-gradient-to-r from-primary via-accent to-primary opacity-30">
+              <div className="h-full bg-gradient-to-r from-primary to-accent animate-dash-move" 
+                   style={{ 
+                     backgroundImage: 'repeating-linear-gradient(90deg, transparent 0, transparent 10px, currentColor 10px, currentColor 20px)',
+                     backgroundSize: '40px 100%'
+                   }} 
+              />
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+              {timelineSteps.map((step, index) => (
+                <motion.div
+                  key={step.title}
+                  className="relative text-center"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.2, duration: 0.5 }}
+                >
+                  <motion.div 
+                    className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-primary to-accent text-white flex items-center justify-center font-bold text-lg animate-glow-pulse"
+                    whileHover={{ scale: 1.1, rotate: 360 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    {index + 1}
+                  </motion.div>
+                  <h3 className="font-semibold mb-2">{step.title}</h3>
+                  <p className="text-sm text-muted-foreground">{step.description}</p>
+                </motion.div>
               ))}
             </div>
           </div>
-        </div>
+        </motion.div>
       </section>
 
-      {/* Split Section */}
-      <section className="mx-auto w-full max-w-6xl px-4 pb-16">
-        <div className="grid md:grid-cols-2 gap-5">
-          <div className="rounded-2xl border bg-card p-6 transition-transform duration-200 will-change-transform hover:-translate-y-1 hover:shadow-[0_20px_44px_-24px_rgba(0,0,0,0.4)]">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-[10px] bg-primary text-primary-foreground grid place-items-center border">
-                <span className="font-bold">1</span>
-              </div>
-              <div className="font-semibold">{ui(activeLang, "Manage Farms & Simulate Growth")}</div>
-            </div>
-<p className="text-sm text-muted-foreground mt-2">
-  {ui(activeLang, "Manage Farms Desc")}
-</p>
-            {!postGate && (
-              <div className="mt-4">
-                <Button variant="outline" className="rounded-xl" onClick={() => navigate("/my-farm")}>
-                  {ui(activeLang, "Go to My Farm")}
-                </Button>
-              </div>
-            )}
-          </div>
-
-          <div className="rounded-2xl border bg-card p-6">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-[10px] bg-primary text-primary-foreground grid place-items-center border">
-                <span className="font-bold">2</span>
-              </div>
-              <div className="font-semibold">{ui(activeLang, "Local Language Experience")}</div>
-            </div>
-<p className="text-sm text-muted-foreground mt-2">
-  {ui(activeLang, "Local Language Desc")}
-</p>
-            {!postGate && (
-              <div className="mt-4">
-                <Button variant="outline" className="rounded-xl" onClick={() => navigate("/settings")}>
-                  {ui(activeLang, "Set Language")}
-                </Button>
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* Removed image mosaic gallery to avoid stock/filler visuals */}
-
-      {/* Testimonials */}
+      {/* Enhanced Testimonials */}
       <section className="mx-auto w-full max-w-6xl px-4 pb-12">
-        <div className="grid md:grid-cols-3 gap-5">
-          {[
-            { name: "Ravi", role: "Farmer, AP", body: "The irrigation advisor nailed my watering schedule. Saved water and time." },
-            { name: "Meera", role: "Farmer, TN", body: "Soil test insights helped me balance nutrients better this season." },
-            { name: "Arjun", role: "Co-op Lead, KA", body: "Community and jobs made it easy to find help for harvesting." },
-          ].map((t, idx) => (
-            <div key={idx} className="rounded-2xl border bg-card p-5 md:p-6">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-primary/15 grid place-items-center border">
-                  <Users2 className="h-5 w-5 text-primary" />
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <h2 className="text-3xl font-bold text-center mb-8 text-gradient-animated">
+            Trusted by Farmers Everywhere
+          </h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              { name: "Ravi", role: "Farmer, AP", body: "The irrigation advisor nailed my watering schedule. Saved water and time.", avatar: "🧑‍🌾" },
+              { name: "Meera", role: "Farmer, TN", body: "Soil test insights helped me balance nutrients better this season.", avatar: "👩‍🌾" },
+              { name: "Arjun", role: "Co-op Lead, KA", body: "Community and jobs made it easy to find help for harvesting.", avatar: "👨‍💼" },
+            ].map((testimonial, index) => (
+              <motion.div 
+                key={index} 
+                className="gradient-border rounded-2xl p-6 hover-parallax"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.2, duration: 0.5 }}
+                whileHover={{ scale: 1.02 }}
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="text-2xl">{testimonial.avatar}</div>
+                  <div>
+                    <div className="font-semibold">{testimonial.name}</div>
+                    <div className="text-xs text-muted-foreground">{testimonial.role}</div>
+                  </div>
                 </div>
-                <div>
-                  <div className="font-semibold leading-tight">{t.name}</div>
-                  <div className="text-xs text-muted-foreground">{t.role}</div>
-                </div>
-              </div>
-              <p className="text-sm text-muted-foreground mt-3">{t.body}</p>
-            </div>
-          ))}
-        </div>
+                <p className="text-sm text-muted-foreground italic">"{testimonial.body}"</p>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
       </section>
 
-      {/* CTA */}
+      {/* Enhanced CTA */}
       <section className="mx-auto w-full max-w-6xl px-4 pb-24">
-        <div className="rounded-2xl border bg-card p-8 text-center transition-transform duration-200 will-change-transform hover:-translate-y-1 hover:shadow-[0_24px_60px_-28px_rgba(0,0,0,0.45)]">
-          <h2 className="text-2xl md:text-3xl font-extrabold">{ui(activeLang, "Start with your voice")}</h2>
-<p className="text-muted-foreground mt-2">
-  {ui(activeLang, "Voice CTA")}
-</p>
+        <motion.div 
+          className="gradient-border rounded-2xl p-8 text-center hover-parallax glow-sweep"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          whileHover={{ scale: 1.02 }}
+        >
+          <motion.h2 
+            className="text-3xl md:text-4xl font-extrabold text-gradient-animated"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+          >
+            {ui(activeLang, "Start with your voice")}
+          </motion.h2>
+          <motion.p 
+            className="text-muted-foreground mt-2 text-lg"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.4 }}
+          >
+            {ui(activeLang, "Voice CTA")}
+          </motion.p>
           {!postGate && (
-            <div className="mt-6 flex items-center justify-center gap-3">
-              <Button className="rounded-xl px-5 py-5 text-base" onClick={() => navigate("/dashboard")}>
+            <motion.div 
+              className="mt-6 flex items-center justify-center gap-3"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.6 }}
+            >
+              <Button 
+                className="magnetic-hover rounded-xl px-6 py-6 text-lg animate-shimmer" 
+                onClick={() => navigate("/dashboard")}
+              >
+                <Zap className="mr-2 h-5 w-5" />
                 {ui(activeLang, "Get Started")}
               </Button>
-              <Button variant="secondary" className="rounded-xl px-5 py-5 text-base" onClick={() => navigate("/soil-test")}>
+              <Button 
+                variant="secondary" 
+                className="magnetic-hover rounded-xl px-6 py-6 text-lg glow-sweep" 
+                onClick={() => navigate("/soil-test")}
+              >
+                <Camera className="mr-2 h-5 w-5" />
                 {ui(activeLang, "Try Soil Test")}
               </Button>
-            </div>
+            </motion.div>
           )}
-        </div>
+        </motion.div>
       </section>
 
-      {/* Official Footer */}
-      <section className="border-t bg-card/60">
+      {/* Enhanced Official Footer */}
+      <section className="border-t bg-card/60 relative">
+        {/* Animated gradient top border */}
+        <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary via-accent to-primary animate-gradient-shift" />
+        
         <div className="mx-auto w-full max-w-6xl px-4 py-12 grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div>
-            <div className="flex items-center gap-2">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="flex items-center gap-2 relative">
+              {/* Soft glow behind logo */}
+              <div className="absolute -inset-2 bg-primary/10 rounded-lg blur-lg animate-glow-pulse" />
               <img
                 src="/logo.svg"
                 alt="Root AI"
-                className="h-8 w-8 rounded-md border object-cover"
+                className="relative h-8 w-8 rounded-md border object-cover animate-float-slow"
                 onError={(e) => {
                   const t = e.currentTarget as HTMLImageElement;
                   if (t.src !== '/logo.png') t.src = '/logo.png';
                   t.onerror = null;
                 }}
               />
-              <span className="font-extrabold tracking-wide">Root AI</span>
+              <span className="relative font-extrabold tracking-wide text-gradient-animated">Root AI</span>
             </div>
             <p className="text-sm text-muted-foreground mt-3">
               Helping farms grow smarter with AI-driven insights, localized experience, and real-time tools.
             </p>
-            <div className="mt-4 inline-flex items-center gap-2 rounded-xl border bg-muted/50 px-3 py-2 text-xs">
-              <span className="inline-block h-3 w-3 rounded-[4px] bg-primary" />
+            <div className="mt-4 inline-flex items-center gap-2 rounded-xl border bg-muted/50 px-3 py-2 text-xs animate-glow-pulse">
+              <span className="inline-block h-3 w-3 rounded-[4px] bg-primary animate-pulse" />
               Private & secure. You control your data.
             </div>
-          </div>
+          </motion.div>
 
-          <div>
-            <div className="text-sm font-semibold mb-3">Product</div>
-            <ul className="space-y-2 text-sm">
-              <li><a href="/dashboard" className="hover:underline">Dashboard</a></li>
-              <li><a href="/my-farm" className="hover:underline">My Farm</a></li>
-              <li><a href="/soil-test" className="hover:underline">Soil Test</a></li>
-              <li><a href="/market" className="hover:underline">Market</a></li>
-            </ul>
-          </div>
-
-          <div>
-            <div className="text-sm font-semibold mb-3">Company</div>
-            <ul className="space-y-2 text-sm">
-              <li><a href="/our-mission" className="hover:underline">Our Mission</a></li>
-              <li><a href="/our-team" className="hover:underline">Our Team</a></li>
-              <li><a href="/future-plan" className="hover:underline">Future Plan</a></li>
-            </ul>
-          </div>
-
-          <div>
-            <div className="text-sm font-semibold mb-3">Resources</div>
-            <ul className="space-y-2 text-sm">
-              <li><a href="/#faq" className="hover:underline">Frequently Asked Questions</a></li>
-              <li><a href="/learn" className="hover:underline">Learn</a></li>
-              <li><a href="/community" className="hover:underline">Community</a></li>
-              <li><a href="/settings" className="hover:underline">Settings</a></li>
-            </ul>
-          </div>
+          {[
+            {
+              title: "Product",
+              links: [
+                { label: "Dashboard", href: "/dashboard" },
+                { label: "My Farm", href: "/my-farm" },
+                { label: "Soil Test", href: "/soil-test" },
+                { label: "Market", href: "/market" }
+              ]
+            },
+            {
+              title: "Company", 
+              links: [
+                { label: "Our Mission", href: "/our-mission" },
+                { label: "Our Team", href: "/our-team" },
+                { label: "Future Plan", href: "/future-plan" }
+              ]
+            },
+            {
+              title: "Resources",
+              links: [
+                { label: "Frequently Asked Questions", href: "/#faq" },
+                { label: "Learn", href: "/learn" },
+                { label: "Community", href: "/community" },
+                { label: "Settings", href: "/settings" }
+              ]
+            }
+          ].map((section, index) => (
+            <motion.div
+              key={section.title}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: (index + 1) * 0.1 }}
+            >
+              <div className="text-sm font-semibold mb-3">{section.title}</div>
+              <ul className="space-y-2 text-sm">
+                {section.links.map((link) => (
+                  <li key={link.label}>
+                    <a href={link.href} className="hover:underline hover:text-primary transition-colors">
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+          ))}
         </div>
 
         <div className="border-t">
-          <div className="mx-auto w-full max-w-6xl px-4 py-4 text-xs flex flex-col md:flex-row items-center justify-between gap-2">
+          <motion.div 
+            className="mx-auto w-full max-w-6xl px-4 py-4 text-xs flex flex-col md:flex-row items-center justify-between gap-2"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+          >
             <div className="text-muted-foreground">© {new Date().getFullYear()} Root AI. All rights reserved.</div>
             <div className="flex items-center gap-4">
-              <a href="/#faq" className="hover:underline">FAQs</a>
-              <a href="#" className="hover:underline">Privacy</a>
-              <a href="#" className="hover:underline">Terms</a>
+              <a href="/#faq" className="hover:underline hover:text-primary transition-colors">FAQs</a>
+              <a href="#" className="hover:underline hover:text-primary transition-colors">Privacy</a>
+              <a href="#" className="hover:underline hover:text-primary transition-colors">Terms</a>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
     </div>

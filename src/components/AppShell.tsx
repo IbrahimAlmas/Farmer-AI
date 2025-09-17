@@ -14,7 +14,7 @@ import {
   Camera 
 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { localeFromLang, type LangKey, ui } from "@/lib/i18n";
 import { toast } from "sonner";
 import { MoreHorizontal } from "lucide-react";
@@ -134,11 +134,20 @@ export function AppShell({ children, title }: AppShellProps) {
     <div className="min-h-screen flex flex-col bg-background">
       {/* Top Bar - hidden on dashboard */}
       {!hideTopBar && (
-        <header className="sticky top-0 z-40">
+        <motion.header 
+          className="sticky top-0 z-40"
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
           <div className="px-4 pt-[env(safe-area-inset-top)]" />
           <div className="mx-auto w-full max-w-6xl">
-            {/* Updated glass header - cleaner, floating pill */}
-            <div className="mx-3 md:mx-0 rounded-2xl border bg-card/80 backdrop-blur-xl supports-[backdrop-filter]:bg-card/70 shadow-[0_12px_40px_-12px_rgba(0,0,0,0.35)] ring-1 ring-black/5">
+            {/* Enhanced glass header with animations */}
+            <motion.div 
+              className="mx-3 md:mx-0 rounded-2xl border bg-card/80 backdrop-blur-xl supports-[backdrop-filter]:bg-card/70 shadow-[0_12px_40px_-12px_rgba(0,0,0,0.35)] ring-1 ring-black/5 glow-sweep"
+              whileHover={{ y: -2 }}
+              transition={{ duration: 0.2 }}
+            >
               <div className="flex items-center justify-between px-4 py-3">
                 <LogoDropdown />
                 {/* Replace title with contextual nav for Learn More section pages */}
@@ -147,7 +156,7 @@ export function AppShell({ children, title }: AppShellProps) {
                     <Button
                       variant={location.pathname === "/our-team" ? "secondary" : "ghost"}
                       size="sm"
-                      className="rounded-xl px-3 py-2"
+                      className="rounded-xl px-3 py-2 magnetic-hover"
                       onClick={() => navigate("/our-team")}
                     >
                       {ui(currentLang, "Our Team")}
@@ -155,7 +164,7 @@ export function AppShell({ children, title }: AppShellProps) {
                     <Button
                       variant={location.pathname === "/our-mission" ? "secondary" : "ghost"}
                       size="sm"
-                      className="rounded-xl px-3 py-2"
+                      className="rounded-xl px-3 py-2 magnetic-hover"
                       onClick={() => navigate("/our-mission")}
                     >
                       {ui(currentLang, "Our Mission")}
@@ -163,16 +172,21 @@ export function AppShell({ children, title }: AppShellProps) {
                     <Button
                       variant={location.pathname === "/future-plan" ? "secondary" : "ghost"}
                       size="sm"
-                      className="rounded-xl px-3 py-2"
+                      className="rounded-xl px-3 py-2 magnetic-hover"
                       onClick={() => navigate("/future-plan")}
                     >
                       {ui(currentLang, "Future Plan")}
                     </Button>
                   </div>
                 ) : (
-                  <h1 className="text-[15px] sm:text-base font-semibold tracking-wide truncate flex-1 text-center">
+                  <motion.h1 
+                    className="text-[15px] sm:text-base font-semibold tracking-wide truncate flex-1 text-center"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.2 }}
+                  >
                     {title || "KrishiMitra"}
-                  </h1>
+                  </motion.h1>
                 )}
                 <div className="w-auto">
                   {/* Show Home button on Learn More pages; otherwise show language selector + optional community action */}
@@ -180,7 +194,7 @@ export function AppShell({ children, title }: AppShellProps) {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="rounded-xl px-3 py-2"
+                      className="rounded-xl px-3 py-2 magnetic-hover"
                       onClick={() => navigate("/dashboard")}
                       aria-label="Home"
                     >
@@ -191,11 +205,13 @@ export function AppShell({ children, title }: AppShellProps) {
                     <div className="flex items-center gap-2">
                       {/* Added: current community chip in header on community page (and visible if membership exists) */}
                       {isCommunity && myCommunity?.community && (
-                        <button
+                        <motion.button
                           onClick={() => navigate("/community")}
-                          className="flex items-center gap-2 rounded-xl border bg-card/70 hover:bg-card/90 transition-colors px-2.5 py-1.5"
+                          className="flex items-center gap-2 rounded-xl border bg-card/70 hover:bg-card/90 transition-colors px-2.5 py-1.5 magnetic-hover"
                           aria-label="Current Community"
                           title={myCommunity.community.name}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
                         >
                           <img
                             src={myCommunity.community.image ?? "/assets/Logo_.png"}
@@ -210,13 +226,13 @@ export function AppShell({ children, title }: AppShellProps) {
                           <span className="text-xs font-medium truncate max-w-[120px]">
                             {myCommunity.community.name}
                           </span>
-                        </button>
+                        </motion.button>
                       )}
                       {isCommunity && (
                         <Button
                           variant="secondary"
                           size="sm"
-                          className="rounded-xl px-3 py-2"
+                          className="rounded-xl px-3 py-2 magnetic-hover"
                           onClick={() => {
                             navigate("/community/create");
                           }}
@@ -230,7 +246,7 @@ export function AppShell({ children, title }: AppShellProps) {
                         <Button
                           variant="outline"
                           size="sm"
-                          className="rounded-xl px-3 py-2"
+                          className="rounded-xl px-3 py-2 magnetic-hover"
                           onClick={() => navigate("/community")}
                           aria-label="Back to Community"
                         >
@@ -242,18 +258,19 @@ export function AppShell({ children, title }: AppShellProps) {
                   )}
                 </div>
               </div>
-              {/* subtle gradient bar enhanced with scroll progress */}
+              {/* Enhanced gradient bar with scroll progress */}
               <div className="relative h-[2px] w-full">
                 <div className="absolute inset-0 bg-muted/60" />
-                <div
-                  className="h-full bg-[linear-gradient(90deg,theme(colors.primary/60),theme(colors.cyan.400/60),theme(colors.primary/60))] transition-[width] duration-200"
+                <motion.div
+                  className="h-full bg-[linear-gradient(90deg,theme(colors.primary/60),theme(colors.cyan.400/60),theme(colors.primary/60))] animate-gradient-shift"
                   style={{ width: `${scrollProgress}%` }}
+                  transition={{ duration: 0.2 }}
                   aria-hidden
                 />
               </div>
-            </div>
+            </motion.div>
           </div>
-        </header>
+        </motion.header>
       )}
 
       {/* Main Content */}
@@ -261,7 +278,7 @@ export function AppShell({ children, title }: AppShellProps) {
         {children}
       </main>
 
-      {/* Mac-style Dock (desktop) */}
+      {/* Enhanced Mac-style Dock (desktop) */}
       {!isOurTeam && (
         <>
           {/* Reveal zone to pop the dock when cursor hits bottom */}
@@ -269,107 +286,142 @@ export function AppShell({ children, title }: AppShellProps) {
             className="fixed inset-x-0 bottom-0 h-12 z-40 hidden md:block"
             onMouseEnter={() => setDockVisible(true)}
           />
-          <div
-            onMouseEnter={() => setDockVisible(true)}
-            onMouseLeave={() => setDockVisible(false)}
-            className={`fixed left-1/2 -translate-x-1/2 z-40 hidden md:block transition-all duration-300 ${
-              dockVisible ? "opacity-100 translate-y-0 bottom-10" : "opacity-0 translate-y-6 pointer-events-none bottom-6"
-            }`}
-          >
-            <div className="flex items-end gap-4 rounded-[22px] border bg-card/80 backdrop-blur-xl supports-[backdrop-filter]:bg-card/70 shadow-[0_28px_80px_-20px_rgba(0,0,0,0.6)] px-5 py-3">
-              {/* Left side items */}
-              {leftItems.map((item) => {
-                const isActive = location.pathname === item.path;
-                const Icon = item.icon;
-                return (
-                  <button
-                    key={item.path}
-                    onClick={() => navigate(item.path)}
-                    aria-label={ui(currentLang, item.label as any)}
-                    aria-current={isActive ? "page" : undefined}
-                    className="group relative grid place-items-center"
-                  >
-                    <div
-                      className={`grid place-items-center size-16 rounded-3xl transition-all duration-150
-                      ${isActive ? "bg-primary/20 text-primary shadow-[0_0_36px_-6px_theme(colors.primary/55)] ring-2 ring-primary/30" : "text-foreground/80 hover:text-foreground"}
-                      hover:scale-125 active:scale-95 hover:shadow-[0_16px_40px_-12px_rgba(0,0,0,0.55)] ring-0 active:ring-2 active:ring-primary/50`}
-                    >
-                      <Icon className="h-7 w-7" />
-                      {isActive && (
-                        <span
-                          className="absolute -bottom-1 h-1.5 w-1.5 rounded-full bg-primary/90 shadow-[0_0_12px_theme(colors.primary/60)]"
-                          aria-hidden
-                        />
-                      )}
-                    </div>
-                    <span className="pointer-events-none absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black/70 px-2 py-0.5 text-[11px] text-white opacity-0 transition-opacity duration-150 group-hover:opacity-100">
-                      {ui(currentLang, item.label as any)}
-                    </span>
-                  </button>
-                );
-              })}
-
-              {/* Left Divider */}
-              <div className="h-16 w-px bg-border/40 mx-2 shrink-0" aria-hidden />
-
-              {/* Embedded Voice Button centered */}
-              <div
-                className="group relative grid place-items-center shrink-0"
-                aria-label={ui(currentLang, "Voice")}
-                title={ui(currentLang, "Voice")}
+          <AnimatePresence>
+            {dockVisible && (
+              <motion.div
+                onMouseEnter={() => setDockVisible(true)}
+                onMouseLeave={() => setDockVisible(false)}
+                className="fixed left-1/2 -translate-x-1/2 z-40 hidden md:block bottom-10"
+                initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 20, scale: 0.9 }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
               >
-                <div className="grid place-items-center size-16 rounded-3xl transition-all duration-150 text-foreground/80 hover:text-foreground hover:scale-125 active:scale-95 hover:shadow-[0_16px_40px_-12px_rgba(0,0,0,0.55)]">
-                  <VoiceButton
-                    embedInDock
-                    className="relative"
-                    onTranscript={handleVoiceCommand}
-                    transcribe={({ audio, language, contentType, filename }) =>
-                      transcribe({ audio, language: language ?? localeFromLang(currentLang), contentType, filename })
-                    }
-                    language={localeFromLang(currentLang)}
-                  />
-                </div>
-                <span className="pointer-events-none absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black/70 px-2 py-0.5 text-[11px] text-white opacity-0 transition-opacity duration-150 group-hover:opacity-100">
-                  {ui(currentLang, "Voice")}
-                </span>
-              </div>
+                {/* Ambient glow behind dock */}
+                <div className="absolute inset-0 bg-primary/5 rounded-[22px] blur-2xl scale-110 animate-glow-pulse" />
+                
+                <div className="relative flex items-end gap-4 rounded-[22px] border bg-card/80 backdrop-blur-xl supports-[backdrop-filter]:bg-card/70 shadow-[0_28px_80px_-20px_rgba(0,0,0,0.6)] px-5 py-3">
+                  {/* Left side items */}
+                  {leftItems.map((item) => {
+                    const isActive = location.pathname === item.path;
+                    const Icon = item.icon;
+                    return (
+                      <motion.button
+                        key={item.path}
+                        onClick={() => navigate(item.path)}
+                        aria-label={ui(currentLang, item.label as any)}
+                        aria-current={isActive ? "page" : undefined}
+                        className="group relative grid place-items-center"
+                        whileHover={{ 
+                          scale: 1.25, 
+                          y: -8,
+                          rotate: isActive ? 0 : 5,
+                          transition: { duration: 0.2 }
+                        }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <div
+                          className={`grid place-items-center size-16 rounded-3xl transition-all duration-150 glow-sweep
+                          ${isActive ? "bg-primary/20 text-primary shadow-[0_0_36px_-6px_theme(colors.primary/55)] ring-2 ring-primary/30" : "text-foreground/80 hover:text-foreground"}
+                          hover:shadow-[0_16px_40px_-12px_rgba(0,0,0,0.55)] ring-0 active:ring-2 active:ring-primary/50`}
+                        >
+                          <Icon className="h-7 w-7" />
+                          {isActive && (
+                            <motion.span
+                              className="absolute -bottom-1 h-1.5 w-1.5 rounded-full bg-primary/90 shadow-[0_0_12px_theme(colors.primary/60)]"
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              aria-hidden
+                            />
+                          )}
+                        </div>
+                        <span className="pointer-events-none absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black/70 px-2 py-0.5 text-[11px] text-white opacity-0 transition-opacity duration-150 group-hover:opacity-100">
+                          {ui(currentLang, item.label as any)}
+                        </span>
+                      </motion.button>
+                    );
+                  })}
 
-              {/* Right Divider */}
-              <div className="h-16 w-px bg-border/40 mx-2 shrink-0" aria-hidden />
+                  {/* Left Divider */}
+                  <div className="h-16 w-px bg-border/40 mx-2 shrink-0" aria-hidden />
 
-              {/* Right side items */}
-              {rightItems.map((item) => {
-                const isActive = location.pathname === item.path;
-                const Icon = item.icon;
-                return (
-                  <button
-                    key={item.path}
-                    onClick={() => navigate(item.path)}
-                    aria-label={ui(currentLang, item.label as any)}
-                    aria-current={isActive ? "page" : undefined}
-                    className="group relative grid place-items-center"
+                  {/* Enhanced Embedded Voice Button centered */}
+                  <div
+                    className="group relative grid place-items-center shrink-0"
+                    aria-label={ui(currentLang, "Voice")}
+                    title={ui(currentLang, "Voice")}
                   >
-                    <div
-                      className={`grid place-items-center size-16 rounded-3xl transition-all duration-150
-                      ${isActive ? "bg-primary/20 text-primary shadow-[0_0_36px_-6px_theme(colors.primary/55)] ring-2 ring-primary/30" : "text-foreground/80 hover:text-foreground"}
-                      hover:scale-125 active:scale-95 hover:shadow-[0_16px_40px_-12px_rgba(0,0,0,0.55)] ring-0 active:ring-2 active:ring-primary/50`}
+                    <motion.div 
+                      className="grid place-items-center size-16 rounded-3xl transition-all duration-150 text-foreground/80 hover:text-foreground hover:shadow-[0_16px_40px_-12px_rgba(0,0,0,0.55)]"
+                      whileHover={{ 
+                        scale: 1.25, 
+                        y: -8,
+                        transition: { duration: 0.2 }
+                      }}
+                      whileTap={{ scale: 0.95 }}
                     >
-                      <Icon className="h-7 w-7" />
-                      {isActive && (
-                        <span
-                          className="absolute -bottom-1 h-1.5 w-1.5 rounded-full bg-primary/90 shadow-[0_0_12px_theme(colors.primary/60)]"
-                          aria-hidden
-                        />
-                      )}
-                    </div>
+                      <VoiceButton
+                        embedInDock
+                        className="relative"
+                        onTranscript={handleVoiceCommand}
+                        transcribe={({ audio, language, contentType, filename }) =>
+                          transcribe({ audio, language: language ?? localeFromLang(currentLang), contentType, filename })
+                        }
+                        language={localeFromLang(currentLang)}
+                      />
+                    </motion.div>
                     <span className="pointer-events-none absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black/70 px-2 py-0.5 text-[11px] text-white opacity-0 transition-opacity duration-150 group-hover:opacity-100">
-                      {ui(currentLang, item.label as any)}
+                      {ui(currentLang, "Voice")}
                     </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+                  </div>
+
+                  {/* Right Divider */}
+                  <div className="h-16 w-px bg-border/40 mx-2 shrink-0" aria-hidden />
+
+                  {/* Right side items */}
+                  {rightItems.map((item) => {
+                    const isActive = location.pathname === item.path;
+                    const Icon = item.icon;
+                    return (
+                      <motion.button
+                        key={item.path}
+                        onClick={() => navigate(item.path)}
+                        aria-label={ui(currentLang, item.label as any)}
+                        aria-current={isActive ? "page" : undefined}
+                        className="group relative grid place-items-center"
+                        whileHover={{ 
+                          scale: 1.25, 
+                          y: -8,
+                          rotate: isActive ? 0 : -5,
+                          transition: { duration: 0.2 }
+                        }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <div
+                          className={`grid place-items-center size-16 rounded-3xl transition-all duration-150 glow-sweep
+                          ${isActive ? "bg-primary/20 text-primary shadow-[0_0_36px_-6px_theme(colors.primary/55)] ring-2 ring-primary/30" : "text-foreground/80 hover:text-foreground"}
+                          hover:shadow-[0_16px_40px_-12px_rgba(0,0,0,0.55)] ring-0 active:ring-2 active:ring-primary/50`}
+                        >
+                          <Icon className="h-7 w-7" />
+                          {isActive && (
+                            <motion.span
+                              className="absolute -bottom-1 h-1.5 w-1.5 rounded-full bg-primary/90 shadow-[0_0_12px_theme(colors.primary/60)]"
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              aria-hidden
+                            />
+                          )}
+                        </div>
+                        <span className="pointer-events-none absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black/70 px-2 py-0.5 text-[11px] text-white opacity-0 transition-opacity duration-150 group-hover:opacity-100">
+                          {ui(currentLang, item.label as any)}
+                        </span>
+                      </motion.button>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </>
       )}
     </div>

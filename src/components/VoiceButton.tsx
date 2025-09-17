@@ -258,10 +258,20 @@ export default function VoiceButton({
           </>
         )}
 
+        {/* Idle pulse glow when not recording */}
+        {!recording && (
+          <motion.span
+            className="pointer-events-none absolute inset-0 rounded-3xl bg-primary/5"
+            animate={{ opacity: [0.3, 0.6, 0.3] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            aria-hidden
+          />
+        )}
+
         <Button
           variant="default"
           size="icon"
-          className={`h-14 w-14 rounded-3xl transition-all duration-150 ${recording ? "bg-red-600 text-white ring-2 ring-red-400/50 shadow-[0_0_36px_-6px_rgba(239,68,68,0.55)]" : ""}`}
+          className={`h-14 w-14 rounded-3xl transition-all duration-150 glow-sweep ${recording ? "bg-red-600 text-white ring-2 ring-red-400/50 shadow-[0_0_36px_-6px_rgba(239,68,68,0.55)]" : ""}`}
           onClick={toggle}
           disabled={disabled || !supported || isStarting}
           aria-busy={isStarting || undefined}
@@ -329,10 +339,20 @@ export default function VoiceButton({
       className={className ?? ""}
       aria-label="Drag to reposition the voice button"
     >
+      {/* Idle pulse glow when not recording */}
+      {!recording && (
+        <motion.div
+          className="absolute inset-0 rounded-full bg-primary/10 blur-lg"
+          animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
+          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+          aria-hidden
+        />
+      )}
+
       <Button
         variant="default"
         size="icon"
-        className={`h-14 w-14 rounded-full ${recording ? "bg-red-600 text-white" : ""}`}
+        className={`h-14 w-14 rounded-full glow-sweep ${recording ? "bg-red-600 text-white" : ""}`}
         onMouseDown={start}
         onMouseUp={stop}
         onTouchStart={(e) => {
