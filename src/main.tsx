@@ -16,6 +16,26 @@ import "./types/global.d.ts";
 
 const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
 
+// Initialize theme early: default to dark, respect saved preference if present
+(() => {
+  try {
+    const saved = localStorage.getItem("theme"); // 'dark' | 'light' | null
+    const prefersDark =
+      typeof window !== "undefined" &&
+      window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+    const useDark = saved ? saved === "dark" : true || prefersDark;
+    const rootEl = document.documentElement;
+
+    if (useDark) rootEl.classList.add("dark");
+    else rootEl.classList.remove("dark");
+  } catch {
+    // If anything fails, still enable dark by default
+    document.documentElement.classList.add("dark");
+  }
+})();
+
 import MyFarm from "@/pages/MyFarm.tsx";
 import Tasks from "@/pages/Tasks.tsx";
 import Market from "@/pages/Market.tsx";
