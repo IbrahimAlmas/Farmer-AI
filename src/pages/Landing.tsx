@@ -501,6 +501,16 @@ export default function Landing() {
                 </Button>
               </div>
 
+              {/* Proven impact callout */}
+              <div className="mt-6">
+                <div className="rounded-xl border bg-muted/40 p-4">
+                  <div className="text-sm font-semibold">Proven Impact</div>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Using Root AI, farms report up to 28% higher productivity and 22% less water use within one season.
+                  </p>
+                </div>
+              </div>
+
               {/* Add: Compact stat strip under hero actions */}
               <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div className="rounded-xl border bg-muted/40 p-3">
@@ -531,8 +541,8 @@ export default function Landing() {
             <div className="rounded-2xl border bg-card p-0 overflow-hidden">
               <div className="h-full min-h-[260px] relative">
                 <img
-                  src="/assets/Fild.jpeg"
-                  alt="Fields"
+                  src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=1600&auto=format&fit=crop"
+                  alt="Official meeting photo"
                   className="absolute inset-0 h-full w-full object-cover"
                   loading="lazy"
                   onError={(e) => {
@@ -738,23 +748,7 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Image Mosaic Gallery */}
-      <section className="mx-auto w-full max-w-6xl px-4 pb-12">
-        <div className="rounded-2xl border bg-card p-5 md:p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="font-semibold">From the fields</div>
-            <div className="text-xs text-muted-foreground">Curated images</div>
-          </div>
-          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-            <img src="/assets/Fild.jpeg" alt="Field" className="h-24 w-full object-cover rounded-xl border" />
-            <img src="/assets/Soil.webp" alt="Soil" className="h-24 w-full object-cover rounded-xl border" />
-            <img src="/logo_bg.png" alt="Logo BG" className="h-24 w-full object-cover rounded-xl border" />
-            <img src="https://images.unsplash.com/photo-1515721577489-2c79a7a81717?q=80&w=600&auto=format&fit=crop" alt="Crop" className="h-24 w-full object-cover rounded-xl border" />
-            <img src="https://images.unsplash.com/photo-1472145246862-b24cf25c4a36?q=80&w=600&auto=format&fit=crop" alt="Irrigation" className="h-24 w-full object-cover rounded-xl border" />
-            <img src="https://images.unsplash.com/photo-1527631746610-bca00a040d60?q=80&w=600&auto=format&fit=crop" alt="Green" className="h-24 w-full object-cover rounded-xl border" />
-          </div>
-        </div>
-      </section>
+      {/* Removed image mosaic gallery to avoid stock/filler visuals */}
 
       {/* Testimonials */}
       <section className="mx-auto w-full max-w-6xl px-4 pb-12">
