@@ -446,6 +446,21 @@ export default function Landing() {
             }}
           />
           <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/70 to-background z-10" />
+          {/* Animated decorative orbs */}
+          <motion.div
+            className="absolute -top-20 -left-10 size-72 rounded-full bg-primary/10 blur-3xl"
+            initial={{ opacity: 0, y: -20, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 1.2, ease: 'easeOut' }}
+            aria-hidden
+          />
+          <motion.div
+            className="absolute -bottom-28 -right-10 size-80 rounded-full bg-accent/10 blur-3xl"
+            initial={{ opacity: 0, y: 20, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 1.4, ease: 'easeOut' }}
+            aria-hidden
+          />
         </div>
 
         <div className="relative z-20 mx-auto w-full max-w-6xl px-4 pt-16 pb-16">
@@ -456,7 +471,7 @@ export default function Landing() {
 
           <div className="mt-6 grid md:grid-cols-[1.25fr_1fr] gap-6 items-stretch">
             {/* Left: Title + CTAs */}
-            <div className="rounded-2xl bg-card border p-6 md:p-8 shadow-none">
+            <div className="rounded-2xl bg-card border p-6 md:p-8 shadow-none transition-transform duration-200 will-change-transform hover:-translate-y-1 hover:shadow-[0_24px_60px_-28px_rgba(0,0,0,0.45)] hover:ring-2 hover:ring-primary/20">
               <div className="flex items-center gap-3">
                 <img
                   src="https://harmless-tapir-303.convex.cloud/api/storage/a4af3a5d-e126-420d-b31d-c1929a3c833b"
@@ -536,7 +551,7 @@ export default function Landing() {
             </div>
 
             {/* Right: Visual card with texture */}
-            <div className="rounded-2xl border bg-card p-0 overflow-hidden">
+            <div className="rounded-2xl border bg-card p-0 overflow-hidden transition-transform duration-200 will-change-transform hover:-translate-y-1 hover:shadow-[0_24px_60px_-28px_rgba(0,0,0,0.45)]">
               <div className="h-full min-h-[260px] relative">
                 <img
                   src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=1600&auto=format&fit=crop"
@@ -564,7 +579,7 @@ export default function Landing() {
       {/* Feature Blocks — neobrutalist cards */}
       <section className="mx-auto w-full max-w-6xl px-4 py-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <div className="rounded-2xl border bg-card p-5 md:p-6">
+          <div className="rounded-2xl border bg-card p-5 md:p-6 transition-transform duration-200 will-change-transform hover:-translate-y-1 hover:shadow-[0_20px_44px_-24px_rgba(0,0,0,0.4)]">
             <div className="inline-flex items-center justify-center h-12 w-12 rounded-[10px] bg-primary text-primary-foreground mb-3 border">
               <Sparkles className="h-6 w-6" />
             </div>
@@ -573,7 +588,7 @@ export default function Landing() {
               Real-time recommendations for irrigation and planting powered by modern AI.
             </p>
           </div>
-          <div className="rounded-2xl border bg-card p-5 md:p-6">
+          <div className="rounded-2xl border bg-card p-5 md:p-6 transition-transform duration-200 will-change-transform hover:-translate-y-1 hover:shadow-[0_20px_44px_-24px_rgba(0,0,0,0.4)]">
             <div className="inline-flex items-center justify-center h-12 w-12 rounded-[10px] bg-primary text-primary-foreground mb-3 border">
               <Cloud className="h-6 w-6" />
             </div>
@@ -582,7 +597,7 @@ export default function Landing() {
               ET0 and rainfall integrated to guide watering with precision per field.
             </p>
           </div>
-          <div className="rounded-2xl border bg-card p-5 md:p-6">
+          <div className="rounded-2xl border bg-card p-5 md:p-6 transition-transform duration-200 will-change-transform hover:-translate-y-1 hover:shadow-[0_20px_44px_-24px_rgba(0,0,0,0.4)]">
             <div className="inline-flex items-center justify-center h-12 w-12 rounded-[10px] bg-primary text-primary-foreground mb-3 border">
               <MapPin className="h-6 w-6" />
             </div>
@@ -592,7 +607,7 @@ export default function Landing() {
             </p>
           </div>
 
-          <div className="rounded-2xl border bg-card p-5 md:p-6">
+          <div className="rounded-2xl border bg-card p-5 md:p-6 transition-transform duration-200 will-change-transform hover:-translate-y-1 hover:shadow-[0_20px_44px_-24px_rgba(0,0,0,0.4)]">
             <div className="inline-flex items-center justify-center h-12 w-12 rounded-[10px] bg-primary text-primary-foreground mb-3 border">
               <Leaf className="h-6 w-6" />
             </div>
@@ -601,7 +616,7 @@ export default function Landing() {
               Seed types, stages, and coefficients modeled for realistic growth.
             </p>
           </div>
-          <div className="rounded-2xl border bg-card p-5 md:p-6">
+          <div className="rounded-2xl border bg-card p-5 md:p-6 transition-transform duration-200 will-change-transform hover:-translate-y-1 hover:shadow-[0_20px_44px_-24px_rgba(0,0,0,0.4)]">
             <div className="inline-flex items-center justify-center h-12 w-12 rounded-[10px] bg-primary text-primary-foreground mb-3 border">
               <BarChart3 className="h-6 w-6" />
             </div>
@@ -610,7 +625,7 @@ export default function Landing() {
               Growth, health, and soil moisture metrics visualized cleanly.
             </p>
           </div>
-          <div className="rounded-2xl border bg-card p-5 md:p-6">
+          <div className="rounded-2xl border bg-card p-5 md:p-6 transition-transform duration-200 will-change-transform hover:-translate-y-1 hover:shadow-[0_20px_44px_-24px_rgba(0,0,0,0.4)]">
             <div className="inline-flex items-center justify-center h-12 w-12 rounded-[10px] bg-primary text-primary-foreground mb-3 border">
               <Shield className="h-6 w-6" />
             </div>
@@ -625,7 +640,7 @@ export default function Landing() {
       {/* Add: Expanded Feature Grid (denser, 2 rows) */}
       <section className="mx-auto w-full max-w-6xl px-4 pb-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <div className="rounded-2xl border bg-card p-5 md:p-6">
+          <div className="rounded-2xl border bg-card p-5 md:p-6 transition-transform duration-200 will-change-transform hover:-translate-y-1 hover:shadow-[0_20px_44px_-24px_rgba(0,0,0,0.4)]">
             <div className="inline-flex h-12 w-12 items-center justify-center rounded-[10px] bg-primary text-primary-foreground mb-3 border">
               <Sparkles className="h-6 w-6" />
             </div>
@@ -634,7 +649,7 @@ export default function Landing() {
               Real-time recommendations for irrigation and planting powered by modern AI.
             </p>
           </div>
-          <div className="rounded-2xl border bg-card p-5 md:p-6">
+          <div className="rounded-2xl border bg-card p-5 md:p-6 transition-transform duration-200 will-change-transform hover:-translate-y-1 hover:shadow-[0_20px_44px_-24px_rgba(0,0,0,0.4)]">
             <div className="inline-flex h-12 w-12 items-center justify-center rounded-[10px] bg-primary text-primary-foreground mb-3 border">
               <Cloud className="h-6 w-6" />
             </div>
@@ -643,7 +658,7 @@ export default function Landing() {
               ET0 and rainfall integrated to guide watering with precision per field.
             </p>
           </div>
-          <div className="rounded-2xl border bg-card p-5 md:p-6">
+          <div className="rounded-2xl border bg-card p-5 md:p-6 transition-transform duration-200 will-change-transform hover:-translate-y-1 hover:shadow-[0_20px_44px_-24px_rgba(0,0,0,0.4)]">
             <div className="inline-flex h-12 w-12 items-center justify-center rounded-[10px] bg-primary text-primary-foreground mb-3 border">
               <MapPin className="h-6 w-6" />
             </div>
@@ -685,7 +700,7 @@ export default function Landing() {
 
       {/* Add: Partner / Trusted by marquee */}
       <section className="mx-auto w-full max-w-6xl px-4 pb-12">
-        <div className="rounded-2xl border bg-card p-5 md:p-6 overflow-hidden">
+        <div className="rounded-2xl border bg-card p-5 md:p-6 overflow-hidden transition-transform duration-200 will-change-transform hover:-translate-y-1 hover:shadow-[0_20px_44px_-24px_rgba(0,0,0,0.4)]">
           <div className="flex items-center justify-between">
             <div className="text-sm font-semibold">Trusted by innovative teams</div>
             <div className="text-xs text-muted-foreground">Beta</div>
@@ -706,7 +721,7 @@ export default function Landing() {
       {/* Split Section */}
       <section className="mx-auto w-full max-w-6xl px-4 pb-16">
         <div className="grid md:grid-cols-2 gap-5">
-          <div className="rounded-2xl border bg-card p-6">
+          <div className="rounded-2xl border bg-card p-6 transition-transform duration-200 will-change-transform hover:-translate-y-1 hover:shadow-[0_20px_44px_-24px_rgba(0,0,0,0.4)]">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-[10px] bg-primary text-primary-foreground grid place-items-center border">
                 <span className="font-bold">1</span>
@@ -774,7 +789,7 @@ export default function Landing() {
 
       {/* CTA */}
       <section className="mx-auto w-full max-w-6xl px-4 pb-24">
-        <div className="rounded-2xl border bg-card p-8 text-center">
+        <div className="rounded-2xl border bg-card p-8 text-center transition-transform duration-200 will-change-transform hover:-translate-y-1 hover:shadow-[0_24px_60px_-28px_rgba(0,0,0,0.45)]">
           <h2 className="text-2xl md:text-3xl font-extrabold">{ui(activeLang, "Start with your voice")}</h2>
 <p className="text-muted-foreground mt-2">
   {ui(activeLang, "Voice CTA")}
