@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowRight, Mic, Sprout, Camera, ShoppingCart, Languages, ShieldCheck, Loader2 } from "lucide-react";
+import { ArrowRight, Mic, Sprout, Camera, ShoppingCart, Languages, ShieldCheck, Loader2, Cloud, Sparkles, MapPin, Leaf, BarChart3, Shield, Users2, Zap } from "lucide-react";
 import { useNavigate } from "react-router";
 import { useMemo, useEffect, useState } from "react";
 import { api } from "@/convex/_generated/api";
@@ -9,6 +9,7 @@ import LanguageSelect from "@/components/LanguageSelect";
 import { useAction, useMutation, useQuery } from "convex/react";
 import { toast } from "sonner";
 import { ui, type LangKey } from "@/lib/i18n";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -500,6 +501,26 @@ export default function Landing() {
                 </Button>
               </div>
 
+              {/* Add: Compact stat strip under hero actions */}
+              <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div className="rounded-xl border bg-muted/40 p-3">
+                  <div className="text-xs text-muted-foreground">Active Farmers</div>
+                  <div className="text-lg font-extrabold">12,500+</div>
+                </div>
+                <div className="rounded-xl border bg-muted/40 p-3">
+                  <div className="text-xs text-muted-foreground">Soil Tests</div>
+                  <div className="text-lg font-extrabold">48k</div>
+                </div>
+                <div className="rounded-xl border bg-muted/40 p-3">
+                  <div className="text-xs text-muted-foreground">Communities</div>
+                  <div className="text-lg font-extrabold">320</div>
+                </div>
+                <div className="rounded-xl border bg-muted/40 p-3">
+                  <div className="text-xs text-muted-foreground">Recommendations</div>
+                  <div className="text-lg font-extrabold">1.2M</div>
+                </div>
+              </div>
+
               <div className="mt-6 inline-flex items-center gap-2 rounded-xl border bg-muted/50 px-3 py-2 text-sm">
                 <span className="inline-block h-3 w-3 rounded-[4px] bg-primary" />
                 {ui(activeLang, "SecurityNote")}
@@ -537,32 +558,139 @@ export default function Landing() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           <div className="rounded-2xl border bg-card p-5 md:p-6">
             <div className="inline-flex items-center justify-center h-12 w-12 rounded-[10px] bg-primary text-primary-foreground mb-3 border">
-              <span className="text-lg font-bold">A</span>
+              <Sparkles className="h-6 w-6" />
             </div>
-            <div className="font-semibold">{ui(activeLang, "Voice‑First & Multilingual")}</div>
+            <div className="font-semibold">AI Insights</div>
             <p className="text-sm text-muted-foreground mt-1">
-              {ui(activeLang, "Voice Feature Desc")}
+              Real-time recommendations for irrigation and planting powered by modern AI.
+            </p>
+          </div>
+          <div className="rounded-2xl border bg-card p-5 md:p-6">
+            <div className="inline-flex items-center justify-center h-12 w-12 rounded-[10px] bg-primary text-primary-foreground mb-3 border">
+              <Cloud className="h-6 w-6" />
+            </div>
+            <div className="font-semibold">Weather-Aware</div>
+            <p className="text-sm text-muted-foreground mt-1">
+              ET0 and rainfall integrated to guide watering with precision per field.
+            </p>
+          </div>
+          <div className="rounded-2xl border bg-card p-5 md:p-6">
+            <div className="inline-flex items-center justify-center h-12 w-12 rounded-[10px] bg-primary text-primary-foreground mb-3 border">
+              <MapPin className="h-6 w-6" />
+            </div>
+            <div className="font-semibold">Location Smart</div>
+            <p className="text-sm text-muted-foreground mt-1">
+              Region-specific market info and community discovery near you.
             </p>
           </div>
 
           <div className="rounded-2xl border bg-card p-5 md:p-6">
             <div className="inline-flex items-center justify-center h-12 w-12 rounded-[10px] bg-primary text-primary-foreground mb-3 border">
-              <span className="text-lg font-bold">B</span>
+              <Leaf className="h-6 w-6" />
             </div>
-            <div className="font-semibold">{ui(activeLang, "Camera‑Powered Soil Test")}</div>
+            <div className="font-semibold">Crop Profiles</div>
             <p className="text-sm text-muted-foreground mt-1">
-              {ui(activeLang, "Camera Feature Desc")}
+              Seed types, stages, and coefficients modeled for realistic growth.
+            </p>
+          </div>
+          <div className="rounded-2xl border bg-card p-5 md:p-6">
+            <div className="inline-flex items-center justify-center h-12 w-12 rounded-[10px] bg-primary text-primary-foreground mb-3 border">
+              <BarChart3 className="h-6 w-6" />
+            </div>
+            <div className="font-semibold">Track & Improve</div>
+            <p className="text-sm text-muted-foreground mt-1">
+              Growth, health, and soil moisture metrics visualized cleanly.
+            </p>
+          </div>
+          <div className="rounded-2xl border bg-card p-5 md:p-6">
+            <div className="inline-flex items-center justify-center h-12 w-12 rounded-[10px] bg-primary text-primary-foreground mb-3 border">
+              <Shield className="h-6 w-6" />
+            </div>
+            <div className="font-semibold">Private by Design</div>
+            <p className="text-sm text-muted-foreground mt-1">
+              Your data stays yours. Clear controls and transparent storage.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Add: Expanded Feature Grid (denser, 2 rows) */}
+      <section className="mx-auto w-full max-w-6xl px-4 pb-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="rounded-2xl border bg-card p-5 md:p-6">
+            <div className="inline-flex h-12 w-12 items-center justify-center rounded-[10px] bg-primary text-primary-foreground mb-3 border">
+              <Sparkles className="h-6 w-6" />
+            </div>
+            <div className="font-semibold">AI Insights</div>
+            <p className="text-sm text-muted-foreground mt-1">
+              Real-time recommendations for irrigation and planting powered by modern AI.
+            </p>
+          </div>
+          <div className="rounded-2xl border bg-card p-5 md:p-6">
+            <div className="inline-flex h-12 w-12 items-center justify-center rounded-[10px] bg-primary text-primary-foreground mb-3 border">
+              <Cloud className="h-6 w-6" />
+            </div>
+            <div className="font-semibold">Weather-Aware</div>
+            <p className="text-sm text-muted-foreground mt-1">
+              ET0 and rainfall integrated to guide watering with precision per field.
+            </p>
+          </div>
+          <div className="rounded-2xl border bg-card p-5 md:p-6">
+            <div className="inline-flex h-12 w-12 items-center justify-center rounded-[10px] bg-primary text-primary-foreground mb-3 border">
+              <MapPin className="h-6 w-6" />
+            </div>
+            <div className="font-semibold">Location Smart</div>
+            <p className="text-sm text-muted-foreground mt-1">
+              Region-specific market info and community discovery near you.
             </p>
           </div>
 
           <div className="rounded-2xl border bg-card p-5 md:p-6">
-            <div className="inline-flex items-center justify-center h-12 w-12 rounded-[10px] bg-primary text-primary-foreground mb-3 border">
-              <span className="text-lg font-bold">C</span>
+            <div className="inline-flex h-12 w-12 items-center justify-center rounded-[10px] bg-primary text-primary-foreground mb-3 border">
+              <Leaf className="h-6 w-6" />
             </div>
-            <div className="font-semibold">{ui(activeLang, "Region‑Aware Market Prices")}</div>
+            <div className="font-semibold">Crop Profiles</div>
             <p className="text-sm text-muted-foreground mt-1">
-              {ui(activeLang, "Market Feature Desc")}
+              Seed types, stages, and coefficients modeled for realistic growth.
             </p>
+          </div>
+          <div className="rounded-2xl border bg-card p-5 md:p-6">
+            <div className="inline-flex h-12 w-12 items-center justify-center rounded-[10px] bg-primary text-primary-foreground mb-3 border">
+              <BarChart3 className="h-6 w-6" />
+            </div>
+            <div className="font-semibold">Track & Improve</div>
+            <p className="text-sm text-muted-foreground mt-1">
+              Growth, health, and soil moisture metrics visualized cleanly.
+            </p>
+          </div>
+          <div className="rounded-2xl border bg-card p-5 md:p-6">
+            <div className="inline-flex h-12 w-12 items-center justify-center rounded-[10px] bg-primary text-primary-foreground mb-3 border">
+              <Shield className="h-6 w-6" />
+            </div>
+            <div className="font-semibold">Private by Design</div>
+            <p className="text-sm text-muted-foreground mt-1">
+              Your data stays yours. Clear controls and transparent storage.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Add: Partner / Trusted by marquee */}
+      <section className="mx-auto w-full max-w-6xl px-4 pb-12">
+        <div className="rounded-2xl border bg-card p-5 md:p-6 overflow-hidden">
+          <div className="flex items-center justify-between">
+            <div className="text-sm font-semibold">Trusted by innovative teams</div>
+            <div className="text-xs text-muted-foreground">Beta</div>
+          </div>
+          <div className="relative mt-4">
+            <div className="flex gap-8 animate-[marquee_24s_linear_infinite] will-change-transform"
+                 style={{ maskImage: "linear-gradient(90deg, transparent 0, black 10%, black 90%, transparent 100%)" as any }}>
+              {[...Array(12)].map((_, i) => (
+                <div key={i} className="h-10 min-w-[160px] grid place-items-center rounded-xl border bg-muted/40 px-4">
+                  <img src="/logo.svg" alt="Partner" className="h-6 opacity-70" />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -610,6 +738,48 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* Image Mosaic Gallery */}
+      <section className="mx-auto w-full max-w-6xl px-4 pb-12">
+        <div className="rounded-2xl border bg-card p-5 md:p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="font-semibold">From the fields</div>
+            <div className="text-xs text-muted-foreground">Curated images</div>
+          </div>
+          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+            <img src="/assets/Fild.jpeg" alt="Field" className="h-24 w-full object-cover rounded-xl border" />
+            <img src="/assets/Soil.webp" alt="Soil" className="h-24 w-full object-cover rounded-xl border" />
+            <img src="/logo_bg.png" alt="Logo BG" className="h-24 w-full object-cover rounded-xl border" />
+            <img src="https://images.unsplash.com/photo-1515721577489-2c79a7a81717?q=80&w=600&auto=format&fit=crop" alt="Crop" className="h-24 w-full object-cover rounded-xl border" />
+            <img src="https://images.unsplash.com/photo-1472145246862-b24cf25c4a36?q=80&w=600&auto=format&fit=crop" alt="Irrigation" className="h-24 w-full object-cover rounded-xl border" />
+            <img src="https://images.unsplash.com/photo-1527631746610-bca00a040d60?q=80&w=600&auto=format&fit=crop" alt="Green" className="h-24 w-full object-cover rounded-xl border" />
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="mx-auto w-full max-w-6xl px-4 pb-12">
+        <div className="grid md:grid-cols-3 gap-5">
+          {[
+            { name: "Ravi", role: "Farmer, AP", body: "The irrigation advisor nailed my watering schedule. Saved water and time." },
+            { name: "Meera", role: "Farmer, TN", body: "Soil test insights helped me balance nutrients better this season." },
+            { name: "Arjun", role: "Co-op Lead, KA", body: "Community and jobs made it easy to find help for harvesting." },
+          ].map((t, idx) => (
+            <div key={idx} className="rounded-2xl border bg-card p-5 md:p-6">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-xl bg-primary/15 grid place-items-center border">
+                  <Users2 className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <div className="font-semibold leading-tight">{t.name}</div>
+                  <div className="text-xs text-muted-foreground">{t.role}</div>
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground mt-3">{t.body}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="mx-auto w-full max-w-6xl px-4 pb-24">
         <div className="rounded-2xl border bg-card p-8 text-center">
@@ -627,6 +797,36 @@ export default function Landing() {
               </Button>
             </div>
           )}
+        </div>
+      </section>
+
+      {/* FAQ Accordion */}
+      <section className="mx-auto w-full max-w-6xl px-4 pb-24">
+        <div className="rounded-2xl border bg-card p-5 md:p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="font-semibold">Frequently asked questions</div>
+            <div className="text-xs text-muted-foreground">Updated weekly</div>
+          </div>
+          <Accordion type="single" collapsible className="w-full">
+            <AccordionItem value="item-1">
+              <AccordionTrigger>How does the irrigation advisor work?</AccordionTrigger>
+              <AccordionContent>
+                It uses weather (ET0 and precipitation), crop coefficients, and your field's context to recommend daily water in mm and liters.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-2">
+              <AccordionTrigger>Can I use my local language?</AccordionTrigger>
+              <AccordionContent>
+                Yes. Switch languages from the top-right selector; navigation and key content adapt instantly.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-3">
+              <AccordionTrigger>What is AI model generation?</AccordionTrigger>
+              <AccordionContent>
+                Upload a farm photo and generate a realistic 3D model via Meshy. You can track status and preview when ready.
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
         </div>
       </section>
     </div>
