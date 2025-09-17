@@ -516,7 +516,7 @@ export default function Landing() {
                   {ui(langForGate, "Back")}
                 </button>
                 <Button
-                  className="rounded-xl px-5 py-5 text-base bg-primary text-primary-foreground hover:opacity-95"
+                  className="rounded-xl px-5 py-5 text-base bg-primary text-primary-foreground hover:opacity-95 animate-shimmer shadow-lg shadow-primary/30"
                   onClick={confirmLanguage}
                 >
                   {ui(langForGate, "Continue")}
@@ -634,7 +634,7 @@ export default function Landing() {
           <div className="mt-6 grid md:grid-cols-[1.25fr_1fr] gap-6 items-stretch">
             {/* Left: Title + CTAs */}
             <motion.div 
-              className="rounded-3xl p-6 md:p-8 bg-white/10 backdrop-blur-xl border border-transparent ring-1 ring-white/20 shadow-[0_12px_60px_-10px_rgba(0,0,0,0.25)] transition-all duration-300 will-change-transform hover:-translate-y-2 hover:shadow-[0_24px_80px_-20px_rgba(0,0,0,0.35)] hover:scale-[1.02] glow-sweep"
+              className="rounded-3xl gradient-border p-6 md:p-8 bg-white/10 backdrop-blur-xl border border-transparent ring-1 ring-white/20 shadow-[0_12px_60px_-10px_rgba(0,0,0,0.25)] transition-all duration-300 will-change-transform hover:-translate-y-2 hover:shadow-[0_24px_80px_-20px_rgba(0,0,0,0.35)] hover:scale-[1.02] glow-sweep"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
@@ -687,7 +687,7 @@ export default function Landing() {
               >
                 <Button
                   variant="outline"
-                  className="magnetic-hover rounded-xl px-5 py-5 text-base bg-secondary hover:bg-secondary/80 glow-sweep"
+                  className="magnetic-hover rounded-xl px-5 py-5 text-base bg-secondary hover:bg-secondary/80 glow-sweep shadow-lg shadow-primary/20"
                   onClick={() => {
                     try { localStorage.removeItem("km.lang"); } catch {}
                     setGuestLang(null);
@@ -700,7 +700,7 @@ export default function Landing() {
                   {ui(activeLang, "Change Language")}
                 </Button>
                 <Button
-                  className="magnetic-hover rounded-xl px-5 py-5 text-base bg-primary text-primary-foreground hover:opacity-95 animate-shimmer"
+                  className="magnetic-hover rounded-xl px-5 py-5 text-base bg-primary text-primary-foreground hover:opacity-95 animate-shimmer shadow-lg shadow-primary/30"
                   onClick={() => navigate("/dashboard")}
                 >
                   {ui(activeLang, "Open App")}
@@ -768,7 +768,7 @@ export default function Landing() {
 
             {/* Right: Enhanced Visual card */}
             <motion.div 
-              className="rounded-3xl p-0 overflow-hidden bg-white/5 backdrop-blur-xl border border-transparent ring-1 ring-white/15 shadow-[0_12px_60px_-10px_rgba(0,0,0,0.25)] transition-all duration-300 will-change-transform hover:-translate-y-2 hover:shadow-[0_24px_80px_-20px_rgba(0,0,0,0.35)] hover:scale-[1.02]"
+              className="rounded-3xl gradient-border p-0 overflow-hidden bg-white/5 backdrop-blur-xl border border-transparent ring-1 ring-white/15 shadow-[0_12px_60px_-10px_rgba(0,0,0,0.25)] transition-all duration-300 will-change-transform hover:-translate-y-2 hover:shadow-[0_28px_120px_-28px_rgba(0,0,0,0.5)] hover:scale-[1.02]"
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
@@ -851,7 +851,7 @@ export default function Landing() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Voice */}
-          <div className="rounded-3xl border border-transparent ring-1 ring-white/15 bg-white/10 backdrop-blur-xl p-0 overflow-hidden hover:-translate-y-1 hover:shadow-[0_16px_60px_-16px_rgba(0,0,0,0.3)] transition-all">
+          <div className="rounded-3xl gradient-border border border-transparent ring-1 ring-white/15 bg-white/10 backdrop-blur-xl p-0 overflow-hidden hover:-translate-y-1 hover:scale-[1.01] hover:shadow-[0_24px_80px_-24px_rgba(0,0,0,0.45)] transition-all">
             <div className="h-40 relative">
               <div className="absolute inset-0 bg-gradient-to-br from-primary/15 via-background to-accent/15" />
               <div className="absolute inset-0 grid place-items-center">
@@ -868,14 +868,14 @@ export default function Landing() {
               </p>
               <div className="mt-4 flex items-center gap-2">
                 <Button
-                  className="rounded-xl"
+                  className="rounded-xl shadow-md shadow-primary/20"
                   onClick={() => navigate("/dashboard")}
                 >
                   Open App <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
                 <Button
                   variant="secondary"
-                  className="rounded-xl"
+                  className="rounded-xl shadow-md shadow-primary/10"
                   onClick={() => navigate("/settings")}
                 >
                   Change Language
@@ -885,7 +885,7 @@ export default function Landing() {
           </div>
 
           {/* Soil Test */}
-          <div className="rounded-3xl border border-transparent ring-1 ring-white/15 bg-white/10 backdrop-blur-xl p-0 overflow-hidden hover:-translate-y-1 hover:shadow-[0_16px_60px_-16px_rgba(0,0,0,0.3)] transition-all">
+          <div className="rounded-3xl gradient-border border border-transparent ring-1 ring-white/15 bg-white/10 backdrop-blur-xl p-0 overflow-hidden hover:-translate-y-1 hover:scale-[1.01] hover:shadow-[0_24px_80px_-24px_rgba(0,0,0,0.45)] transition-all">
             <div className="h-40 relative">
               <img
                 src="/assets/Soil.webp"
@@ -905,14 +905,14 @@ export default function Landing() {
               </p>
               <div className="mt-4 flex items-center gap-2">
                 <Button
-                  className="rounded-xl"
+                  className="rounded-xl shadow-md shadow-primary/20"
                   onClick={() => navigate("/soil-test")}
                 >
                   Try Soil Test <Camera className="ml-2 h-4 w-4" />
                 </Button>
                 <Button
                   variant="secondary"
-                  className="rounded-xl"
+                  className="rounded-xl shadow-md shadow-primary/10"
                   onClick={() => navigate("/learn")}
                 >
                   Learn More
@@ -922,7 +922,7 @@ export default function Landing() {
           </div>
 
           {/* My Farm */}
-          <div className="rounded-3xl border border-transparent ring-1 ring-white/15 bg-white/10 backdrop-blur-xl p-0 overflow-hidden hover:-translate-y-1 hover:shadow-[0_16px_60px_-16px_rgba(0,0,0,0.3)] transition-all">
+          <div className="rounded-3xl gradient-border border border-transparent ring-1 ring-white/15 bg-white/10 backdrop-blur-xl p-0 overflow-hidden hover:-translate-y-1 hover:scale-[1.01] hover:shadow-[0_24px_80px_-24px_rgba(0,0,0,0.45)] transition-all">
             <div className="h-40 relative">
               <img
                 src="/assets/Fild.jpeg"
@@ -942,14 +942,14 @@ export default function Landing() {
               </p>
               <div className="mt-4 flex items-center gap-2">
                 <Button
-                  className="rounded-xl"
+                  className="rounded-xl shadow-md shadow-primary/20"
                   onClick={() => navigate("/my-farm")}
                 >
                   Go to My Farm <Sprout className="ml-2 h-4 w-4" />
                 </Button>
                 <Button
                   variant="secondary"
-                  className="rounded-xl"
+                  className="rounded-xl shadow-md shadow-primary/10"
                   onClick={() => navigate("/dashboard")}
                 >
                   Open App
@@ -961,21 +961,21 @@ export default function Landing() {
 
         {/* Why Root AI */}
         <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="rounded-2xl border border-transparent ring-1 ring-white/15 bg-white/10 backdrop-blur-xl p-5 shadow-[0_8px_30px_rgba(0,0,0,0.15)] hover:-translate-y-1 transition-all">
+          <div className="rounded-2xl gradient-border border border-transparent ring-1 ring-white/15 bg-white/10 backdrop-blur-xl p-5 shadow-[0_8px_30px_rgba(0,0,0,0.15)] hover:-translate-y-1 hover:shadow-[0_20px_80px_-24px_rgba(0,0,0,0.45)] transition-all">
             <div className="text-xs uppercase tracking-widest text-muted-foreground">Irrigation</div>
             <div className="mt-2 font-bold text-lg">Real Weather Advisor</div>
             <p className="text-sm text-muted-foreground mt-1">
               Uses ET0 and rain to guide watering for your chosen crop.
             </p>
           </div>
-          <div className="rounded-2xl border border-transparent ring-1 ring-white/15 bg-white/10 backdrop-blur-xl p-5 shadow-[0_8px_30px_rgba(0,0,0,0.15)] hover:-translate-y-1 transition-all">
+          <div className="rounded-2xl gradient-border border border-transparent ring-1 ring-white/15 bg-white/10 backdrop-blur-xl p-5 shadow-[0_8px_30px_rgba(0,0,0,0.15)] hover:-translate-y-1 hover:shadow-[0_20px_80px_-24px_rgba(0,0,0,0.45)] transition-all">
             <div className="text-xs uppercase tracking-widest text-muted-foreground">Multilingual</div>
             <div className="mt-2 font-bold text-lg">20+ Languages</div>
             <p className="text-sm text-muted-foreground mt-1">
               A native experience with dynamic language switching.
             </p>
           </div>
-          <div className="rounded-2xl border border-transparent ring-1 ring-white/15 bg-white/10 backdrop-blur-xl p-5 shadow-[0_8px_30px_rgba(0,0,0,0.15)] hover:-translate-y-1 transition-all">
+          <div className="rounded-2xl gradient-border border border-transparent ring-1 ring-white/15 bg-white/10 backdrop-blur-xl p-5 shadow-[0_8px_30px_rgba(0,0,0,0.15)] hover:-translate-y-1 hover:shadow-[0_20px_80px_-24px_rgba(0,0,0,0.45)] transition-all">
             <div className="text-xs uppercase tracking-widest text-muted-foreground">Privacy</div>
             <div className="mt-2 font-bold text-lg">Your Data, Yours</div>
             <p className="text-sm text-muted-foreground mt-1">
@@ -988,7 +988,7 @@ export default function Landing() {
       {/* Enhanced CTA */}
       <section className="mx-auto w-full max-w-6xl px-4 pb-24">
         <motion.div 
-          className="rounded-3xl p-8 text-center bg-white/10 backdrop-blur-xl border border-transparent ring-1 ring-white/20 shadow-[0_12px_60px_-10px_rgba(0,0,0,0.25)] hover:-translate-y-1 transition-all"
+          className="rounded-3xl gradient-border p-8 text-center bg-white/10 backdrop-blur-xl border border-transparent ring-1 ring-white/20 shadow-[0_12px_60px_-10px_rgba(0,0,0,0.25)] hover:-translate-y-1 hover:shadow-[0_28px_120px_-28px_rgba(0,0,0,0.5)] transition-all"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -1022,7 +1022,7 @@ export default function Landing() {
               transition={{ delay: 0.6 }}
             >
               <Button 
-                className="magnetic-hover rounded-xl px-6 py-6 text-lg animate-shimmer" 
+                className="magnetic-hover rounded-xl px-6 py-6 text-lg animate-shimmer shadow-lg shadow-primary/30" 
                 onClick={() => navigate("/dashboard")}
               >
                 <Zap className="mr-2 h-5 w-5" />
@@ -1030,7 +1030,7 @@ export default function Landing() {
               </Button>
               <Button 
                 variant="secondary" 
-                className="magnetic-hover rounded-xl px-6 py-6 text-lg glow-sweep" 
+                className="magnetic-hover rounded-xl px-6 py-6 text-lg glow-sweep shadow-md shadow-primary/15" 
                 onClick={() => navigate("/soil-test")}
               >
                 <Camera className="mr-2 h-5 w-5" />
