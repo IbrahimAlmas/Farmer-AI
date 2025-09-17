@@ -503,30 +503,29 @@ export default function Landing() {
               {/* Proven impact callout */}
               <div className="mt-6">
                 <div className="rounded-xl border bg-muted/40 p-4">
-                  <div className="text-sm font-semibold">Proven Impact</div>
+                  {/* Reword to avoid unverifiable % claims */}
+                  <div className="text-sm font-semibold">Real Impact, No Hype</div>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Using Root AI, farms report up to 28% higher productivity and 22% less water use within one season.
+                    Measure your own outcomes over time. Our irrigation guidance uses real weather data and crop profiles to help you make informed decisions. Results vary by farm, soil, and climate.
                   </p>
                 </div>
               </div>
 
               {/* Add: Compact stat strip under hero actions */}
-              <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div className="rounded-xl border bg-muted/40 p-3">
-                  <div className="text-xs text-muted-foreground">Active Farmers</div>
-                  <div className="text-lg font-extrabold">12,500+</div>
+              <div className="mt-6 grid grid-cols-1 gap-3">
+                <div className="rounded-2xl border bg-card p-4">
+                  <div className="text-sm font-semibold mb-2">What you can expect</div>
+                  <ul className="text-sm text-muted-foreground space-y-2 list-disc pl-5">
+                    <li>Weather-informed irrigation suggestions (ET0 and rain) tailored to your chosen crop.</li>
+                    <li>Simple per‑farm records to track planting, watering, and harvest actions.</li>
+                    <li>Localized experience in your language for key navigation and actions.</li>
+                  </ul>
                 </div>
-                <div className="rounded-xl border bg-muted/40 p-3">
-                  <div className="text-xs text-muted-foreground">Soil Tests</div>
-                  <div className="text-lg font-extrabold">48k</div>
-                </div>
-                <div className="rounded-xl border bg-muted/40 p-3">
-                  <div className="text-xs text-muted-foreground">Communities</div>
-                  <div className="text-lg font-extrabold">320</div>
-                </div>
-                <div className="rounded-xl border bg-muted/40 p-3">
-                  <div className="text-xs text-muted-foreground">Recommendations</div>
-                  <div className="text-lg font-extrabold">1.2M</div>
+                <div className="rounded-2xl border bg-card p-4">
+                  <div className="text-sm font-semibold mb-2">Data sources</div>
+                  <p className="text-sm text-muted-foreground">
+                    Uses Open‑Meteo for weather and ET0, plus your farm inputs. No fabricated metrics are shown. You're encouraged to compare before/after outcomes in your own context.
+                  </p>
                 </div>
               </div>
 
