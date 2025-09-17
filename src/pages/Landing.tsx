@@ -571,7 +571,7 @@ export default function Landing() {
               className="absolute inset-0 animate-drift-slower"
               style={{
                 background:
-                  "repeating-linear-gradient(135deg, color-mix(in oklab, var(--color-secondary) 70%, white 30%) 0 14px, color-mix(in oklab, var(--color-secondary) 85%, black 15%) 14px 28px)",
+                  "radial-gradient(80% 80% at 20% 20%, color-mix(in oklab, var(--color-primary) 20%, transparent 80%), transparent 60%), radial-gradient(80% 80% at 80% 80%, color-mix(in oklab, var(--color-accent) 18%, transparent 82%), transparent 60%)",
               }}
             />
             
@@ -634,7 +634,7 @@ export default function Landing() {
           <div className="mt-6 grid md:grid-cols-[1.25fr_1fr] gap-6 items-stretch">
             {/* Left: Title + CTAs */}
             <motion.div 
-              className="gradient-border rounded-2xl p-6 md:p-8 shadow-none transition-all duration-300 will-change-transform hover:-translate-y-2 hover:shadow-[0_32px_80px_-32px_rgba(0,0,0,0.5)] hover:scale-[1.02] glow-sweep"
+              className="rounded-3xl p-6 md:p-8 bg-white/10 backdrop-blur-xl border border-transparent ring-1 ring-white/20 shadow-[0_12px_60px_-10px_rgba(0,0,0,0.25)] transition-all duration-300 will-change-transform hover:-translate-y-2 hover:shadow-[0_24px_80px_-20px_rgba(0,0,0,0.35)] hover:scale-[1.02] glow-sweep"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
@@ -648,7 +648,7 @@ export default function Landing() {
                 <motion.img
                   src="https://harmless-tapir-303.convex.cloud/api/storage/a4af3a5d-e126-420d-b31d-c1929a3c833b"
                   alt="Root AI"
-                  className="h-12 w-12 rounded-lg object-cover animate-glow-pulse"
+                  className="h-12 w-12 rounded-xl object-cover ring-1 ring-white/30 shadow-md"
                   whileHover={{ scale: 1.1, rotate: 5 }}
                   onError={(e) => {
                     const t = e.currentTarget as HTMLImageElement;
@@ -715,7 +715,7 @@ export default function Landing() {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 1.4 }}
               >
-                <div className="gradient-border rounded-xl p-4 hover-parallax">
+                <div className="rounded-2xl p-4 bg-white/10 backdrop-blur-xl border border-transparent ring-1 ring-white/15 shadow-[0_8px_30px_rgba(0,0,0,0.15)] hover:translate-y-[-4px] transition-transform">
                   <div className="text-sm font-semibold flex items-center gap-2">
                     <CheckCircle className="h-4 w-4 text-green-500" />
                     Real Impact, No Hype
@@ -733,7 +733,7 @@ export default function Landing() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 1.6 }}
               >
-                <div className="gradient-border rounded-2xl p-4 hover-parallax">
+                <div className="rounded-2xl p-4 bg-white/10 backdrop-blur-xl border border-transparent ring-1 ring-white/15 shadow-[0_8px_30px_rgba(0,0,0,0.15)] hover:translate-y-[-4px] transition-transform">
                   <div className="text-sm font-semibold mb-2 flex items-center gap-2">
                     <TrendingUp className="h-4 w-4 text-primary" />
                     What you can expect
@@ -744,7 +744,7 @@ export default function Landing() {
                     <li>Localized experience in your language for key navigation and actions.</li>
                   </ul>
                 </div>
-                <div className="gradient-border rounded-2xl p-4 hover-parallax">
+                <div className="rounded-2xl p-4 bg-white/10 backdrop-blur-xl border border-transparent ring-1 ring-white/15 shadow-[0_8px_30px_rgba(0,0,0,0.15)] hover:translate-y-[-4px] transition-transform">
                   <div className="text-sm font-semibold mb-2 flex items-center gap-2">
                     <Shield className="h-4 w-4 text-accent" />
                     Data sources
@@ -756,7 +756,7 @@ export default function Landing() {
               </motion.div>
 
               <motion.div 
-                className="mt-6 inline-flex items-center gap-2 rounded-xl border bg-muted/50 px-3 py-2 text-sm animate-glow-pulse"
+                className="mt-6 inline-flex items-center gap-2 rounded-xl border border-transparent bg-white/10 backdrop-blur-md ring-1 ring-white/15 px-3 py-2 text-sm"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 1.8 }}
@@ -768,7 +768,7 @@ export default function Landing() {
 
             {/* Right: Enhanced Visual card */}
             <motion.div 
-              className="gradient-border rounded-2xl p-0 overflow-hidden transition-all duration-300 will-change-transform hover:-translate-y-2 hover:shadow-[0_32px_80px_-32px_rgba(0,0,0,0.5)] hover:scale-[1.02]"
+              className="rounded-3xl p-0 overflow-hidden bg-white/5 backdrop-blur-xl border border-transparent ring-1 ring-white/15 shadow-[0_12px_60px_-10px_rgba(0,0,0,0.25)] transition-all duration-300 will-change-transform hover:-translate-y-2 hover:shadow-[0_24px_80px_-20px_rgba(0,0,0,0.35)] hover:scale-[1.02]"
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
@@ -794,7 +794,7 @@ export default function Landing() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 1 }}
                 >
-                  <div className="inline-flex items-center gap-2 rounded-lg bg-background/90 border px-3 py-2 text-xs animate-glow-pulse">
+                  <div className="inline-flex items-center gap-2 rounded-lg border border-transparent bg-white/10 backdrop-blur-md ring-1 ring-white/15 px-3 py-2 text-xs animate-glow-pulse">
                     <Cpu className="h-3 w-3" />
                     <span className="font-semibold">{ui(activeLang, "Live Tools")}</span>
                   </div>
@@ -851,7 +851,7 @@ export default function Landing() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Voice */}
-          <div className="rounded-2xl border p-0 overflow-hidden hover:-translate-y-1 transition-transform">
+          <div className="rounded-3xl border border-transparent ring-1 ring-white/15 bg-white/10 backdrop-blur-xl p-0 overflow-hidden hover:-translate-y-1 hover:shadow-[0_16px_60px_-16px_rgba(0,0,0,0.3)] transition-all">
             <div className="h-40 relative">
               <div className="absolute inset-0 bg-gradient-to-br from-primary/15 via-background to-accent/15" />
               <div className="absolute inset-0 grid place-items-center">
@@ -885,7 +885,7 @@ export default function Landing() {
           </div>
 
           {/* Soil Test */}
-          <div className="rounded-2xl border p-0 overflow-hidden hover:-translate-y-1 transition-transform">
+          <div className="rounded-3xl border border-transparent ring-1 ring-white/15 bg-white/10 backdrop-blur-xl p-0 overflow-hidden hover:-translate-y-1 hover:shadow-[0_16px_60px_-16px_rgba(0,0,0,0.3)] transition-all">
             <div className="h-40 relative">
               <img
                 src="/assets/Soil.webp"
@@ -893,7 +893,7 @@ export default function Landing() {
                 className="absolute inset-0 h-full w-full object-cover"
                 loading="lazy"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
             </div>
             <div className="p-5">
               <div className="flex items-center justify-between">
@@ -922,7 +922,7 @@ export default function Landing() {
           </div>
 
           {/* My Farm */}
-          <div className="rounded-2xl border p-0 overflow-hidden hover:-translate-y-1 transition-transform">
+          <div className="rounded-3xl border border-transparent ring-1 ring-white/15 bg-white/10 backdrop-blur-xl p-0 overflow-hidden hover:-translate-y-1 hover:shadow-[0_16px_60px_-16px_rgba(0,0,0,0.3)] transition-all">
             <div className="h-40 relative">
               <img
                 src="/assets/Fild.jpeg"
@@ -930,7 +930,7 @@ export default function Landing() {
                 className="absolute inset-0 h-full w-full object-cover"
                 loading="lazy"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
             </div>
             <div className="p-5">
               <div className="flex items-center justify-between">
@@ -961,21 +961,21 @@ export default function Landing() {
 
         {/* Why Root AI */}
         <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="rounded-2xl border p-5">
+          <div className="rounded-2xl border border-transparent ring-1 ring-white/15 bg-white/10 backdrop-blur-xl p-5 shadow-[0_8px_30px_rgba(0,0,0,0.15)] hover:-translate-y-1 transition-all">
             <div className="text-xs uppercase tracking-widest text-muted-foreground">Irrigation</div>
             <div className="mt-2 font-bold text-lg">Real Weather Advisor</div>
             <p className="text-sm text-muted-foreground mt-1">
               Uses ET0 and rain to guide watering for your chosen crop.
             </p>
           </div>
-          <div className="rounded-2xl border p-5">
+          <div className="rounded-2xl border border-transparent ring-1 ring-white/15 bg-white/10 backdrop-blur-xl p-5 shadow-[0_8px_30px_rgba(0,0,0,0.15)] hover:-translate-y-1 transition-all">
             <div className="text-xs uppercase tracking-widest text-muted-foreground">Multilingual</div>
             <div className="mt-2 font-bold text-lg">20+ Languages</div>
             <p className="text-sm text-muted-foreground mt-1">
               A native experience with dynamic language switching.
             </p>
           </div>
-          <div className="rounded-2xl border p-5">
+          <div className="rounded-2xl border border-transparent ring-1 ring-white/15 bg-white/10 backdrop-blur-xl p-5 shadow-[0_8px_30px_rgba(0,0,0,0.15)] hover:-translate-y-1 transition-all">
             <div className="text-xs uppercase tracking-widest text-muted-foreground">Privacy</div>
             <div className="mt-2 font-bold text-lg">Your Data, Yours</div>
             <p className="text-sm text-muted-foreground mt-1">
@@ -988,7 +988,7 @@ export default function Landing() {
       {/* Enhanced CTA */}
       <section className="mx-auto w-full max-w-6xl px-4 pb-24">
         <motion.div 
-          className="gradient-border rounded-2xl p-8 text-center hover-parallax glow-sweep"
+          className="rounded-3xl p-8 text-center bg-white/10 backdrop-blur-xl border border-transparent ring-1 ring-white/20 shadow-[0_12px_60px_-10px_rgba(0,0,0,0.25)] hover:-translate-y-1 transition-all"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -1059,7 +1059,7 @@ export default function Landing() {
               <img
                 src="/logo.svg"
                 alt="Root AI"
-                className="relative h-8 w-8 rounded-md border object-cover animate-float-slow"
+                className="relative h-10 w-10 rounded-xl border border-transparent ring-1 ring-white/20 object-cover animate-float-slow"
                 onError={(e) => {
                   const t = e.currentTarget as HTMLImageElement;
                   if (t.src !== '/logo.png') t.src = '/logo.png';
@@ -1071,7 +1071,7 @@ export default function Landing() {
             <p className="text-sm text-muted-foreground mt-3">
               Helping farms grow smarter with AI-driven insights, localized experience, and real-time tools.
             </p>
-            <div className="mt-4 inline-flex items-center gap-2 rounded-xl border bg-muted/50 px-3 py-2 text-xs animate-glow-pulse">
+            <div className="mt-4 inline-flex items-center gap-2 rounded-xl border border-transparent bg-white/10 backdrop-blur-md ring-1 ring-white/15 px-3 py-2 text-xs">
               <span className="inline-block h-3 w-3 rounded-[4px] bg-primary animate-pulse" />
               Private & secure. You control your data.
             </div>
