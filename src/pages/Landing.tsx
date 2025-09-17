@@ -534,6 +534,10 @@ export default function Landing() {
     );
   }
 
+  const SHOW_PREVIEW = false;
+  const SHOW_TIMELINE = false;
+  const SHOW_TESTIMONIALS = false;
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Animated Announcement Ribbon */}
@@ -802,177 +806,183 @@ export default function Landing() {
       </section>
 
       {/* Live Preview Strip */}
-      <section className="mx-auto w-full max-w-6xl px-4 py-8">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          <h2 className="text-2xl font-bold text-center mb-6 text-gradient-animated">Live Farm Intelligence</h2>
-          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
-            {livePreviewTiles.map((tile, index) => {
-              const Icon = tile.icon;
-              return (
-                <motion.div
-                  key={tile.label}
-                  className="gradient-border min-w-[140px] p-4 rounded-xl hover-parallax glow-sweep"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1, duration: 0.4 }}
-                  whileHover={{ y: -5 }}
-                >
-                  <Icon className={`h-8 w-8 ${tile.color} mb-2 animate-float-slow`} />
-                  <div className="text-sm font-medium">{tile.label}</div>
-                </motion.div>
-              );
-            })}
-          </div>
-        </motion.div>
-      </section>
-
-      {/* Dynamic Feature Grid */}
-      <section className="mx-auto w-full max-w-6xl px-4 py-12">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          <h2 className="text-3xl font-bold text-center mb-8 text-gradient-animated">
-            Powerful Features for Modern Farming
-          </h2>
-          <motion.div 
-            className="grid grid-cols-1 md:grid-cols-3 gap-6"
-            variants={{
-              hidden: { opacity: 0 },
-              show: {
-                opacity: 1,
-                transition: {
-                  staggerChildren: 0.1
-                }
-              }
-            }}
-            initial="hidden"
-            whileInView="show"
+      {SHOW_PREVIEW && (
+        <section className="mx-auto w-full max-w-6xl px-4 py-8">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
           >
-            {dynamicFeatures.map((feature, index) => {
-              const Icon = feature.icon;
-              return (
-                <motion.div
-                  key={feature.title}
-                  className="gradient-border rounded-2xl p-6 hover-parallax glow-sweep transition-all duration-300"
-                  variants={{
-                    hidden: { opacity: 0, y: 20, scale: 0.9 },
-                    show: { opacity: 1, y: 0, scale: 1 }
-                  }}
-                  whileHover={{ 
-                    scale: 1.05,
-                    rotateY: 5,
-                    rotateX: 5,
-                    transition: { duration: 0.2 }
-                  }}
-                >
-                  <div className={`inline-flex items-center justify-center h-12 w-12 rounded-xl bg-gradient-to-r ${feature.gradient} text-white mb-4 animate-glow-pulse`}>
-                    <Icon className="h-6 w-6" />
-                  </div>
-                  <h3 className="font-semibold text-lg mb-2">{feature.title}</h3>
-                  <p className="text-sm text-muted-foreground">{feature.description}</p>
-                </motion.div>
-              );
-            })}
-          </motion.div>
-        </motion.div>
-      </section>
-
-      {/* Motion Timeline */}
-      <section className="mx-auto w-full max-w-6xl px-4 py-12">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          <h2 className="text-3xl font-bold text-center mb-12 text-gradient-animated">
-            Your Journey to Smart Farming
-          </h2>
-          <div className="relative">
-            {/* Animated connecting line */}
-            <div className="absolute top-8 left-8 right-8 h-0.5 bg-gradient-to-r from-primary via-accent to-primary opacity-30">
-              <div className="h-full bg-gradient-to-r from-primary to-accent animate-dash-move" 
-                   style={{ 
-                     backgroundImage: 'repeating-linear-gradient(90deg, transparent 0, transparent 10px, currentColor 10px, currentColor 20px)',
-                     backgroundSize: '40px 100%'
-                   }} 
-              />
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
-              {timelineSteps.map((step, index) => (
-                <motion.div
-                  key={step.title}
-                  className="relative text-center"
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.2, duration: 0.5 }}
-                >
-                  <motion.div 
-                    className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-primary to-accent text-white flex items-center justify-center font-bold text-lg animate-glow-pulse"
-                    whileHover={{ scale: 1.1, rotate: 360 }}
-                    transition={{ duration: 0.3 }}
+            <h2 className="text-2xl font-bold text-center mb-6 text-gradient-animated">Live Farm Intelligence</h2>
+            <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+              {livePreviewTiles.map((tile, index) => {
+                const Icon = tile.icon;
+                return (
+                  <motion.div
+                    key={tile.label}
+                    className="gradient-border min-w-[140px] p-4 rounded-xl hover-parallax glow-sweep"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.1, duration: 0.4 }}
+                    whileHover={{ y: -5 }}
                   >
-                    {index + 1}
+                    <Icon className={`h-8 w-8 ${tile.color} mb-2 animate-float-slow`} />
+                    <div className="text-sm font-medium">{tile.label}</div>
                   </motion.div>
-                  <h3 className="font-semibold mb-2">{step.title}</h3>
-                  <p className="text-sm text-muted-foreground">{step.description}</p>
-                </motion.div>
-              ))}
+                );
+              })}
+            </div>
+          </motion.div>
+        </section>
+      )}
+
+      {/* Core Tools Hub */}
+      <section className="mx-auto w-full max-w-6xl px-4 py-12">
+        <div className="mb-8 flex items-center justify-between">
+          <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight">
+            Core Tools Hub
+          </h2>
+          <div className="text-xs uppercase tracking-widest text-muted-foreground">
+            Built for speed • No fluff
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Voice */}
+          <div className="rounded-2xl border p-0 overflow-hidden hover:-translate-y-1 transition-transform">
+            <div className="h-40 relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/15 via-background to-accent/15" />
+              <div className="absolute inset-0 grid place-items-center">
+                <Mic className="h-10 w-10 text-primary animate-float-slow" />
+              </div>
+            </div>
+            <div className="p-5">
+              <div className="flex items-center justify-between">
+                <h3 className="font-bold text-lg">Voice Commands</h3>
+                <span className="text-[10px] uppercase text-muted-foreground">Fast</span>
+              </div>
+              <p className="text-sm text-muted-foreground mt-1">
+                Navigate and act hands‑free in your language.
+              </p>
+              <div className="mt-4 flex items-center gap-2">
+                <Button
+                  className="rounded-xl"
+                  onClick={() => navigate("/dashboard")}
+                >
+                  Open App <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+                <Button
+                  variant="secondary"
+                  className="rounded-xl"
+                  onClick={() => navigate("/settings")}
+                >
+                  Change Language
+                </Button>
+              </div>
             </div>
           </div>
-        </motion.div>
-      </section>
 
-      {/* Enhanced Testimonials */}
-      <section className="mx-auto w-full max-w-6xl px-4 pb-12">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          <h2 className="text-3xl font-bold text-center mb-8 text-gradient-animated">
-            Trusted by Farmers Everywhere
-          </h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              { name: "Ravi", role: "Farmer, AP", body: "The irrigation advisor nailed my watering schedule. Saved water and time.", avatar: "🧑‍🌾" },
-              { name: "Meera", role: "Farmer, TN", body: "Soil test insights helped me balance nutrients better this season.", avatar: "👩‍🌾" },
-              { name: "Arjun", role: "Co-op Lead, KA", body: "Community and jobs made it easy to find help for harvesting.", avatar: "👨‍💼" },
-            ].map((testimonial, index) => (
-              <motion.div 
-                key={index} 
-                className="gradient-border rounded-2xl p-6 hover-parallax"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.2, duration: 0.5 }}
-                whileHover={{ scale: 1.02 }}
-              >
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="text-2xl">{testimonial.avatar}</div>
-                  <div>
-                    <div className="font-semibold">{testimonial.name}</div>
-                    <div className="text-xs text-muted-foreground">{testimonial.role}</div>
-                  </div>
-                </div>
-                <p className="text-sm text-muted-foreground italic">"{testimonial.body}"</p>
-              </motion.div>
-            ))}
+          {/* Soil Test */}
+          <div className="rounded-2xl border p-0 overflow-hidden hover:-translate-y-1 transition-transform">
+            <div className="h-40 relative">
+              <img
+                src="/assets/Soil.webp"
+                alt="Soil"
+                className="absolute inset-0 h-full w-full object-cover"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
+            </div>
+            <div className="p-5">
+              <div className="flex items-center justify-between">
+                <h3 className="font-bold text-lg">Soil Test</h3>
+                <span className="text-[10px] uppercase text-muted-foreground">Camera</span>
+              </div>
+              <p className="text-sm text-muted-foreground mt-1">
+                Upload or capture soil photos for instant insights.
+              </p>
+              <div className="mt-4 flex items-center gap-2">
+                <Button
+                  className="rounded-xl"
+                  onClick={() => navigate("/soil-test")}
+                >
+                  Try Soil Test <Camera className="ml-2 h-4 w-4" />
+                </Button>
+                <Button
+                  variant="secondary"
+                  className="rounded-xl"
+                  onClick={() => navigate("/learn")}
+                >
+                  Learn More
+                </Button>
+              </div>
+            </div>
           </div>
-        </motion.div>
+
+          {/* My Farm */}
+          <div className="rounded-2xl border p-0 overflow-hidden hover:-translate-y-1 transition-transform">
+            <div className="h-40 relative">
+              <img
+                src="/assets/Fild.jpeg"
+                alt="Farm"
+                className="absolute inset-0 h-full w-full object-cover"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
+            </div>
+            <div className="p-5">
+              <div className="flex items-center justify-between">
+                <h3 className="font-bold text-lg">My Farm</h3>
+                <span className="text-[10px] uppercase text-muted-foreground">Simulate</span>
+              </div>
+              <p className="text-sm text-muted-foreground mt-1">
+                Manage farms and run simulations with real weather.
+              </p>
+              <div className="mt-4 flex items-center gap-2">
+                <Button
+                  className="rounded-xl"
+                  onClick={() => navigate("/my-farm")}
+                >
+                  Go to My Farm <Sprout className="ml-2 h-4 w-4" />
+                </Button>
+                <Button
+                  variant="secondary"
+                  className="rounded-xl"
+                  onClick={() => navigate("/dashboard")}
+                >
+                  Open App
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Why Root AI */}
+        <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="rounded-2xl border p-5">
+            <div className="text-xs uppercase tracking-widest text-muted-foreground">Irrigation</div>
+            <div className="mt-2 font-bold text-lg">Real Weather Advisor</div>
+            <p className="text-sm text-muted-foreground mt-1">
+              Uses ET0 and rain to guide watering for your chosen crop.
+            </p>
+          </div>
+          <div className="rounded-2xl border p-5">
+            <div className="text-xs uppercase tracking-widest text-muted-foreground">Multilingual</div>
+            <div className="mt-2 font-bold text-lg">20+ Languages</div>
+            <p className="text-sm text-muted-foreground mt-1">
+              A native experience with dynamic language switching.
+            </p>
+          </div>
+          <div className="rounded-2xl border p-5">
+            <div className="text-xs uppercase tracking-widest text-muted-foreground">Privacy</div>
+            <div className="mt-2 font-bold text-lg">Your Data, Yours</div>
+            <p className="text-sm text-muted-foreground mt-1">
+              No hype. Clear sources and transparent outcomes.
+            </p>
+          </div>
+        </div>
       </section>
 
       {/* Enhanced CTA */}
