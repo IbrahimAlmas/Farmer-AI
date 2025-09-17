@@ -16,22 +16,19 @@ import "./types/global.d.ts";
 
 const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
 
-// Initialize theme early: default to dark, respect saved preference if present
+/**
+ * Initialize theme early and force dark mode now.
+ * Also persist the preference so subsequent loads stay dark.
+ */
 (() => {
   try {
-    const saved = localStorage.getItem("theme"); // 'dark' | 'light' | null
-    const prefersDark =
-      typeof window !== "undefined" &&
-      window.matchMedia &&
-      window.matchMedia("(prefers-color-scheme: dark)").matches;
-
-    const useDark = saved ? saved === "dark" : true || prefersDark;
     const rootEl = document.documentElement;
-
-    if (useDark) rootEl.classList.add("dark");
-    else rootEl.classList.remove("dark");
+    rootEl.classList.add("dark");
+    try {
+      localStorage.setItem("theme", "dark");
+    } catch {}
   } catch {
-    // If anything fails, still enable dark by default
+    // Fallback: still enable dark by default
     document.documentElement.classList.add("dark");
   }
 })();
