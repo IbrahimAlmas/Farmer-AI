@@ -9,7 +9,6 @@ import LanguageSelect from "@/components/LanguageSelect";
 import { useAction, useMutation, useQuery } from "convex/react";
 import { toast } from "sonner";
 import { ui, type LangKey } from "@/lib/i18n";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -794,33 +793,71 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* FAQ Accordion */}
-      <section className="mx-auto w-full max-w-6xl px-4 pb-24">
-        <div className="rounded-2xl border bg-card p-5 md:p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="font-semibold">Frequently asked questions</div>
-            <div className="text-xs text-muted-foreground">Updated weekly</div>
+      {/* Official Footer */}
+      <section className="border-t bg-card/60">
+        <div className="mx-auto w-full max-w-6xl px-4 py-12 grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div>
+            <div className="flex items-center gap-2">
+              <img
+                src="/logo.svg"
+                alt="Root AI"
+                className="h-8 w-8 rounded-md border object-cover"
+                onError={(e) => {
+                  const t = e.currentTarget as HTMLImageElement;
+                  if (t.src !== '/logo.png') t.src = '/logo.png';
+                  t.onerror = null;
+                }}
+              />
+              <span className="font-extrabold tracking-wide">Root AI</span>
+            </div>
+            <p className="text-sm text-muted-foreground mt-3">
+              Helping farms grow smarter with AI-driven insights, localized experience, and real-time tools.
+            </p>
+            <div className="mt-4 inline-flex items-center gap-2 rounded-xl border bg-muted/50 px-3 py-2 text-xs">
+              <span className="inline-block h-3 w-3 rounded-[4px] bg-primary" />
+              Private & secure. You control your data.
+            </div>
           </div>
-          <Accordion type="single" collapsible className="w-full">
-            <AccordionItem value="item-1">
-              <AccordionTrigger>How does the irrigation advisor work?</AccordionTrigger>
-              <AccordionContent>
-                It uses weather (ET0 and precipitation), crop coefficients, and your field's context to recommend daily water in mm and liters.
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="item-2">
-              <AccordionTrigger>Can I use my local language?</AccordionTrigger>
-              <AccordionContent>
-                Yes. Switch languages from the top-right selector; navigation and key content adapt instantly.
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="item-3">
-              <AccordionTrigger>What is AI model generation?</AccordionTrigger>
-              <AccordionContent>
-                Upload a farm photo and generate a realistic 3D model via Meshy. You can track status and preview when ready.
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
+
+          <div>
+            <div className="text-sm font-semibold mb-3">Product</div>
+            <ul className="space-y-2 text-sm">
+              <li><a href="/dashboard" className="hover:underline">Dashboard</a></li>
+              <li><a href="/my-farm" className="hover:underline">My Farm</a></li>
+              <li><a href="/soil-test" className="hover:underline">Soil Test</a></li>
+              <li><a href="/market" className="hover:underline">Market</a></li>
+            </ul>
+          </div>
+
+          <div>
+            <div className="text-sm font-semibold mb-3">Company</div>
+            <ul className="space-y-2 text-sm">
+              <li><a href="/our-mission" className="hover:underline">Our Mission</a></li>
+              <li><a href="/our-team" className="hover:underline">Our Team</a></li>
+              <li><a href="/future-plan" className="hover:underline">Future Plan</a></li>
+            </ul>
+          </div>
+
+          <div>
+            <div className="text-sm font-semibold mb-3">Resources</div>
+            <ul className="space-y-2 text-sm">
+              <li><a href="/#faq" className="hover:underline">Frequently Asked Questions</a></li>
+              <li><a href="/learn" className="hover:underline">Learn</a></li>
+              <li><a href="/community" className="hover:underline">Community</a></li>
+              <li><a href="/settings" className="hover:underline">Settings</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="border-t">
+          <div className="mx-auto w-full max-w-6xl px-4 py-4 text-xs flex flex-col md:flex-row items-center justify-between gap-2">
+            <div className="text-muted-foreground">© {new Date().getFullYear()} Root AI. All rights reserved.</div>
+            <div className="flex items-center gap-4">
+              <a href="/#faq" className="hover:underline">FAQs</a>
+              <a href="#" className="hover:underline">Privacy</a>
+              <a href="#" className="hover:underline">Terms</a>
+            </div>
+          </div>
         </div>
       </section>
     </div>
