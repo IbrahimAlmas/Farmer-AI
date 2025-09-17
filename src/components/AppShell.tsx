@@ -150,7 +150,7 @@ export function AppShell({ children, title }: AppShellProps) {
                       className="rounded-xl px-3 py-2"
                       onClick={() => navigate("/our-team")}
                     >
-                      Our Team
+                      {ui(currentLang, "Our Team")}
                     </Button>
                     <Button
                       variant={location.pathname === "/our-mission" ? "secondary" : "ghost"}
@@ -158,7 +158,7 @@ export function AppShell({ children, title }: AppShellProps) {
                       className="rounded-xl px-3 py-2"
                       onClick={() => navigate("/our-mission")}
                     >
-                      Our Mission
+                      {ui(currentLang, "Our Mission")}
                     </Button>
                     <Button
                       variant={location.pathname === "/future-plan" ? "secondary" : "ghost"}
@@ -166,7 +166,7 @@ export function AppShell({ children, title }: AppShellProps) {
                       className="rounded-xl px-3 py-2"
                       onClick={() => navigate("/future-plan")}
                     >
-                      Future Plan
+                      {ui(currentLang, "Future Plan")}
                     </Button>
                   </div>
                 ) : (
@@ -315,8 +315,8 @@ export function AppShell({ children, title }: AppShellProps) {
               {/* Embedded Voice Button centered */}
               <div
                 className="group relative grid place-items-center shrink-0"
-                aria-label="Voice"
-                title="Voice"
+                aria-label={ui(currentLang, "Voice")}
+                title={ui(currentLang, "Voice")}
               >
                 <div className="grid place-items-center size-16 rounded-3xl transition-all duration-150 text-foreground/80 hover:text-foreground hover:scale-125 active:scale-95 hover:shadow-[0_16px_40px_-12px_rgba(0,0,0,0.55)]">
                   <VoiceButton

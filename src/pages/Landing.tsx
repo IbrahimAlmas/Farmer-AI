@@ -337,6 +337,7 @@ export default function Landing() {
   };
 
   const activeLang: LangKey = (String(profile?.preferredLang || guestLang || selectedLang || "en") as LangKey);
+  const langForGate: LangKey = (gateOpen ? (selectedLang as LangKey) : activeLang);
 
   if (gateOpen) {
     return (
@@ -366,15 +367,15 @@ export default function Landing() {
                 t.onerror = null;
               }}
             />
-            <div className="text-xs uppercase tracking-widest text-muted-foreground">Choose your language</div>
+            <div className="text-xs uppercase tracking-widest text-muted-foreground">{ui(langForGate, "Choose Language")}</div>
           </div>
 
           {/* Card */}
           <div className="rounded-2xl border bg-card shadow-none">
             <div className="p-5 md:p-6">
-              <h2 className="text-xl font-extrabold">Select your preferred language</h2>
+              <h2 className="text-xl font-extrabold">{ui(langForGate, "Select Preferred Language")}</h2>
               <p className="text-muted-foreground text-sm mt-1">
-                You can change this anytime from Settings.
+                {ui(langForGate, "Language Change Note")}
               </p>
 
               {/* Grid with scroll to accommodate 18+ languages */}
@@ -410,20 +411,20 @@ export default function Landing() {
                     setGateOpen(false);
                   }}
                 >
-                  Back
+                  {ui(langForGate, "Back")}
                 </button>
                 <Button
                   className="rounded-xl px-5 py-5 text-base bg-primary text-primary-foreground hover:opacity-95"
                   onClick={confirmLanguage}
                 >
-                  Continue
+                  {ui(langForGate, "Continue")}
                 </Button>
               </div>
             </div>
 
             {/* Footer note */}
             <div className="border-t px-5 py-3 text-center text-xs text-muted-foreground">
-              Private & secure. You control your data.
+              {ui(langForGate, "SecurityNote")}
             </div>
           </div>
         </div>
@@ -495,7 +496,7 @@ export default function Landing() {
                   className="rounded-xl px-5 py-5 text-base bg-primary text-primary-foreground hover:opacity-95"
                   onClick={() => navigate("/dashboard")}
                 >
-                  Open App
+                  {ui(activeLang, "Open App")}
                 </Button>
               </div>
 
@@ -538,9 +539,9 @@ export default function Landing() {
             <div className="inline-flex items-center justify-center h-12 w-12 rounded-[10px] bg-primary text-primary-foreground mb-3 border">
               <span className="text-lg font-bold">A</span>
             </div>
-            <div className="font-semibold">Voice‑First & Multilingual</div>
+            <div className="font-semibold">{ui(activeLang, "Voice‑First & Multilingual")}</div>
             <p className="text-sm text-muted-foreground mt-1">
-              Navigate, add tasks, and get answers with your voice in Telugu, Hindi, English, and more.
+              {ui(activeLang, "Voice Feature Desc")}
             </p>
           </div>
 
@@ -548,9 +549,9 @@ export default function Landing() {
             <div className="inline-flex items-center justify-center h-12 w-12 rounded-[10px] bg-primary text-primary-foreground mb-3 border">
               <span className="text-lg font-bold">B</span>
             </div>
-            <div className="font-semibold">Camera‑Powered Soil Test</div>
+            <div className="font-semibold">{ui(activeLang, "Camera‑Powered Soil Test")}</div>
             <p className="text-sm text-muted-foreground mt-1">
-              Click or upload soil photos for instant AI insights and actionable recommendations.
+              {ui(activeLang, "Camera Feature Desc")}
             </p>
           </div>
 
@@ -558,9 +559,9 @@ export default function Landing() {
             <div className="inline-flex items-center justify-center h-12 w-12 rounded-[10px] bg-primary text-primary-foreground mb-3 border">
               <span className="text-lg font-bold">C</span>
             </div>
-            <div className="font-semibold">Region‑Aware Market Prices</div>
+            <div className="font-semibold">{ui(activeLang, "Region‑Aware Market Prices")}</div>
             <p className="text-sm text-muted-foreground mt-1">
-              See indicative local retail prices (₹/kg) for vegetables in your state.
+              {ui(activeLang, "Market Feature Desc")}
             </p>
           </div>
         </div>
@@ -582,7 +583,7 @@ export default function Landing() {
             {!postGate && (
               <div className="mt-4">
                 <Button variant="outline" className="rounded-xl" onClick={() => navigate("/my-farm")}>
-                  Go to My Farm
+                  {ui(activeLang, "Go to My Farm")}
                 </Button>
               </div>
             )}
@@ -601,7 +602,7 @@ export default function Landing() {
             {!postGate && (
               <div className="mt-4">
                 <Button variant="outline" className="rounded-xl" onClick={() => navigate("/settings")}>
-                  Set Language
+                  {ui(activeLang, "Set Language")}
                 </Button>
               </div>
             )}
@@ -619,10 +620,10 @@ export default function Landing() {
           {!postGate && (
             <div className="mt-6 flex items-center justify-center gap-3">
               <Button className="rounded-xl px-5 py-5 text-base" onClick={() => navigate("/dashboard")}>
-                Get Started
+                {ui(activeLang, "Get Started")}
               </Button>
               <Button variant="secondary" className="rounded-xl px-5 py-5 text-base" onClick={() => navigate("/soil-test")}>
-                Try Soil Test
+                {ui(activeLang, "Try Soil Test")}
               </Button>
             </div>
           )}

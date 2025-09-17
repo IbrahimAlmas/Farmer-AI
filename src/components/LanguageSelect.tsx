@@ -3,7 +3,7 @@ import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { SupportedLanguages } from "@/lib/i18n";
+import { SupportedLanguages, type LangKey, ui } from "@/lib/i18n";
 
 type Option = { label: string; value: string };
 
@@ -42,7 +42,7 @@ export default function LanguageSelect({ size = "sm" }: { size?: "sm" | "md" }) 
   return (
     <Select value={current} onValueChange={onChange} disabled={saving}>
       <SelectTrigger className={size === "sm" ? "h-8 w-[120px] rounded-xl" : "h-10 w-[150px] rounded-xl"}>
-        <SelectValue placeholder="Language" />
+        <SelectValue placeholder={ui((current as LangKey), "Set Language")} />
       </SelectTrigger>
       <SelectContent>
         {options.map((opt) => (
