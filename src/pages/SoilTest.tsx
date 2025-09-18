@@ -38,6 +38,7 @@ export default function SoilTest() {
   const [cameraError, setCameraError] = useState<string | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const [step, setStep] = useState<"intro" | "capture" | "review" | "results">("intro");
+  const startedRef = useRef(false);
 
   useEffect(() => {
     let didCancel = false;
@@ -53,6 +54,15 @@ export default function SoilTest() {
     };
   }, []);
 
+  useEffect(() => {
+    if (step === "capture" && !cameraOn && !startedRef.current) {
+      startedRef.current = true;
+      startCamera().catch(() => {
+        // fall back handled in startCamera; keep silent here
+      });
+    }
+  }, [step, cameraOn]);
+
   const stopCamera = () => {
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((t) => t.stop());
@@ -63,6 +73,7 @@ export default function SoilTest() {
     }
     setCameraOn(false);
     setCameraReady(false);
+    startedRef.current = false; // reset auto-start guard
     setStep("capture"); // ensure step resets if camera is stopped
     setErrorMsg(null);
   };
@@ -81,7 +92,9 @@ export default function SoilTest() {
         setCameraReady(false);
         return;
       }
-      const constraints: MediaStreamConstraints = {
+
+      // Try back camera first; if it fails, retry with generic video
+      const primaryConstraints: MediaStreamConstraints = {
         video: {
           facingMode: { ideal: "environment" },
           width: { ideal: 1280 },
@@ -89,21 +102,42 @@ export default function SoilTest() {
         },
         audio: false,
       };
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      const fallbackConstraints: MediaStreamConstraints = {
+        video: true,
+        audio: false,
+      };
+
+      let stream: MediaStream | null = null;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia(primaryConstraints);
+      } catch {
+        // Retry with fallback (desktop webcams or devices without env camera)
+        stream = await navigator.mediaDevices.getUserMedia(fallbackConstraints);
+      }
+
       streamRef.current = stream;
 
       if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        // Wait for metadata to ensure correct videoWidth/Height before drawImage
+        const v = videoRef.current;
+        v.srcObject = stream;
+        // Wait metadata for correct dimensions
         await new Promise<void>((resolve) => {
-          const v = videoRef.current!;
           const onLoaded = () => {
             v.removeEventListener("loadedmetadata", onLoaded);
             resolve();
           };
           v.addEventListener("loadedmetadata", onLoaded);
         });
-        await videoRef.current.play().catch(() => {});
+
+        try {
+          await v.play();
+        } catch (playErr: any) {
+          // Autoplay sometimes requires a user gesture
+          setCameraError(
+            "Tap 'Enable Camera' again to start preview (autoplay blocked). Or use 'Upload Photo'."
+          );
+          // We still consider camera on; user can press capture or retry
+        }
       }
 
       setCameraOn(true);
