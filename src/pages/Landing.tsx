@@ -653,9 +653,16 @@ export default function Landing() {
                     </div>
                   </div>
 
+                  {/* NEW: compact feature chips to utilize empty space under the label */}
+                  <div className="mt-2 hidden md:flex flex-wrap items-center gap-2">
+                    <span className="px-2.5 py-1 text-[11px] rounded-full bg-primary/10 text-primary/90">Voice‑first</span>
+                    <span className="px-2.5 py-1 text-[11px] rounded-full bg-accent/10 text-accent/90">20+ languages</span>
+                    <span className="px-2.5 py-1 text-[11px] rounded-full bg-emerald-500/10 text-emerald-400">Smart irrigation</span>
+                  </div>
+
                   {/* Title + tagline with tighter spacing */}
                   <motion.h1
-                    className="mt-3 text-3xl md:text-5xl font-extrabold leading-tight text-gradient-animated"
+                    className="mt-1 text-3xl md:text-5xl font-extrabold leading-tight text-gradient-animated"
                     initial={{ opacity: 0, y: 14 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.4, duration: 0.6 }}
@@ -664,7 +671,7 @@ export default function Landing() {
                   </motion.h1>
 
                   <motion.p
-                    className="mt-2 text-base md:text-lg text-muted-foreground max-w-2xl"
+                    className="mt-1 text-base md:text-lg text-muted-foreground max-w-2xl"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.55 }}
@@ -674,7 +681,7 @@ export default function Landing() {
 
                   {/* CTAs: Open App + Change Language */}
                   <motion.div
-                    className="mt-4 flex flex-wrap items-center gap-3"
+                    className="mt-3 flex flex-wrap items-center gap-3"
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.7 }}
@@ -728,15 +735,16 @@ export default function Landing() {
                 {/* Right: Glassy hero visual (replaces old side image/card) */}
                 <div className="relative">
                   <div className="panel-glass rounded-2xl overflow-hidden shadow-[0_14px_60px_-12px_rgba(0,0,0,0.35)]">
-                    <div className="relative aspect-[4/3] md:aspect-[5/4]">
+                    {/* Tighter aspect to reduce black padding and fill space more */}
+                    <div className="relative aspect-[16/10] md:aspect-[16/9] min-h-[260px] md:min-h-[340px]">
                       <img
                         src="/assets/Fild.jpeg"
                         alt="Modern farming"
-                        className="absolute inset-0 h-full w-full object-cover"
+                        className="absolute inset-0 h-full w-full object-cover object-center"
                         loading="eager"
                       />
-                      {/* Subtle matte gradient to avoid harsh edges, no borders */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-black/10 to-transparent" />
+                      {/* Softer matte gradient, slightly lighter to avoid perceived black space */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-black/10 to-transparent" />
                     </div>
                   </div>
 
