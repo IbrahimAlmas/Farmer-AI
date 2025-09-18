@@ -10,6 +10,18 @@ type Member = {
 
 const members: Array<Member> = [
   {
+    name: "Lokesh",
+    role: "Team Member", 
+    img: "https://harmless-tapir-303.convex.cloud/api/storage/6e63d252-0e0f-4f17-8ed8-aa0aa8f3754e",
+    bio: "Contributes to building practical, farmer‑first features.",
+  },
+  {
+    name: "Venket Sai",
+    role: "Team Member",
+    img: "https://harmless-tapir-303.convex.cloud/api/storage/04a4d9bb-1782-485d-83c7-c00498b8e2a2",
+    bio: "Focuses on user experience and reliability.",
+  },
+  {
     name: "Aarav Verma",
     role: "Agronomy Lead",
     img: "https://images.unsplash.com/photo-1519751138087-5a3c9c3c7683?q=80&w=800&auto=format&fit=crop",

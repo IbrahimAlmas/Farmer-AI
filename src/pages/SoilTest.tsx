@@ -39,6 +39,7 @@ export default function SoilTest() {
   const streamRef = useRef<MediaStream | null>(null);
   const [step, setStep] = useState<"intro" | "capture" | "review" | "results">("intro");
   const startedRef = useRef(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     let didCancel = false;
@@ -243,6 +244,15 @@ export default function SoilTest() {
         {/* Tighter, centered container */}
         <div className="p-4 mx-auto max-w-5xl">
           <div className="p-5 mx-auto max-w-6xl">
+            {/* Add: hidden global file input to trigger programmatically */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={onSelectFile}
+              className="hidden"
+            />
+
             {/* NEW: Intro step with information and single CTA */}
             {step === "intro" && (
               <motion.div
@@ -434,25 +444,14 @@ export default function SoilTest() {
                                   <Play className="h-5 w-5" />
                                   Enable Camera
                                 </Button>
-                                <label>
-                                  <input
-                                    type="file"
-                                    accept="image/*"
-                                    capture="environment"
-                                    onChange={onSelectFile}
-                                    className="hidden"
-                                  />
-                                  <Button
-                                    variant="default"
-                                    className="gap-2 px-6 py-6 text-base sm:text-lg rounded-xl w-full sm:w-auto min-w-[200px] bg-amber-600 hover:bg-amber-500 text-white shadow-md"
-                                    asChild
-                                  >
-                                    <span>
-                                      <Upload className="h-5 w-5" />
-                                      Upload Photo
-                                    </span>
-                                  </Button>
-                                </label>
+<Button
+  variant="default"
+  className="gap-2 px-6 py-6 text-base sm:text-lg rounded-xl w-full sm:w-auto min-w-[200px] bg-amber-600 hover:bg-amber-500 text-white shadow-md"
+  onClick={() => fileInputRef.current?.click()}
+>
+  <Upload className="h-5 w-5" />
+  Upload Photo
+</Button>
                               </div>
 
                               {/* Troubleshooter */}
@@ -576,21 +575,10 @@ export default function SoilTest() {
                             >
                               Retake
                             </Button>
-                            <label>
-                              <input
-                                type="file"
-                                accept="image/*"
-                                capture="environment"
-                                onChange={onSelectFile}
-                                className="hidden"
-                              />
-                              <Button variant="outline" className="gap-2" asChild>
-                                <span>
-                                  <Upload className="h-4 w-4" />
-                                  Add More
-                                </span>
-                              </Button>
-                            </label>
+<Button variant="outline" className="gap-2" onClick={() => fileInputRef.current?.click()}>
+  <Upload className="h-4 w-4" />
+  Add More
+</Button>
                           </div>
                         </>
                       ) : (
@@ -657,21 +645,10 @@ export default function SoilTest() {
                           >
                             Retake
                           </Button>
-                          <label>
-                            <input
-                              type="file"
-                              accept="image/*"
-                              capture="environment"
-                              onChange={onSelectFile}
-                              className="hidden"
-                            />
-                            <Button variant="outline" className="gap-2" asChild>
-                              <span>
-                                <Upload className="h-4 w-4" />
-                                Add More
-                              </span>
-                            </Button>
-                          </label>
+<Button variant="outline" className="gap-2" onClick={() => fileInputRef.current?.click()}>
+  <Upload className="h-4 w-4" />
+  Add More
+</Button>
                         </div>
                       </div>
                     </CardContent>
