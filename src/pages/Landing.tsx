@@ -630,6 +630,12 @@ export default function Landing() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-7 items-center">
                 {/* Left: Logo row + Title + Tagline + CTAs */}
                 <div>
+                  {/* Welcome element for a friendlier app entry */}
+                  <div className="mt-2 inline-flex items-center gap-2 panel-glass rounded-full px-3 py-1.5 text-xs shadow-[0_6px_20px_-8px_rgba(0,0,0,0.35)]">
+                    <Sparkles className="h-3.5 w-3.5 text-accent" />
+                    <span>Welcome to Root AI</span>
+                  </div>
+
                   {/* Top row: logo badge + small label and compact language */}
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
@@ -653,26 +659,7 @@ export default function Landing() {
                     </div>
                   </div>
 
-                  {/* NEW: compact feature chips to utilize empty space under the label */}
-                  {/* Replaced chips with a compact card grid for better space usage */}
-                  <div className="mt-2 grid grid-cols-2 md:grid-cols-4 gap-2">
-                    <div className="panel-glass rounded-xl px-3 py-3 flex items-center gap-2 hover:-translate-y-0.5 transition-all">
-                      <Languages className="h-4 w-4 text-accent shrink-0" />
-                      <span className="text-xs">Speak your language</span>
-                    </div>
-                    <div className="panel-glass rounded-xl px-3 py-3 flex items-center gap-2 hover:-translate-y-0.5 transition-all">
-                      <Sprout className="h-4 w-4 text-primary shrink-0" />
-                      <span className="text-xs">Manage farms</span>
-                    </div>
-                    <div className="panel-glass rounded-xl px-3 py-3 flex items-center gap-2 hover:-translate-y-0.5 transition-all">
-                      <Camera className="h-4 w-4 text-orange-400 shrink-0" />
-                      <span className="text-xs">Soil test camera</span>
-                    </div>
-                    <div className="panel-glass rounded-xl px-3 py-3 flex items-center gap-2 hover:-translate-y-0.5 transition-all">
-                      <Cloud className="h-4 w-4 text-cyan-400 shrink-0" />
-                      <span className="text-xs">Live weather</span>
-                    </div>
-                  </div>
+                  {/* (cards removed per request) */}
 
                   {/* Title + tagline with tighter spacing */}
                   <motion.h1
