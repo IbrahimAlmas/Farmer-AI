@@ -144,13 +144,18 @@ export function AppShell({ children, title }: AppShellProps) {
           <div className="mx-auto w-full max-w-6xl">
             {/* Enhanced glass header with animations */}
             <motion.div 
-              className="mx-3 md:mx-0 rounded-2xl panel-glass bg-card/90 backdrop-blur-xl supports-[backdrop-filter]:bg-card/80 gradient-border ring-2 ring-primary/40 shadow-[0_0_40px_-10px_theme(colors.primary/55)]"
+              className="mx-3 md:mx-0 rounded-[22px] panel-glass bg-card/90 backdrop-blur-xl supports-[backdrop-filter]:bg-card/80 gradient-border ring-2 ring-emerald-400/35 shadow-[0_0_40px_-10px_theme(colors.emerald.400/45)] relative overflow-visible"
               whileHover={{ y: -2 }}
               transition={{ duration: 0.2 }}
             >
-              {/* Ambient glossy glow behind header border */}
+              {/* Subtle moving green beam around header (blunt, rounded edge) */}
               <div
-                className="pointer-events-none absolute -inset-[3px] rounded-3xl blur-xl opacity-90 bg-[linear-gradient(90deg,theme(colors.primary/20),theme(colors.cyan.400/15),theme(colors.primary/20))] animate-gradient-shift"
+                className="pointer-events-none absolute -inset-[2px] rounded-[24px] opacity-45 bg-[conic-gradient(from_0deg,theme(colors.emerald.400)_0%,theme(colors.green.300)_25%,transparent_40%,transparent_60%,theme(colors.green.300)_75%,theme(colors.emerald.400)_100%)] animate-ring-rotate"
+                aria-hidden
+              />
+              {/* Gentle glossy green glow behind border */}
+              <div
+                className="pointer-events-none absolute -inset-[3px] rounded-[26px] blur-xl opacity-80 bg-[linear-gradient(90deg,theme(colors.emerald.400/20),theme(colors.green.300/14),theme(colors.emerald.400/20))] animate-gradient-shift"
                 aria-hidden
               />
               <div className="flex items-center justify-between px-4 py-3 relative">
