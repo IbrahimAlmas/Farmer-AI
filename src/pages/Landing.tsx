@@ -626,97 +626,122 @@ export default function Landing() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
             >
-              {/* Top row: logo badge + small label and compact language */}
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <motion.img
-                    src="https://harmless-tapir-303.convex.cloud/api/storage/a4af3a5d-e126-420d-b31d-c1929a3c833b"
-                    alt="Root AI"
-                    className="h-10 w-10 rounded-xl object-cover ring-1 ring-white/20 shadow-md"
-                    whileHover={{ scale: 1.06, rotate: 2 }}
-                    onError={(e) => {
-                      const t = e.currentTarget as HTMLImageElement;
-                      if (t.src !== '/logo.svg') t.src = '/logo.svg';
-                      t.onerror = null;
-                    }}
-                  />
-                  <span className="text-[10px] md:text-xs uppercase tracking-widest text-muted-foreground">
-                    {ui(activeLang, "Farming Companion")}
-                  </span>
-                </div>
-                <div className="hidden md:block">
-                  <LanguageSelect size="sm" />
-                </div>
-              </div>
-
-              {/* Title + tagline with tighter spacing */}
-              <motion.h1
-                className="mt-3 text-3xl md:text-5xl font-extrabold leading-tight text-gradient-animated"
-                initial={{ opacity: 0, y: 14 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4, duration: 0.6 }}
-              >
-                {ui(activeLang, "AppTitle")}
-              </motion.h1>
-
-              <motion.p
-                className="mt-2 text-base md:text-lg text-muted-foreground max-w-3xl"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.55 }}
-              >
-                {ui(activeLang, "AppTagline")}
-              </motion.p>
-
-              {/* CTA row — redesigned, compact, glassy */}
-              <motion.div
-                className="mt-4 flex flex-wrap items-center gap-3"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.7 }}
-              >
-                <Button
-                  className="btn-neon rounded-xl px-5 py-5 text-base"
-                  onClick={() => navigate("/dashboard")}
-                >
-                  {ui(activeLang, "Open App")}
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-                <Button
-                  variant="secondary"
-                  className="rounded-xl px-5 py-5 text-base"
-                  onClick={() => {
-                    try { localStorage.removeItem("km.lang"); } catch {}
-                    setGuestLang(null);
-                    setSelectedLang("en");
-                    setPostGate(false);
-                    setGateOpen(true);
-                  }}
-                >
-                  <Languages className="mr-2 h-4 w-4" />
-                  {ui(activeLang, "Change Language")}
-                </Button>
-              </motion.div>
-
-              {/* Compact credibility + note row */}
-              <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div className="panel-glass rounded-2xl p-4 shadow-[0_8px_30px_rgba(0,0,0,0.15)]">
-                  <div className="text-sm font-semibold flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    Real Impact, No Hype
+              {/* Compact two-column banner: content + hero visual, no hard borders */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-7 items-center">
+                {/* Left: Logo row + Title + Tagline + CTAs */}
+                <div>
+                  {/* Top row: logo badge + small label and compact language */}
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <motion.img
+                        src="https://harmless-tapir-303.convex.cloud/api/storage/a4af3a5d-e126-420d-b31d-c1929a3c833b"
+                        alt="Root AI"
+                        className="h-10 w-10 rounded-xl object-cover ring-1 ring-white/15 shadow-md"
+                        whileHover={{ scale: 1.06, rotate: 2 }}
+                        onError={(e) => {
+                          const t = e.currentTarget as HTMLImageElement;
+                          if (t.src !== '/logo.svg') t.src = '/logo.svg';
+                          t.onerror = null;
+                        }}
+                      />
+                      <span className="text-[10px] md:text-xs uppercase tracking-widest text-muted-foreground">
+                        {ui(activeLang, "Farming Companion")}
+                      </span>
+                    </div>
+                    <div className="hidden md:block">
+                      <LanguageSelect size="sm" />
+                    </div>
                   </div>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Weather‑based irrigation guidance and simple records to help you decide, without clutter.
-                  </p>
-                </div>
-                <div className="panel-glass rounded-2xl p-4 shadow-[0_8px_30px_rgba(0,0,0,0.15)]">
-                  <div className="text-sm font-semibold mb-1 flex items-center gap-2">
-                    <Shield className="h-4 w-4 text-accent" />
-                    Data sources
+
+                  {/* Title + tagline with tighter spacing */}
+                  <motion.h1
+                    className="mt-3 text-3xl md:text-5xl font-extrabold leading-tight text-gradient-animated"
+                    initial={{ opacity: 0, y: 14 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4, duration: 0.6 }}
+                  >
+                    {ui(activeLang, "AppTitle")}
+                  </motion.h1>
+
+                  <motion.p
+                    className="mt-2 text-base md:text-lg text-muted-foreground max-w-2xl"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.55 }}
+                  >
+                    {ui(activeLang, "AppTagline")}
+                  </motion.p>
+
+                  {/* CTAs: Open App + Change Language */}
+                  <motion.div
+                    className="mt-4 flex flex-wrap items-center gap-3"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.7 }}
+                  >
+                    <Button
+                      className="btn-neon rounded-xl px-5 py-5 text-base"
+                      onClick={() => navigate("/dashboard")}
+                    >
+                      {ui(activeLang, "Open App")}
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      className="rounded-xl px-5 py-5 text-base"
+                      onClick={() => {
+                        try { localStorage.removeItem("km.lang"); } catch {}
+                        setGuestLang(null);
+                        setSelectedLang("en");
+                        setPostGate(false);
+                        setGateOpen(true);
+                      }}
+                    >
+                      <Languages className="mr-2 h-4 w-4" />
+                      {ui(activeLang, "Change Language")}
+                    </Button>
+                  </motion.div>
+
+                  {/* Compact credibility row */}
+                  <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="panel-glass rounded-2xl p-4 shadow-[0_8px_30px_rgba(0,0,0,0.15)]">
+                      <div className="text-sm font-semibold flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-green-500" />
+                        Real Impact, No Hype
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Weather‑based irrigation guidance and simple records—no clutter.
+                      </p>
+                    </div>
+                    <div className="panel-glass rounded-2xl p-4 shadow-[0_8px_30px_rgba(0,0,0,0.15)]">
+                      <div className="text-sm font-semibold mb-1 flex items-center gap-2">
+                        <Shield className="h-4 w-4 text-accent" />
+                        Data sources
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        Open‑Meteo for weather/ET0 + your farm inputs.
+                      </p>
+                    </div>
                   </div>
-                  <p className="text-sm text-muted-foreground">
-                    Open‑Meteo for weather/ET0 + your farm inputs. No fabricated metrics.
-                  </p>
+                </div>
+
+                {/* Right: Glassy hero visual (replaces old side image/card) */}
+                <div className="relative">
+                  <div className="panel-glass rounded-2xl overflow-hidden shadow-[0_14px_60px_-12px_rgba(0,0,0,0.35)]">
+                    <div className="relative aspect-[4/3] md:aspect-[5/4]">
+                      <img
+                        src="/assets/Fild.jpeg"
+                        alt="Modern farming"
+                        className="absolute inset-0 h-full w-full object-cover"
+                        loading="eager"
+                      />
+                      {/* Subtle matte gradient to avoid harsh edges, no borders */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-black/10 to-transparent" />
+                    </div>
+                  </div>
+
+                  {/* Soft glow decoration, no border */}
+                  <div className="pointer-events-none absolute -inset-2 rounded-3xl blur-2xl bg-primary/10 animate-glow-pulse" />
                 </div>
               </div>
             </motion.div>
