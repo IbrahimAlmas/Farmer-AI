@@ -621,7 +621,7 @@ export default function Landing() {
           <div className="mt-4 grid md:grid-cols-[1.25fr_1fr] gap-4 items-stretch">
             {/* Left: Title + CTAs */}
             <motion.div 
-              className="rounded-3xl gradient-border p-6 md:p-8 bg-white/10 backdrop-blur-xl border border-transparent ring-1 ring-white/20 shadow-[0_12px_60px_-10px_rgba(0,0,0,0.25)] transition-all duration-300 will-change-transform hover:-translate-y-2 hover:shadow-[0_24px_80px_-20px_rgba(0,0,0,0.35)] hover:scale-[1.02] glow-sweep"
+              className="panel-glass rounded-3xl p-5 md:p-6 shadow-[0_12px_60px_-10px_rgba(0,0,0,0.25)] transition-all duration-300 will-change-transform hover:-translate-y-1.5 hover:shadow-[0_20px_70px_-18px_rgba(0,0,0,0.35)]"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
@@ -649,7 +649,7 @@ export default function Landing() {
               </motion.div>
 
               <motion.h1 
-                className="mt-5 text-4xl md:text-6xl font-extrabold leading-[1.1] text-gradient-animated"
+                className="mt-3 text-4xl md:text-6xl font-extrabold leading-[1.1] text-gradient-animated"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.8, duration: 0.8 }}
@@ -658,7 +658,7 @@ export default function Landing() {
               </motion.h1>
               
               <motion.p 
-                className="mt-3 text-base md:text-lg text-muted-foreground max-w-2xl"
+                className="mt-2 text-base md:text-lg text-muted-foreground max-w-2xl"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 1 }}
@@ -667,7 +667,7 @@ export default function Landing() {
               </motion.p>
 
               <motion.div 
-                className="mt-6 flex flex-wrap items-center gap-3"
+                className="mt-4 flex flex-wrap items-center gap-3"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 1.2 }}
@@ -697,12 +697,12 @@ export default function Landing() {
 
               {/* Enhanced Proven impact callout */}
               <motion.div 
-                className="mt-6"
+                className="mt-4"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 1.4 }}
               >
-                <div className="rounded-2xl p-4 bg-white/10 backdrop-blur-xl border border-transparent ring-1 ring-white/15 shadow-[0_8px_30px_rgba(0,0,0,0.15)] hover:translate-y-[-4px] transition-transform">
+                <div className="panel-glass rounded-2xl p-4 shadow-[0_8px_30px_rgba(0,0,0,0.15)] hover:translate-y-[-3px] transition-transform">
                   <div className="text-sm font-semibold flex items-center gap-2">
                     <CheckCircle className="h-4 w-4 text-green-500" />
                     Real Impact, No Hype
@@ -715,12 +715,12 @@ export default function Landing() {
 
               {/* Enhanced stat strip */}
               <motion.div 
-                className="mt-6 grid grid-cols-1 gap-3"
+                className="mt-4 grid grid-cols-1 gap-3"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 1.6 }}
               >
-                <div className="rounded-2xl p-4 bg-white/10 backdrop-blur-xl border border-transparent ring-1 ring-white/15 shadow-[0_8px_30px_rgba(0,0,0,0.15)] hover:translate-y-[-4px] transition-transform">
+                <div className="panel-glass rounded-2xl p-4 shadow-[0_8px_30px_rgba(0,0,0,0.15)] hover:translate-y-[-3px] transition-transform">
                   <div className="text-sm font-semibold mb-2 flex items-center gap-2">
                     <TrendingUp className="h-4 w-4 text-primary" />
                     What you can expect
@@ -731,7 +731,7 @@ export default function Landing() {
                     <li>Localized experience in your language for key navigation and actions.</li>
                   </ul>
                 </div>
-                <div className="rounded-2xl p-4 bg-white/10 backdrop-blur-xl border border-transparent ring-1 ring-white/15 shadow-[0_8px_30px_rgba(0,0,0,0.15)] hover:translate-y-[-4px] transition-transform">
+                <div className="panel-glass rounded-2xl p-4 shadow-[0_8px_30px_rgba(0,0,0,0.15)] hover:translate-y-[-3px] transition-transform">
                   <div className="text-sm font-semibold mb-2 flex items-center gap-2">
                     <Shield className="h-4 w-4 text-accent" />
                     Data sources
@@ -743,7 +743,7 @@ export default function Landing() {
               </motion.div>
 
               <motion.div 
-                className="mt-6 inline-flex items-center gap-2 rounded-xl border border-transparent bg-white/10 backdrop-blur-md ring-1 ring-white/15 px-3 py-2 text-sm"
+                className="mt-4 inline-flex items-center gap-2 rounded-xl panel-glass px-3 py-2 text-sm"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 1.8 }}
@@ -755,16 +755,16 @@ export default function Landing() {
 
             {/* Right: Enhanced Visual card */}
             <motion.div 
-              className="rounded-3xl gradient-border p-0 overflow-hidden bg-white/5 backdrop-blur-xl border border-transparent ring-1 ring-white/15 shadow-[0_12px_60px_-10px_rgba(0,0,0,0.25)] transition-all duration-300 will-change-transform hover:-translate-y-2 hover:shadow-[0_28px_120px_-28px_rgba(0,0,0,0.5)] hover:scale-[1.02]"
+              className="panel-glass rounded-3xl p-0 overflow-hidden shadow-[0_12px_60px_-10px_rgba(0,0,0,0.25)] transition-all duration-300 will-change-transform hover:-translate-y-1.5 hover:shadow-[0_24px_100px_-26px_rgba(0,0,0,0.45)]"
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
             >
-              <div className="h-full min-h-[260px] relative">
+              <div className="h-full min-h-[220px] relative">
                 <motion.img
                   src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=1600&auto=format&fit=crop"
                   alt="Official meeting photo"
-                  className="absolute inset-0 h-full w-full object-cover"
+                  className="absolute inset-0 h-full w-full object-cover object-center md:object-[center_30%]"
                   loading="lazy"
                   whileHover={{ scale: 1.05 }}
                   transition={{ duration: 0.3 }}
@@ -774,14 +774,14 @@ export default function Landing() {
                     t.onerror = null;
                   }}
                 />
-                <div className="absolute inset-0 bg-[linear-gradient(0deg,rgba(0,0,0,0.35),transparent_40%)]" />
+                <div className="absolute inset-0 bg-[linear-gradient(0deg,rgba(0,0,0,0.28),transparent_35%)]" />
                 <motion.div 
                   className="absolute bottom-0 left-0 right-0 p-4"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 1 }}
                 >
-                  <div className="inline-flex items-center gap-2 rounded-lg border border-transparent bg-white/10 backdrop-blur-md ring-1 ring-white/15 px-3 py-2 text-xs animate-glow-pulse">
+                  <div className="inline-flex items-center gap-2 rounded-lg panel-glass px-3 py-2 text-xs animate-glow-pulse">
                     <Cpu className="h-3 w-3" />
                     <span className="font-semibold">{ui(activeLang, "Live Tools")}</span>
                   </div>
@@ -838,7 +838,7 @@ export default function Landing() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Voice */}
-          <div className="rounded-3xl gradient-border border border-transparent ring-1 ring-white/15 bg-white/10 backdrop-blur-xl p-0 overflow-hidden hover:-translate-y-1 hover:scale-[1.01] hover:shadow-[0_24px_80px_-24px_rgba(0,0,0,0.45)] transition-all">
+          <div className="panel-glass rounded-3xl p-0 overflow-hidden hover:-translate-y-1 hover:scale-[1.01] hover:shadow-[0_24px_80px_-24px_rgba(0,0,0,0.45)] transition-all">
             <div className="h-40 relative">
               <div className="absolute inset-0 bg-gradient-to-br from-primary/15 via-background to-accent/15" />
               <div className="absolute inset-0 grid place-items-center">
@@ -872,7 +872,7 @@ export default function Landing() {
           </div>
 
           {/* Soil Test */}
-          <div className="rounded-3xl gradient-border border border-transparent ring-1 ring-white/15 bg-white/10 backdrop-blur-xl p-0 overflow-hidden hover:-translate-y-1 hover:scale-[1.01] hover:shadow-[0_24px_80px_-24px_rgba(0,0,0,0.45)] transition-all">
+          <div className="panel-glass rounded-3xl p-0 overflow-hidden hover:-translate-y-1 hover:scale-[1.01] hover:shadow-[0_24px_80px_-24px_rgba(0,0,0,0.45)] transition-all">
             <div className="h-40 relative">
               <img
                 src="/assets/Soil.webp"
@@ -909,7 +909,7 @@ export default function Landing() {
           </div>
 
           {/* My Farm */}
-          <div className="rounded-3xl gradient-border border border-transparent ring-1 ring-white/15 bg-white/10 backdrop-blur-xl p-0 overflow-hidden hover:-translate-y-1 hover:scale-[1.01] hover:shadow-[0_24px_80px_-24px_rgba(0,0,0,0.45)] transition-all">
+          <div className="panel-glass rounded-3xl p-0 overflow-hidden hover:-translate-y-1 hover:scale-[1.01] hover:shadow-[0_24px_80px_-24px_rgba(0,0,0,0.45)] transition-all">
             <div className="h-40 relative">
               <img
                 src="/assets/Fild.jpeg"
@@ -948,21 +948,21 @@ export default function Landing() {
 
         {/* Why Root AI */}
         <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="rounded-2xl gradient-border border border-transparent ring-1 ring-white/15 bg-white/10 backdrop-blur-xl p-5 shadow-[0_8px_30px_rgba(0,0,0,0.15)] hover:-translate-y-1 hover:shadow-[0_20px_80px_-24px_rgba(0,0,0,0.45)] transition-all">
+          <div className="panel-glass rounded-2xl p-5 shadow-[0_8px_30px_rgba(0,0,0,0.15)] hover:-translate-y-1 hover:shadow-[0_20px_80px_-24px_rgba(0,0,0,0.45)] transition-all">
             <div className="text-xs uppercase tracking-widest text-muted-foreground">Irrigation</div>
             <div className="mt-2 font-bold text-lg">Real Weather Advisor</div>
             <p className="text-sm text-muted-foreground mt-1">
               Uses ET0 and rain to guide watering for your chosen crop.
             </p>
           </div>
-          <div className="rounded-2xl gradient-border border border-transparent ring-1 ring-white/15 bg-white/10 backdrop-blur-xl p-5 shadow-[0_8px_30px_rgba(0,0,0,0.15)] hover:-translate-y-1 hover:shadow-[0_20px_80px_-24px_rgba(0,0,0,0.45)] transition-all">
+          <div className="panel-glass rounded-2xl p-5 shadow-[0_8px_30px_rgba(0,0,0,0.15)] hover:-translate-y-1 hover:shadow-[0_20px_80px_-24px_rgba(0,0,0,0.45)] transition-all">
             <div className="text-xs uppercase tracking-widest text-muted-foreground">Multilingual</div>
             <div className="mt-2 font-bold text-lg">20+ Languages</div>
             <p className="text-sm text-muted-foreground mt-1">
               A native experience with dynamic language switching.
             </p>
           </div>
-          <div className="rounded-2xl gradient-border border border-transparent ring-1 ring-white/15 bg-white/10 backdrop-blur-xl p-5 shadow-[0_8px_30px_rgba(0,0,0,0.15)] hover:-translate-y-1 hover:shadow-[0_20px_80px_-24px_rgba(0,0,0,0.45)] transition-all">
+          <div className="panel-glass rounded-2xl p-5 shadow-[0_8px_30px_rgba(0,0,0,0.15)] hover:-translate-y-1 hover:shadow-[0_20px_80px_-24px_rgba(0,0,0,0.45)] transition-all">
             <div className="text-xs uppercase tracking-widest text-muted-foreground">Privacy</div>
             <div className="mt-2 font-bold text-lg">Your Data, Yours</div>
             <p className="text-sm text-muted-foreground mt-1">
