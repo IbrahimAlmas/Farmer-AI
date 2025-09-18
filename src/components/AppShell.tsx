@@ -144,7 +144,7 @@ export function AppShell({ children, title }: AppShellProps) {
           <div className="mx-auto w-full max-w-6xl">
             {/* Enhanced glass header with animations */}
             <motion.div 
-              className="mx-3 md:mx-0 rounded-[22px] panel-glass bg-card/90 backdrop-blur-xl supports-[backdrop-filter]:bg-card/80 gradient-border animate-gradient-shift ring-2 ring-emerald-400/35 shadow-[0_0_40px_-10px_theme(colors.emerald.400/45)] relative overflow-visible"
+              className="mx-3 md:mx-0 rounded-[22px] panel-glass bg-white/10 backdrop-blur-xl supports-[backdrop-filter]:bg-white/10 gradient-border animate-gradient-shift ring-2 ring-emerald-400/35 shadow-[0_0_40px_-10px_theme(colors.emerald.400/45)] relative overflow-visible border-beam"
               whileHover={{ y: -2 }}
               transition={{ duration: 0.2 }}
             >

@@ -304,4 +304,84 @@
   .glow-sweep:hover::after {
     left: 100%;
   }
+
+  @keyframes beam-travel {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .border-beam {
+    position: relative;
+    isolation: isolate;
+    border-radius: inherit;
+  }
+
+  /* Primary beam */
+  .border-beam::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 3;
+    background:
+      conic-gradient(
+        from 0deg,
+        transparent 0deg 320deg,
+        color-mix(in oklab, var(--color-primary) 68%, transparent 32%) 340deg,
+        transparent 360deg
+      );
+    filter: drop-shadow(0 0 10px color-mix(in oklab, var(--color-primary) 50%, transparent 50%))
+            drop-shadow(0 0 18px color-mix(in oklab, var(--color-primary) 30%, transparent 70%));
+    mask:
+      radial-gradient(12px 12px at left 12px top 12px, #000 98%, transparent) top left,
+      radial-gradient(12px 12px at right 12px top 12px, #000 98%, transparent) top right,
+      radial-gradient(12px 12px at left 12px bottom 12px, #000 98%, transparent) bottom left,
+      radial-gradient(12px 12px at right 12px bottom 12px, #000 98%, transparent) bottom right;
+    -webkit-mask:
+      radial-gradient(12px 12px at left 12px top 12px, #000 98%, transparent) top left,
+      radial-gradient(12px 12px at right 12px top 12px, #000 98%, transparent) top right,
+      radial-gradient(12px 12px at left 12px bottom 12px, #000 98%, transparent) bottom left,
+      radial-gradient(12px 12px at right 12px bottom 12px, #000 98%, transparent) bottom right;
+    mask-size: 51% 51%;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: 51% 51%;
+    -webkit-mask-repeat: no-repeat;
+    animation: beam-travel 30s linear infinite;
+    opacity: 0.9;
+  }
+
+  /* Secondary faint beam for richness */
+  .border-beam::after {
+    content: "";
+    position: absolute;
+    inset: -3px;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 2;
+    background:
+      conic-gradient(
+        from 180deg,
+        transparent 0deg 330deg,
+        color-mix(in oklab, var(--color-primary) 45%, transparent 55%) 350deg,
+        transparent 360deg
+      );
+    filter: drop-shadow(0 0 6px color-mix(in oklab, var(--color-primary) 35%, transparent 65%));
+    mask:
+      radial-gradient(14px 14px at left 14px top 14px, #000 98%, transparent) top left,
+      radial-gradient(14px 14px at right 14px top 14px, #000 98%, transparent) top right,
+      radial-gradient(14px 14px at left 14px bottom 14px, #000 98%, transparent) bottom left,
+      radial-gradient(14px 14px at right 14px bottom 14px, #000 98%, transparent) bottom right;
+    -webkit-mask:
+      radial-gradient(14px 14px at left 14px top 14px, #000 98%, transparent) top left,
+      radial-gradient(14px 14px at right 14px top 14px, #000 98%, transparent) top right,
+      radial-gradient(14px 14px at left 14px bottom 14px, #000 98%, transparent) bottom left,
+      radial-gradient(14px 14px at right 14px bottom 14px, #000 98%, transparent) bottom right;
+    mask-size: 51% 51%;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: 51% 51%;
+    -webkit-mask-repeat: no-repeat;
+    animation: beam-travel 36s linear infinite reverse;
+    opacity: 0.6;
+  }
 }
