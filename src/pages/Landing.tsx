@@ -540,20 +540,7 @@ export default function Landing() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Animated Announcement Ribbon */}
-      <motion.div 
-        initial={{ y: -50, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        className="bg-gradient-to-r from-primary to-accent text-primary-foreground py-2 overflow-hidden"
-      >
-        <div className="animate-marquee whitespace-nowrap">
-          <span className="mx-8">🌱 Welcome to the future of farming</span>
-          <span className="mx-8">🚀 AI-powered agriculture at your fingertips</span>
-          <span className="mx-8">🌍 Supporting 20+ languages</span>
-          <span className="mx-8">💧 Smart irrigation recommendations</span>
-          <span className="mx-8">📱 Voice-first mobile experience</span>
-        </div>
-      </motion.div>
+      {/* Announcement ribbon removed per feedback for cleaner look and better space usage */}
 
       {/* Hero Section with Spotlight Effect */}
       <section className="relative overflow-hidden border-b">
@@ -620,7 +607,7 @@ export default function Landing() {
           />
         </motion.div>
 
-        <div className="relative z-20 mx-auto w-full max-w-6xl px-4 pt-16 pb-16">
+        <div className="relative z-20 mx-auto w-full max-w-6xl px-4 pt-8 pb-8">
           {/* Top-right language selector for landing */}
           <motion.div 
             className="flex justify-end"
@@ -631,7 +618,7 @@ export default function Landing() {
             <LanguageSelect size="sm" />
           </motion.div>
 
-          <div className="mt-6 grid md:grid-cols-[1.25fr_1fr] gap-6 items-stretch">
+          <div className="mt-4 grid md:grid-cols-[1.25fr_1fr] gap-4 items-stretch">
             {/* Left: Title + CTAs */}
             <motion.div 
               className="rounded-3xl gradient-border p-6 md:p-8 bg-white/10 backdrop-blur-xl border border-transparent ring-1 ring-white/20 shadow-[0_12px_60px_-10px_rgba(0,0,0,0.25)] transition-all duration-300 will-change-transform hover:-translate-y-2 hover:shadow-[0_24px_80px_-20px_rgba(0,0,0,0.35)] hover:scale-[1.02] glow-sweep"
@@ -839,7 +826,7 @@ export default function Landing() {
       )}
 
       {/* Core Tools Hub */}
-      <section className="mx-auto w-full max-w-6xl px-4 py-12">
+      <section className="mx-auto w-full max-w-6xl px-4 py-8">
         <div className="mb-8 flex items-center justify-between">
           <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight">
             Core Tools Hub
@@ -986,7 +973,7 @@ export default function Landing() {
       </section>
 
       {/* Enhanced CTA */}
-      <section className="mx-auto w-full max-w-6xl px-4 pb-24">
+      <section className="mx-auto w-full max-w-6xl px-4 pb-16">
         <motion.div 
           className="rounded-3xl gradient-border p-8 text-center bg-white/10 backdrop-blur-xl border border-transparent ring-1 ring-white/20 shadow-[0_12px_60px_-10px_rgba(0,0,0,0.25)] hover:-translate-y-1 hover:shadow-[0_28px_120px_-28px_rgba(0,0,0,0.5)] transition-all"
           initial={{ opacity: 0, y: 30 }}
