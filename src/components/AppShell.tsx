@@ -144,11 +144,13 @@ export function AppShell({ children, title }: AppShellProps) {
           <div className="mx-auto w-full max-w-6xl">
             {/* Enhanced glass header with animations */}
             <motion.div 
-              className="mx-3 md:mx-0 rounded-2xl border bg-card/80 backdrop-blur-xl supports-[backdrop-filter]:bg-card/70 shadow-[0_12px_40px_-12px_rgba(0,0,0,0.35)] ring-1 ring-black/5 glow-sweep"
+              className="mx-3 md:mx-0 rounded-2xl panel-glass bg-card/90 backdrop-blur-xl supports-[backdrop-filter]:bg-card/80 shadow-[0_16px_48px_-12px_rgba(0,0,0,0.45)] ring-1 ring-primary/20"
               whileHover={{ y: -2 }}
               transition={{ duration: 0.2 }}
             >
-              <div className="flex items-center justify-between px-4 py-3">
+              {/* Ambient glow behind header */}
+              <div className="pointer-events-none absolute -inset-2 rounded-3xl bg-primary/10 blur-xl" aria-hidden />
+              <div className="flex items-center justify-between px-4 py-3 relative">
                 <LogoDropdown />
                 {/* Replace title with contextual nav for Learn More section pages */}
                 {[ "/learn-more", "/our-team", "/our-mission", "/future-plan" ].includes(location.pathname) ? (
@@ -258,8 +260,8 @@ export function AppShell({ children, title }: AppShellProps) {
                   )}
                 </div>
               </div>
-              {/* Enhanced gradient bar with scroll progress */}
-              <div className="relative h-[2px] w-full">
+              {/* Enhanced gradient bar with scroll progress (make slightly thicker) */}
+              <div className="relative h-[3px] w-full">
                 <div className="absolute inset-0 bg-muted/60" />
                 <motion.div
                   className="h-full bg-[linear-gradient(90deg,theme(colors.primary/60),theme(colors.cyan.400/60),theme(colors.primary/60))] animate-gradient-shift"

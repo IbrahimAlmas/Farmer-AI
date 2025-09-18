@@ -609,7 +609,7 @@ export default function Landing() {
 
         <div className="relative z-20 mx-auto w-full max-w-6xl px-4 pt-8 pb-8">
           {/* Local header inside hero */}
-          <div className="panel-glass rounded-2xl px-3 py-2 flex items-center justify-between shadow-[0_10px_30px_-12px_rgba(0,0,0,0.4)]">
+          <div className="panel-glass rounded-2xl px-3 py-2 flex items-center justify-center gap-3 shadow-[0_10px_30px_-12px_rgba(0,0,0,0.4)] ring-1 ring-primary/20">
             <div className="flex items-center gap-2">
               <img
                 src="/logo.svg"
@@ -623,15 +623,13 @@ export default function Landing() {
               />
               <span className="text-sm font-semibold">Welcome to Root AI</span>
             </div>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="secondary"
-                className="rounded-xl"
-                onClick={() => navigate("/reviews")}
-              >
-                Reviews
-              </Button>
-            </div>
+            <Button
+              variant="secondary"
+              className="rounded-xl"
+              onClick={() => navigate("/reviews")}
+            >
+              Reviews
+            </Button>
           </div>
 
           {/* Top-right language selector for landing */}
