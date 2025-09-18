@@ -45,18 +45,6 @@ const members: Array<Member> = [
     img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=800&auto=format&fit=crop",
     bio: "Delivers fast, reliable app flows — offline friendly and secure.",
   },
-  {
-    name: "Abdul Rahman",
-    role: "Data & Platforms",
-    img: "https://images.unsplash.com/photo-1556157382-97eda2d62296?q=80&w=800&auto=format&fit=crop",
-    bio: "Pipelines, market data, and integrations tuned for rural networks.",
-  },
-  {
-    name: "Kavya Rao",
-    role: "Community & Ops",
-    img: "https://images.unsplash.com/photo-1554151228-14d9def656e4?q=80&w=800&auto=format&fit=crop",
-    bio: "Farmer onboarding, feedback loops, and language coverage expansion.",
-  },
 ];
 
 export default function OurTeam() {
