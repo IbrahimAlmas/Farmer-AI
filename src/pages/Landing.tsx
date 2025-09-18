@@ -608,9 +608,35 @@ export default function Landing() {
         </motion.div>
 
         <div className="relative z-20 mx-auto w-full max-w-6xl px-4 pt-8 pb-8">
+          {/* Local header inside hero */}
+          <div className="panel-glass rounded-2xl px-3 py-2 flex items-center justify-between shadow-[0_10px_30px_-12px_rgba(0,0,0,0.4)]">
+            <div className="flex items-center gap-2">
+              <img
+                src="/logo.svg"
+                alt="Root AI"
+                className="h-8 w-8 rounded-md object-cover ring-1 ring-white/15"
+                onError={(e) => {
+                  const t = e.currentTarget as HTMLImageElement;
+                  if (t.src !== '/logo.png') t.src = '/logo.png';
+                  t.onerror = null;
+                }}
+              />
+              <span className="text-sm font-semibold">Welcome to Root AI</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="secondary"
+                className="rounded-xl"
+                onClick={() => navigate("/reviews")}
+              >
+                Reviews
+              </Button>
+            </div>
+          </div>
+
           {/* Top-right language selector for landing */}
           <motion.div 
-            className="flex justify-end"
+            className="flex justify-end mt-3"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.5 }}
@@ -1041,7 +1067,7 @@ export default function Landing() {
               ]
             },
             {
-              title: "Company", 
+              title: "Company",
               links: [
                 { label: "Our Mission", href: "/our-mission" },
                 { label: "Our Team", href: "/our-team" },

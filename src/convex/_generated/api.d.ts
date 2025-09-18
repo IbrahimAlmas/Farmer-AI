@@ -26,6 +26,7 @@ import type * as market_prices from "../market_prices.js";
 import type * as meshy from "../meshy.js";
 import type * as profiles from "../profiles.js";
 import type * as resources from "../resources.js";
+import type * as reviews from "../reviews.js";
 import type * as seed from "../seed.js";
 import type * as sims from "../sims.js";
 import type * as soil from "../soil.js";
@@ -56,6 +57,7 @@ declare const fullApi: ApiFromModules<{
   meshy: typeof meshy;
   profiles: typeof profiles;
   resources: typeof resources;
+  reviews: typeof reviews;
   seed: typeof seed;
   sims: typeof sims;
   soil: typeof soil;

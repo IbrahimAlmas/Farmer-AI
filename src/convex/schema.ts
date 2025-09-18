@@ -230,6 +230,13 @@ const schema = defineSchema(
     })
       .index("by_communityId", ["communityId"])
       .index("by_userId", ["userId"]),
+
+    // Simple public reviews left by farmers
+    reviews: defineTable({
+      name: v.string(),
+      rating: v.number(), // 1..5
+      comment: v.string(),
+    }),
   },
   {
     schemaValidation: false,
