@@ -676,7 +676,7 @@ export default function Landing() {
 
                   {/* Title + tagline with tighter spacing */}
                   <motion.h1
-                    className="mt-2 text-3xl md:text-5xl font-extrabold leading-tight text-gradient-animated"
+                    className="mt-2 text-3xl md:text-5xl font-extrabold leading-tight text-green-400"
                     initial={{ opacity: 0, y: 14 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.4, duration: 0.6 }}
