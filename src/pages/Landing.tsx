@@ -609,7 +609,12 @@ export default function Landing() {
 
         <div className="relative z-20 mx-auto w-full max-w-6xl px-4 pt-8 pb-8">
           {/* Local header inside hero */}
-          <div className="panel-glass rounded-2xl px-3 py-2 flex items-center justify-center gap-3 shadow-[0_10px_30px_-12px_rgba(0,0,0,0.4)] ring-1 ring-primary/20">
+          <div className="relative panel-glass rounded-2xl px-3 py-2 flex items-center justify-center gap-3 gradient-border ring-2 ring-primary/40 shadow-[0_0_36px_-10px_theme(colors.primary/55)]">
+            {/* Glossy animated border glow */}
+            <div
+              className="pointer-events-none absolute -inset-[2px] rounded-[16px] blur-lg opacity-90 bg-[linear-gradient(90deg,theme(colors.primary/22),theme(colors.cyan.400/18),theme(colors.primary/22))] animate-gradient-shift"
+              aria-hidden
+            />
             <div className="flex items-center gap-2">
               <img
                 src="/logo.svg"
