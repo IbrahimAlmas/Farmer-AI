@@ -654,25 +654,23 @@ export default function Landing() {
                   </div>
 
                   {/* NEW: compact feature chips to utilize empty space under the label */}
-                  <div className="mt-2 flex flex-wrap items-center gap-2">
-                    <span className="px-2.5 py-1 text-[11px] rounded-full bg-primary/10 text-primary/90">Voice‑first</span>
-                    <span className="px-2.5 py-1 text-[11px] rounded-full bg-accent/10 text-accent/90">20+ languages</span>
-                    <span className="px-2.5 py-1 text-[11px] rounded-full bg-emerald-500/10 text-emerald-400">Smart irrigation</span>
-                  </div>
-
-                  {/* NEW: Info tiles strip to use the red-marked space */}
-                  <div className="mt-3 grid grid-cols-3 gap-2">
-                    <div className="panel-glass rounded-xl px-3 py-2 flex items-center gap-2">
-                      <Mic className="h-4 w-4 text-primary" />
-                      <span className="text-xs">Hands‑free</span>
+                  {/* Replaced chips with a compact card grid for better space usage */}
+                  <div className="mt-2 grid grid-cols-2 md:grid-cols-4 gap-2">
+                    <div className="panel-glass rounded-xl px-3 py-3 flex items-center gap-2 hover:-translate-y-0.5 transition-all">
+                      <Languages className="h-4 w-4 text-accent shrink-0" />
+                      <span className="text-xs">Speak your language</span>
                     </div>
-                    <div className="panel-glass rounded-xl px-3 py-2 flex items-center gap-2">
-                      <Languages className="h-4 w-4 text-accent" />
-                      <span className="text-xs">20+ langs</span>
+                    <div className="panel-glass rounded-xl px-3 py-3 flex items-center gap-2 hover:-translate-y-0.5 transition-all">
+                      <Sprout className="h-4 w-4 text-primary shrink-0" />
+                      <span className="text-xs">Manage farms</span>
                     </div>
-                    <div className="panel-glass rounded-xl px-3 py-2 flex items-center gap-2">
-                      <Droplets className="h-4 w-4 text-cyan-400" />
-                      <span className="text-xs">Irrigation</span>
+                    <div className="panel-glass rounded-xl px-3 py-3 flex items-center gap-2 hover:-translate-y-0.5 transition-all">
+                      <Camera className="h-4 w-4 text-orange-400 shrink-0" />
+                      <span className="text-xs">Soil test camera</span>
+                    </div>
+                    <div className="panel-glass rounded-xl px-3 py-3 flex items-center gap-2 hover:-translate-y-0.5 transition-all">
+                      <Cloud className="h-4 w-4 text-cyan-400 shrink-0" />
+                      <span className="text-xs">Live weather</span>
                     </div>
                   </div>
 
