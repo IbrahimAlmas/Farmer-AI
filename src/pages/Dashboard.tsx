@@ -16,8 +16,6 @@ import {
   CartesianGrid,
   BarChart,
   Bar,
-  AreaChart,
-  Area,
   PieChart,
   Pie,
   Cell,
@@ -255,40 +253,12 @@ export default function Dashboard() {
           </div>
         </motion.div>
 
-        {/* Add: Simple analytics (row 1: existing charts) */}
+        {/* Add: Simple analytics (row 1: keep only Estimated Yield by Crop) */}
         <motion.div
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
-          className="grid grid-cols-1 md:grid-cols-2 gap-4"
+          className="grid grid-cols-1 gap-4"
         >
-          {/* Soil Moisture Trend */}
-          <div className="panel-glass rounded-2xl p-4">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-semibold">Soil Moisture (7 days)</h3>
-              <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Realtime</span>
-            </div>
-            <ChartContainer
-              className="h-72"
-              config={{
-                moisture: { label: "Soil Moisture", color: "oklch(0.72 0.15 145)" },
-              }}
-            >
-              <LineChart data={moistureData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border)/0.35)" />
-                <XAxis dataKey="day" tickLine={false} axisLine={false} />
-                <YAxis unit="%" tickLine={false} axisLine={false} />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Line
-                  type="monotone"
-                  dataKey="moisture"
-                  stroke="var(--color-moisture)"
-                  strokeWidth={2}
-                  dot={false}
-                />
-              </LineChart>
-            </ChartContainer>
-          </div>
-
           {/* Estimated Yield by Crop */}
           <div className="panel-glass rounded-2xl p-4">
             <div className="flex items-center justify-between mb-2">
@@ -334,25 +304,20 @@ export default function Dashboard() {
                 temp: { label: "Temperature (°C)", color: "oklch(0.72 0.10 50)" },
               }}
             >
-              <AreaChart data={tempData}>
-                <defs>
-                  <linearGradient id="tempFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="var(--color-temp)" stopOpacity={0.35} />
-                    <stop offset="95%" stopColor="var(--color-temp)" stopOpacity={0.02} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border)/0.35)" />
+              <LineChart data={tempData}>
+                <CartesianGrid strokeDasharray="2 4" stroke="hsl(var(--border)/0.3)" />
                 <XAxis dataKey="day" tickLine={false} axisLine={false} />
                 <YAxis unit="°C" tickLine={false} axisLine={false} />
                 <ChartTooltip content={<ChartTooltipContent />} />
-                <Area
+                <Line
                   type="monotone"
                   dataKey="temp"
                   stroke="var(--color-temp)"
-                  fill="url(#tempFill)"
-                  strokeWidth={2}
+                  strokeWidth={3}
+                  dot={{ r: 3, strokeWidth: 0 }}
+                  activeDot={{ r: 5 }}
                 />
-              </AreaChart>
+              </LineChart>
             </ChartContainer>
           </div>
 
@@ -368,12 +333,18 @@ export default function Dashboard() {
                 rain: { label: "Rain (mm)", color: "oklch(0.70 0.14 145)" },
               }}
             >
-              <BarChart data={rainData} barCategoryGap={18}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border)/0.35)" />
+              <BarChart data={rainData} barCategoryGap={28}>
+                <defs>
+                  <linearGradient id="rainGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="var(--color-rain)" stopOpacity="0.95" />
+                    <stop offset="100%" stopColor="var(--color-rain)" stopOpacity="0.2" />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="1 6" stroke="hsl(var(--border)/0.25)" />
                 <XAxis dataKey="day" tickLine={false} axisLine={false} />
                 <YAxis unit=" mm" tickLine={false} axisLine={false} />
                 <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="rain" fill="var(--color-rain)" radius={[8, 8, 0, 0]} />
+                <Bar dataKey="rain" fill="url(#rainGrad)" radius={[10, 10, 10, 10]} />
               </BarChart>
             </ChartContainer>
           </div>
