@@ -18,10 +18,34 @@ import {
   Bar,
   AreaChart,
   Area,
+  PieChart,
+  Pie,
+  Cell,
+  RadarChart as RChart,
+  Radar,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
 } from "recharts";
+import { toast } from "sonner";
+import { useState } from "react";
 
 export default function Dashboard() {
   const navigate = useNavigate();
+
+  // Add: urgent tasks local state
+  const [urgentTasks, setUrgentTasks] = useState<Array<{ id: number; title: string; due: string; done: boolean }>>([
+    { id: 1, title: "Irrigate wheat plot (Block A)", due: "Today", done: false },
+    { id: 2, title: "Scout pest in maize strip", due: "Today", done: false },
+    { id: 3, title: "Update market prices", due: "Tomorrow", done: false },
+  ]);
+  const toggleTask = (id: number) => {
+    setUrgentTasks((prev) =>
+      prev.map((t) => (t.id === id ? { ...t, done: !t.done } : t)),
+    );
+    const t = urgentTasks.find((x) => x.id === id);
+    if (t) toast.success(`${t.done ? "Reopened" : "Completed"}: ${t.title}`);
+  };
 
   // Add: demo chart data
   const moistureData = [
@@ -60,6 +84,22 @@ export default function Dashboard() {
     { day: "Fri", rain: 0 },
     { day: "Sat", rain: 7 },
     { day: "Sun", rain: 3 },
+  ];
+
+  // Add: extra datasets for distinct chart styles
+  const cropShare = [
+    { name: "Wheat", value: 38, color: "oklch(0.72 0.15 145)" },
+    { name: "Rice", value: 28, color: "oklch(0.70 0.14 90)" },
+    { name: "Maize", value: 22, color: "oklch(0.72 0.10 50)" },
+    { name: "Pulses", value: 12, color: "oklch(0.65 0.10 30)" },
+  ];
+
+  const healthRadar = [
+    { metric: "Moisture", score: 78 },
+    { metric: "Nutrients", score: 65 },
+    { metric: "Pests", score: 55 },
+    { metric: "Growth", score: 72 },
+    { metric: "Soil", score: 68 },
   ];
 
   return (
@@ -116,6 +156,75 @@ export default function Dashboard() {
           <p className="text-muted-foreground">
             Let's check on your farming progress today
           </p>
+        </motion.div>
+
+        {/* Urgent Tasks (new): critical, compact and actionable */}
+        <motion.div
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="panel-glass rounded-2xl p-4"
+        >
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-sm font-semibold">Urgent Tasks</h3>
+            <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
+              Today
+            </span>
+          </div>
+          <ul className="space-y-2">
+            {urgentTasks.map((t) => (
+              <li
+                key={t.id}
+                className="flex items-center justify-between rounded-xl border px-3 py-2"
+              >
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => toggleTask(t.id)}
+                    aria-label={t.done ? "Mark as not done" : "Mark as done"}
+                    className={`size-5 rounded-md border flex items-center justify-center transition-colors ${
+                      t.done
+                        ? "bg-primary/90 text-primary-foreground border-transparent"
+                        : "hover:bg-muted/60"
+                    }`}
+                  >
+                    {t.done ? "✓" : ""}
+                  </button>
+                  <div>
+                    <div
+                      className={`text-sm font-medium ${
+                        t.done ? "line-through text-muted-foreground" : ""
+                      }`}
+                    >
+                      {t.title}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      Due: {t.due}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  {!t.done && (
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      className="rounded-lg"
+                      onClick={() => {
+                        toggleTask(t.id);
+                      }}
+                    >
+                      Quick Complete
+                    </Button>
+                  )}
+                  <Button
+                    size="sm"
+                    className="rounded-lg"
+                    onClick={() => navigate("/tasks")}
+                  >
+                    View All
+                  </Button>
+                </div>
+              </li>
+            ))}
+          </ul>
         </motion.div>
 
         {/* Add: KPI strip */}
@@ -266,6 +375,86 @@ export default function Dashboard() {
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <Bar dataKey="rain" fill="var(--color-rain)" radius={[8, 8, 0, 0]} />
               </BarChart>
+            </ChartContainer>
+          </div>
+        </motion.div>
+
+        {/* Row 3: Distinct styles — Pie + Radar */}
+        <motion.div
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="grid grid-cols-1 md:grid-cols-2 gap-4"
+        >
+          {/* Crop Share — Pie with custom colors and labels */}
+          <div className="panel-glass rounded-2xl p-4">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-semibold">Crop Share</h3>
+              <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                % Area
+              </span>
+            </div>
+            <ChartContainer
+              className="h-72"
+              config={{
+                wheat: { label: "Wheat", color: cropShare[0].color },
+                rice: { label: "Rice", color: cropShare[1].color },
+                maize: { label: "Maize", color: cropShare[2].color },
+                pulses: { label: "Pulses", color: cropShare[3].color },
+              }}
+            >
+              {/* Using Recharts PieChart directly for distinct look */}
+              <PieChart>
+                <Pie
+                  data={cropShare}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={55}
+                  outerRadius={90}
+                  paddingAngle={2}
+                  cornerRadius={6}
+                  stroke="hsl(var(--background))"
+                  strokeWidth={3}
+                  label={({ name, value }) => `${name} ${value}%`}
+                >
+                  {cropShare.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <ChartTooltip content={<ChartTooltipContent />} />
+              </PieChart>
+            </ChartContainer>
+          </div>
+
+          {/* Farm Health — Radar for varied presentation */}
+          <div className="panel-glass rounded-2xl p-4">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-semibold">Farm Health</h3>
+              <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                Composite
+              </span>
+            </div>
+            <ChartContainer
+              className="h-72"
+              config={{
+                score: { label: "Score", color: "oklch(0.72 0.15 145)" },
+              }}
+            >
+              <RChart data={healthRadar}>
+                <PolarGrid stroke="hsl(var(--border)/0.35)" />
+                <PolarAngleAxis dataKey="metric" tick={{ fontSize: 12 }} />
+                <PolarRadiusAxis angle={30} domain={[0, 100]} />
+                <Radar
+                  name="Score"
+                  dataKey="score"
+                  stroke="var(--color-score)"
+                  fill="var(--color-score)"
+                  fillOpacity={0.25}
+                  strokeWidth={2}
+                />
+                <ChartTooltip content={<ChartTooltipContent />} />
+              </RChart>
             </ChartContainer>
           </div>
         </motion.div>
