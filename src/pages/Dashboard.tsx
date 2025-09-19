@@ -3,9 +3,41 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  BarChart,
+  Bar,
+} from "recharts";
 
 export default function Dashboard() {
   const navigate = useNavigate();
+
+  // Add: demo chart data
+  const moistureData = [
+    { day: "Mon", moisture: 42 },
+    { day: "Tue", moisture: 45 },
+    { day: "Wed", moisture: 48 },
+    { day: "Thu", moisture: 44 },
+    { day: "Fri", moisture: 50 },
+    { day: "Sat", moisture: 53 },
+    { day: "Sun", moisture: 49 },
+  ];
+
+  const yieldData = [
+    { crop: "Wheat", yield: 2.8 },
+    { crop: "Rice", yield: 3.2 },
+    { crop: "Maize", yield: 2.4 },
+    { crop: "Pulses", yield: 1.6 },
+  ];
 
   return (
     <AppShell title="Dashboard">
@@ -61,6 +93,67 @@ export default function Dashboard() {
           <p className="text-muted-foreground">
             Let's check on your farming progress today
           </p>
+        </motion.div>
+
+        {/* Add: Simple analytics */}
+        <motion.div
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="grid grid-cols-1 md:grid-cols-2 gap-4"
+        >
+          {/* Soil Moisture Trend */}
+          <div className="panel-glass rounded-2xl p-4">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-semibold">Soil Moisture (7 days)</h3>
+              <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Realtime</span>
+            </div>
+            <ChartContainer
+              className="h-72"
+              config={{
+                moisture: { label: "Soil Moisture", color: "oklch(0.72 0.15 145)" },
+              }}
+            >
+              <LineChart data={moistureData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border)/0.35)" />
+                <XAxis dataKey="day" tickLine={false} axisLine={false} />
+                <YAxis unit="%" tickLine={false} axisLine={false} />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Line
+                  type="monotone"
+                  dataKey="moisture"
+                  stroke="var(--color-moisture)"
+                  strokeWidth={2}
+                  dot={false}
+                />
+              </LineChart>
+            </ChartContainer>
+          </div>
+
+          {/* Estimated Yield by Crop */}
+          <div className="panel-glass rounded-2xl p-4">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-semibold">Estimated Yield by Crop</h3>
+              <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Demo</span>
+            </div>
+            <ChartContainer
+              className="h-72"
+              config={{
+                yield: { label: "Yield (t/ha)", color: "oklch(0.70 0.14 90)" },
+              }}
+            >
+              <BarChart data={yieldData} barCategoryGap={18}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border)/0.35)" />
+                <XAxis dataKey="crop" tickLine={false} axisLine={false} />
+                <YAxis unit=" t/ha" tickLine={false} axisLine={false} />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Bar
+                  dataKey="yield"
+                  fill="var(--color-yield)"
+                  radius={[8, 8, 0, 0]}
+                />
+              </BarChart>
+            </ChartContainer>
+          </div>
         </motion.div>
       </div>
     </AppShell>
