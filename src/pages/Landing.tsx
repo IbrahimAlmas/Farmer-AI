@@ -246,7 +246,7 @@ export default function Landing() {
     bn: "নমস্কার! আমি Root AI, আপনার কৃষি সহকারী!",
     mr: "नमस्कार! मी Root AI, तुमचा शेती सहाय्यक!",
     gu: "નમસ્કાર! હું Root AI, તમારો કૃષિ સહાયક!",
-    pa: "ਸਤ ਸ੍ਰੀ ਅਕਾਲ! ਮੈਂ Root AI, ਤੁਹਾਡਾ ਖੇਤੀ ਸਹਾਇਕ!",
+    pa: "ਸਤ ਸ੍ਰੀ ਅਕਾਲ! ਮੈਂ Root AI, ਤੁਹਾડਾ ਖੇਤੀ ਸਹਾਇਕ!",
     or: "ନମସ୍କାର! ମୁଁ Root AI, ଆପଣଙ୍କ କୃଷି ସହାୟକ!",
     as: "নমস্কাৰ! মই Root AI, আপোনাৰ কৃষি সহায়ক!",
     bho: "प्रणाम! हम Root AI, तोहार खेती सहायक बानी!",
@@ -963,6 +963,227 @@ export default function Landing() {
             <p className="text-sm text-muted-foreground mt-1">
               No hype. Clear sources and transparent outcomes.
             </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Everything in Root AI */}
+      <section className="mx-auto w-full max-w-6xl px-4 py-8">
+        <div className="mb-6 flex items-center justify-between">
+          <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight">Everything in Root AI</h2>
+          <div className="text-xs uppercase tracking-widest text-muted-foreground">Complete feature directory</div>
+        </div>
+
+        {/* Feature Directory Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Dashboard */}
+          <div className="panel-glass rounded-2xl p-5 hover:-translate-y-1 hover:shadow-[0_20px_80px_-28px_rgba(0,0,0,0.45)] transition-all">
+            <div className="flex items-center justify-between">
+              <div className="font-bold text-lg">Dashboard</div>
+              <span className="text-[10px] uppercase text-muted-foreground">Charts</span>
+            </div>
+            <p className="text-sm text-muted-foreground mt-1">
+              KPI strip, Estimated Yield, Temperature, Rainfall, Crop Share (Pie), Farm Health (Radar), and Urgent Tasks.
+            </p>
+            <div className="mt-4 flex items-center gap-2">
+              <Button className="rounded-xl" onClick={() => navigate("/dashboard")}>
+                Open <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+
+          {/* My Farm + Simulation */}
+          <div className="panel-glass rounded-2xl p-5 hover:-translate-y-1 hover:shadow-[0_20px_80px_-28px_rgba(0,0,0,0.45)] transition-all">
+            <div className="flex items-center justify-between">
+              <div className="font-bold text-lg">My Farm + Simulation</div>
+              <span className="text-[10px] uppercase text-muted-foreground">Real-time</span>
+            </div>
+            <p className="text-sm text-muted-foreground mt-1">
+              Manage farms, upload field photo, enter full-screen simulation with 3D top-plane viewer, seed & irrigation methods,
+              growth/health tracking, and Irrigation Advisor using real weather.
+            </p>
+            <div className="mt-4 flex items-center gap-2">
+              <Button className="rounded-xl" onClick={() => navigate("/my-farm")}>
+                Go to My Farm <Sprout className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+
+          {/* 3D Farm Model Viewer */}
+          <div className="panel-glass rounded-2xl p-5 hover:-translate-y-1 hover:shadow-[0_20px_80px_-28px_rgba(0,0,0,0.45)] transition-all">
+            <div className="flex items-center justify-between">
+              <div className="font-bold text-lg">3D Farm Model Viewer</div>
+              <span className="text-[10px] uppercase text-muted-foreground">Top-plane</span>
+            </div>
+            <p className="text-sm text-muted-foreground mt-1">
+              Dedicated page with interactive 3D rotation using CSS transforms. Renders only the top field plane textured with your photo.
+            </p>
+            <div className="mt-4 flex items-center gap-2">
+              <Button className="rounded-xl" onClick={() => navigate("/farm-model")}>
+                Open Viewer <Sparkles className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+
+          {/* Soil Test */}
+          <div className="panel-glass rounded-2xl p-5 hover:-translate-y-1 hover:shadow-[0_20px_80px_-28px_rgba(0,0,0,0.45)] transition-all">
+            <div className="flex items-center justify-between">
+              <div className="font-bold text-lg">Soil Test</div>
+              <span className="text-[10px] uppercase text-muted-foreground">Camera</span>
+            </div>
+            <p className="text-sm text-muted-foreground mt-1">
+              Capture or upload soil images for AI analysis (pH, moisture, nutrients, organic matter) with robust camera fallback.
+            </p>
+            <div className="mt-4 flex items-center gap-2">
+              <Button className="rounded-xl" onClick={() => navigate("/soil-test")}>
+                Try Soil Test <Camera className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+
+          {/* Community */}
+          <div className="panel-glass rounded-2xl p-5 hover:-translate-y-1 hover:shadow-[0_20px_80px_-28px_rgba(0,0,0,0.45)] transition-all">
+            <div className="flex items-center justify-between">
+              <div className="font-bold text-lg">Community</div>
+              <span className="text-[10px] uppercase text-muted-foreground">Chat + Jobs</span>
+            </div>
+            <p className="text-sm text-muted-foreground mt-1">
+              Real-time chat and a job board inside a room modal. Twitter-like feed with posts and likes, robust membership handling.
+            </p>
+            <div className="mt-4 flex items-center gap-2">
+              <Button className="rounded-xl" onClick={() => navigate("/community")}>
+                Enter Community <Users2 className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+
+          {/* Market */}
+          <div className="panel-glass rounded-2xl p-5 hover:-translate-y-1 hover:shadow-[0_20px_80px_-28px_rgba(0,0,0,0.45)] transition-all">
+            <div className="flex items-center justify-between">
+              <div className="font-bold text-lg">Market</div>
+              <span className="text-[10px] uppercase text-muted-foreground">Listings</span>
+            </div>
+            <p className="text-sm text-muted-foreground mt-1">
+              Browse and manage listings for agricultural products. Region-aware market insights.
+            </p>
+            <div className="mt-4 flex items-center gap-2">
+              <Button className="rounded-xl" onClick={() => navigate("/market")}>
+                Open Market <ShoppingCart className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+
+          {/* Tasks */}
+          <div className="panel-glass rounded-2xl p-5 hover:-translate-y-1 hover:shadow-[0_20px_80px_-28px_rgba(0,0,0,0.45)] transition-all">
+            <div className="flex items-center justify-between">
+              <div className="font-bold text-lg">Tasks</div>
+              <span className="text-[10px] uppercase text-muted-foreground">Actionable</span>
+            </div>
+            <p className="text-sm text-muted-foreground mt-1">
+              Plan, track, and complete farm work. Urgent Tasks surfaced on the Dashboard for quick action.
+            </p>
+            <div className="mt-4 flex items-center gap-2">
+              <Button className="rounded-xl" onClick={() => navigate("/tasks")}>
+                View Tasks <CheckCircle className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+
+          {/* Learn */}
+          <div className="panel-glass rounded-2xl p-5 hover:-translate-y-1 hover:shadow-[0_20px_80px_-28px_rgba(0,0,0,0.45)] transition-all">
+            <div className="flex items-center justify-between">
+              <div className="font-bold text-lg">Learn</div>
+              <span className="text-[10px] uppercase text-muted-foreground">Resources</span>
+            </div>
+            <p className="text-sm text-muted-foreground mt-1">
+              Educational resources and guides to improve farming practices.
+            </p>
+            <div className="mt-4 flex items-center gap-2">
+              <Button className="rounded-xl" onClick={() => navigate("/learn")}>
+                Explore <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+
+          {/* Reviews */}
+          <div className="panel-glass rounded-2xl p-5 hover:-translate-y-1 hover:shadow-[0_20px_80px_-28px_rgba(0,0,0,0.45)] transition-all">
+            <div className="flex items-center justify-between">
+              <div className="font-bold text-lg">Reviews</div>
+              <span className="text-[10px] uppercase text-muted-foreground">Feedback</span>
+            </div>
+            <p className="text-sm text-muted-foreground mt-1">
+              Submit and browse farmer reviews: name, rating, and comment. Recent 50 displayed.
+            </p>
+            <div className="mt-4 flex items-center gap-2">
+              <Button className="rounded-xl" onClick={() => navigate("/reviews")}>
+                See Reviews <Sparkles className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+
+          {/* Company Pages */}
+          <div className="panel-glass rounded-2xl p-5 hover:-translate-y-1 hover:shadow-[0_20px_80px_-28px_rgba(0,0,0,0.45)] transition-all">
+            <div className="flex items-center justify-between">
+              <div className="font-bold text-lg">Company</div>
+              <span className="text-[10px] uppercase text-muted-foreground">About</span>
+            </div>
+            <p className="text-sm text-muted-foreground mt-1">
+              Our Mission, Our Team, and Future Plan pages with the global glossy header and neon border beam.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <Button variant="secondary" className="rounded-xl" onClick={() => navigate("/our-mission")}>Our Mission</Button>
+              <Button variant="secondary" className="rounded-xl" onClick={() => navigate("/our-team")}>Our Team</Button>
+              <Button variant="secondary" className="rounded-xl" onClick={() => navigate("/future-plan")}>Future Plan</Button>
+            </div>
+          </div>
+
+          {/* Settings + Localization + Voice */}
+          <div className="panel-glass rounded-2xl p-5 hover:-translate-y-1 hover:shadow-[0_20px_80px_-28px_rgba(0,0,0,0.45)] transition-all">
+            <div className="flex items-center justify-between">
+              <div className="font-bold text-lg">Settings, Localization & Voice</div>
+              <span className="text-[10px] uppercase text-muted-foreground">Multi-language</span>
+            </div>
+            <p className="text-sm text-muted-foreground mt-1">
+              Full UI localization (20+ languages), dynamic language switcher, and voice assistant with audio responses.
+            </p>
+            <div className="mt-4 flex items-center gap-2">
+              <Button className="rounded-xl" onClick={() => navigate("/settings")}>
+                Settings <Languages className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Tech Stack Section */}
+      <section className="mx-auto w-full max-w-6xl px-4 pb-8">
+        <div className="mb-6 flex items-center justify-between">
+          <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight">Tech Stack</h2>
+          <div className="text-xs uppercase tracking-widest text-muted-foreground">Under the hood</div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="panel-glass rounded-2xl p-5">
+            <div className="font-bold text-lg">Frontend</div>
+            <ul className="mt-2 text-sm text-muted-foreground space-y-1">
+              <li>• TypeScript + React</li>
+              <li>• Vite + React Router</li>
+              <li>• Tailwind CSS + shadcn/ui</li>
+              <li>• Framer Motion (animations)</li>
+              <li>• Recharts (visualizations)</li>
+              <li>• Sonner (toasts)</li>
+            </ul>
+          </div>
+          <div className="panel-glass rounded-2xl p-5">
+            <div className="font-bold text-lg">Backend & Integrations</div>
+            <ul className="mt-2 text-sm text-muted-foreground space-y-1">
+              <li>• Convex (database, functions, realtime)</li>
+              <li>• Convex Auth OTP (testing: temporarily bypassed)</li>
+              <li>• Convex Storage (file uploads)</li>
+              <li>• Meshy API (AI Image → 3D models)</li>
+              <li>• OpenRouter (multi‑model LLM access)</li>
+              <li>• Open‑Meteo (weather & ET0 for irrigation)</li>
+            </ul>
           </div>
         </div>
       </section>
