@@ -16,6 +16,8 @@ import {
   CartesianGrid,
   BarChart,
   Bar,
+  AreaChart,
+  Area,
 } from "recharts";
 
 export default function Dashboard() {
@@ -37,6 +39,27 @@ export default function Dashboard() {
     { crop: "Rice", yield: 3.2 },
     { crop: "Maize", yield: 2.4 },
     { crop: "Pulses", yield: 1.6 },
+  ];
+
+  // Add: extra demo data for temperature and rainfall
+  const tempData = [
+    { day: "Mon", temp: 27 },
+    { day: "Tue", temp: 28 },
+    { day: "Wed", temp: 30 },
+    { day: "Thu", temp: 29 },
+    { day: "Fri", temp: 31 },
+    { day: "Sat", temp: 33 },
+    { day: "Sun", temp: 32 },
+  ];
+
+  const rainData = [
+    { day: "Mon", rain: 2 },
+    { day: "Tue", rain: 0 },
+    { day: "Wed", rain: 5 },
+    { day: "Thu", rain: 1 },
+    { day: "Fri", rain: 0 },
+    { day: "Sat", rain: 7 },
+    { day: "Sun", rain: 3 },
   ];
 
   return (
@@ -95,7 +118,35 @@ export default function Dashboard() {
           </p>
         </motion.div>
 
-        {/* Add: Simple analytics */}
+        {/* Add: KPI strip */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="grid grid-cols-2 md:grid-cols-4 gap-3"
+        >
+          <div className="panel-glass rounded-xl p-4">
+            <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Today's ET0</div>
+            <div className="mt-1 text-xl font-bold">4.2 mm</div>
+            <div className="text-xs text-muted-foreground">Clear skies</div>
+          </div>
+          <div className="panel-glass rounded-xl p-4">
+            <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Avg Moisture</div>
+            <div className="mt-1 text-xl font-bold">46%</div>
+            <div className="text-xs text-muted-foreground">Last 7 days</div>
+          </div>
+          <div className="panel-glass rounded-xl p-4">
+            <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Active Farms</div>
+            <div className="mt-1 text-xl font-bold">3</div>
+            <div className="text-xs text-muted-foreground">Managed</div>
+          </div>
+          <div className="panel-glass rounded-xl p-4">
+            <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Alerts</div>
+            <div className="mt-1 text-xl font-bold text-amber-400">2</div>
+            <div className="text-xs text-muted-foreground">Irrigation pending</div>
+          </div>
+        </motion.div>
+
+        {/* Add: Simple analytics (row 1: existing charts) */}
         <motion.div
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
@@ -151,6 +202,69 @@ export default function Dashboard() {
                   fill="var(--color-yield)"
                   radius={[8, 8, 0, 0]}
                 />
+              </BarChart>
+            </ChartContainer>
+          </div>
+        </motion.div>
+
+        {/* Add: More analytics (row 2: temperature + rainfall) */}
+        <motion.div
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="grid grid-cols-1 md:grid-cols-2 gap-4"
+        >
+          {/* Temperature Trend */}
+          <div className="panel-glass rounded-2xl p-4">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-semibold">Temperature (7 days)</h3>
+              <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Realtime</span>
+            </div>
+            <ChartContainer
+              className="h-72"
+              config={{
+                temp: { label: "Temperature (°C)", color: "oklch(0.72 0.10 50)" },
+              }}
+            >
+              <AreaChart data={tempData}>
+                <defs>
+                  <linearGradient id="tempFill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="var(--color-temp)" stopOpacity={0.35} />
+                    <stop offset="95%" stopColor="var(--color-temp)" stopOpacity={0.02} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border)/0.35)" />
+                <XAxis dataKey="day" tickLine={false} axisLine={false} />
+                <YAxis unit="°C" tickLine={false} axisLine={false} />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Area
+                  type="monotone"
+                  dataKey="temp"
+                  stroke="var(--color-temp)"
+                  fill="url(#tempFill)"
+                  strokeWidth={2}
+                />
+              </AreaChart>
+            </ChartContainer>
+          </div>
+
+          {/* Rainfall */}
+          <div className="panel-glass rounded-2xl p-4">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-semibold">Rainfall (7 days)</h3>
+              <span className="text-[10px] uppercase tracking-widest text-muted-foreground">mm</span>
+            </div>
+            <ChartContainer
+              className="h-72"
+              config={{
+                rain: { label: "Rain (mm)", color: "oklch(0.70 0.14 145)" },
+              }}
+            >
+              <BarChart data={rainData} barCategoryGap={18}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border)/0.35)" />
+                <XAxis dataKey="day" tickLine={false} axisLine={false} />
+                <YAxis unit=" mm" tickLine={false} axisLine={false} />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Bar dataKey="rain" fill="var(--color-rain)" radius={[8, 8, 0, 0]} />
               </BarChart>
             </ChartContainer>
           </div>
