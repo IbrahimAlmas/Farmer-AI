@@ -25,14 +25,9 @@ export default function Tasks() {
     | Array<{ at: number; item: string; details: string; technique?: string }>
     | undefined;
 
-  const tasksAll = useQuery(api.tasks.list);
-  // Selected farm filter (moved earlier to avoid init error)
+  // Selected farm filter (must be declared before useMemo below)
   const [selectedForm, setSelectedForm] = useState<string>("All");
-  const demoForms = useMemo(() => ["Farm A", "Farm B", "Farm C"], []);
-  const formNames = useMemo(() => {
-    const names = (farms ?? []).map((f: any) => (f?.name as string) || "Farm");
-    return names.length ? names : demoForms;
-  }, [farms, demoForms]);
+  const tasksAll = useQuery(api.tasks.list);
   // Determine selected farmId from farms + selectedForm
   const selectedFarmId = useMemo(() => {
     if (!farms || selectedForm === "All") return null;
@@ -52,7 +47,13 @@ export default function Tasks() {
   const [title, setTitle] = useState("");
   const [open, setOpen] = useState(false);
 
-  // (moved) selected form filter declarations are defined above to prevent initialization errors
+  // NEW: selected form filter
+  const demoForms = useMemo(() => ["Farm A", "Farm B", "Farm C"], []);
+  const formNames = useMemo(() => {
+    const names = (farms ?? []).map((f: any) => (f?.name as string) || "Farm");
+    return names.length ? names : demoForms;
+  }, [farms, demoForms]);
+  // selectedForm is initialized earlier
 
   // Helpers to extract farm name from strings like "Task — Farm Name"
   const extractFarmName = (text: string): string | null => {
