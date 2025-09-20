@@ -3,10 +3,35 @@ import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 import { taskStatusValidator } from "./schema";
 
+// Add Test User helpers for unauthenticated testers
+async function getTestUserIdIfExists(ctx: any) {
+  const email = "test@demo.local";
+  const existing =
+    (await ctx.db
+      .query("users")
+      .withIndex("email", (q: any) => q.eq("email", email))
+      .unique()
+      .catch(() => null)) || null;
+  return existing?._id ?? null;
+}
+
+async function getOrCreateTestUserId(ctx: any) {
+  const email = "test@demo.local";
+  const existing =
+    (await ctx.db
+      .query("users")
+      .withIndex("email", (q: any) => q.eq("email", email))
+      .unique()
+      .catch(() => null)) || null;
+  if (existing) return existing._id;
+  const id = await ctx.db.insert("users", { email, name: "Test User" });
+  return id;
+}
+
 export const list = query({
   args: {},
   handler: async (ctx) => {
-    const userId = await getAuthUserId(ctx);
+    const userId = (await getAuthUserId(ctx)) ?? (await getTestUserIdIfExists(ctx));
     if (!userId) return [];
     
     return await ctx.db
@@ -20,7 +45,7 @@ export const list = query({
 export const listByFarm = query({
   args: { farmId: v.id("farms") },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
+    const userId = (await getAuthUserId(ctx)) ?? (await getTestUserIdIfExists(ctx));
     if (!userId) return [];
     return await ctx.db
       .query("tasks")
@@ -33,7 +58,7 @@ export const listByFarm = query({
 export const listPending = query({
   args: {},
   handler: async (ctx) => {
-    const userId = await getAuthUserId(ctx);
+    const userId = (await getAuthUserId(ctx)) ?? (await getTestUserIdIfExists(ctx));
     if (!userId) return [];
     
     return await ctx.db
@@ -52,7 +77,7 @@ export const create = mutation({
     farmId: v.optional(v.id("farms")),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
+    const userId = (await getAuthUserId(ctx)) ?? (await getOrCreateTestUserId(ctx));
     if (!userId) throw new Error("Not authenticated");
 
     return await ctx.db.insert("tasks", {
@@ -75,7 +100,7 @@ export const update = mutation({
     notes: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
+    const userId = (await getAuthUserId(ctx)) ?? (await getOrCreateTestUserId(ctx));
     if (!userId) throw new Error("Not authenticated");
 
     const task = await ctx.db.get(args.id);
@@ -91,7 +116,7 @@ export const update = mutation({
 export const markDone = mutation({
   args: { id: v.id("tasks") },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
+    const userId = (await getAuthUserId(ctx)) ?? (await getOrCreateTestUserId(ctx));
     if (!userId) throw new Error("Not authenticated");
 
     const task = await ctx.db.get(args.id);
@@ -106,7 +131,7 @@ export const markDone = mutation({
 export const remove = mutation({
   args: { id: v.id("tasks") },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
+    const userId = (await getAuthUserId(ctx)) ?? (await getOrCreateTestUserId(ctx));
     if (!userId) throw new Error("Not authenticated");
 
     const task = await ctx.db.get(args.id);
@@ -410,7 +435,7 @@ export const createFromSuggestion = mutation({
     farmId: v.optional(v.id("farms")),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
+    const userId = (await getAuthUserId(ctx)) ?? (await getOrCreateTestUserId(ctx));
     if (!userId) throw new Error("Not authenticated");
 
     const dueDate =
