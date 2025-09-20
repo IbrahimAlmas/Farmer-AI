@@ -264,10 +264,165 @@ export default function MyFarm() {
     }
   };
 
+  function FarmCard({ farm, onEnterSim }: { farm: any; onEnterSim: (id: string) => void }) {
+    // Resolve a preview image for the farm (first corner photo if present)
+    const photoId = (farm?.cornerPhotos?.[0] as any) ?? null;
+    const photoUrl = useQuery(
+      api.soil_upload.getFileUrl,
+      photoId ? ({ fileId: photoId as any } as any) : "skip"
+    ) as string | null;
+
+    // Local hooks used by card actions
+    const { _id: farmId, name, modelStatus, modelPreviewUrl } = farm;
+    const getUploadUrl = useMutation(api.soil_upload.getUploadUrl);
+    const setCornerPhotos = useMutation(api.farms.setCornerPhotos);
+    const generate3D = useAction((api as any).meshy.generateFromFarmPhoto as any);
+    const checkStatus = useAction((api as any).meshy.checkStatus as any);
+
+    // Upload handler
+    const handleUpload = async () => {
+      try {
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = "image/*";
+        input.onchange = async () => {
+          const files = (input.files as FileList | null) ?? null;
+          if (!files || files.length === 0) return;
+          const ids: Array<string> = [];
+          const f = files[0];
+          const url = await getUploadUrl({});
+          const res = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": f.type || "application/octet-stream" },
+            body: f,
+          });
+          const { storageId } = (await res.json()) as { storageId: string };
+          ids.push(storageId);
+          await setCornerPhotos({ id: farmId as any, photoIds: ids as any });
+          toast.success("Photo uploaded. Click 'Generate 3D Model' to continue.");
+        };
+        input.click();
+      } catch (e: any) {
+        toast.error(e?.message ?? "Failed to upload photo");
+      }
+    };
+
+    // Generate + status handlers
+    const handleGenerate = async () => {
+      try {
+        toast.info("Starting 3D generation...");
+        const res = await generate3D({ id: farmId as any });
+        if ((res as any)?.pending) {
+          toast.success("Model is being processed. This may take a couple of minutes.");
+        } else {
+          toast.success("3D model ready!");
+        }
+      } catch (e: any) {
+        toast.error(e?.message ?? "Failed to generate 3D model");
+      }
+    };
+
+    const handleCheckStatus = async () => {
+      try {
+        const res = await checkStatus({ id: farmId as any });
+        const status = (res as any)?.status;
+        if ((res as any)?.success && status === "ready") {
+          toast.success("3D model is ready!");
+        } else if ((res as any)?.success) {
+          toast.info(`Model status: ${status ?? "processing"}`);
+        } else {
+          toast.error((res as any)?.error ?? "Failed to check status");
+        }
+      } catch (e: any) {
+        toast.error(e?.message ?? "Failed to check status");
+      }
+    };
+
+    return (
+      <div className="rounded-2xl bg-white ring-1 ring-black/5 shadow-sm overflow-hidden flex flex-col">
+        <div className="h-40 w-full overflow-hidden">
+          <img
+            src={photoUrl || "/assets/Fild.jpeg"}
+            alt={name}
+            className="h-full w-full object-cover"
+            onError={(e) => {
+              const t = e.currentTarget as HTMLImageElement;
+              if (t.src !== "/assets/Fild.jpeg") t.src = "/assets/Fild.jpeg";
+              t.onerror = null;
+            }}
+          />
+        </div>
+
+        <div className="p-4 flex flex-col gap-3">
+          <div>
+            <div className="text-base font-semibold">{name}</div>
+            {modelStatus && (
+              <div className="text-xs text-muted-foreground">Model: {modelStatus}</div>
+            )}
+          </div>
+
+          <div className="grid gap-2">
+            <Button variant="outline" onClick={handleUpload} className="justify-center">
+              Upload Photo
+            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={handleGenerate} className="flex-1">
+                Generate 3D Model (AI)
+              </Button>
+              {modelStatus === "processing" && (
+                <Button variant="outline" onClick={handleCheckStatus}>
+                  Check
+                </Button>
+              )}
+              {modelStatus === "ready" && modelPreviewUrl && (
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    try {
+                      window.open(modelPreviewUrl as string, "_blank");
+                    } catch {
+                      /* noop */
+                    }
+                  }}
+                >
+                  Preview
+                </Button>
+              )}
+            </div>
+            <Button onClick={() => onEnterSim(farmId as any)} className="justify-center">
+              Enter Simulation
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <AppShell title="My Farm">
       <div className="p-4 space-y-4">
-        <Card>
+        {/* New page header + CTA */}
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl md:text-2xl font-bold">My Farms</h2>
+          <Button
+            variant="secondary"
+            onClick={() => {
+              const el = document.querySelector("#add-farm-form");
+              if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+            }}
+          >
+            + Add New Farm
+          </Button>
+        </div>
+
+        {/* New grid displaying farms in card style */}
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {(farms ?? []).map((f: any) => (
+            <FarmCard key={(f as any)._id} farm={f} onEnterSim={(id) => openSim(id)} />
+          ))}
+        </div>
+
+        <Card id="add-farm-form">
           <CardHeader><CardTitle>Add Farm</CardTitle></CardHeader>
           <CardContent className="grid gap-2 sm:grid-cols-[1fr_140px_1fr_auto]">
             <Input placeholder="Farm name" value={name} onChange={(e) => setName(e.target.value)} />
@@ -284,137 +439,6 @@ export default function MyFarm() {
             />
             {/* Enable Add without auth */}
             <Button onClick={add} disabled={!name.trim()}>Add</Button>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader><CardTitle>Your Farms</CardTitle></CardHeader>
-          <CardContent className="space-y-3">
-            {farms?.length ? farms.map((f) => {
-              return (
-                <div key={f._id} className="border rounded-md p-3 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="font-medium">{f.name}</div>
-                      {f.modelStatus && (
-                        <div className="text-xs text-muted-foreground">
-                          Model: {f.modelStatus}
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => {
-                          const input = document.createElement("input");
-                          input.type = "file";
-                          input.accept = "image/*";
-                          input.onchange = async () => {
-                            try {
-                              // @ts-ignore
-                              const files = input.files as FileList | null;
-                              await uploadCornerPhotos(f._id as any, files);
-                            } catch (e: any) {
-                              toast.error(e?.message ?? "Upload failed");
-                            }
-                          };
-                          input.click();
-                        }}
-                      >
-                        Upload Photo
-                      </Button>
-
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        onClick={async () => {
-                          try {
-                            toast.info("Starting 3D generation...");
-                            const res = await generate3D({ id: f._id as any });
-                            if ((res as any)?.pending) {
-                              toast.success("Model is being processed. This may take a couple of minutes.");
-                            } else {
-                              toast.success("3D model ready!");
-                            }
-                          } catch (e: any) {
-                            toast.error(e?.message ?? "Failed to generate 3D model");
-                          }
-                        }}
-                      >
-                        Generate 3D Model (AI)
-                      </Button>
-
-                      {f.modelStatus === "processing" && (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={async () => {
-                            try {
-                              const res = await checkStatus({ id: f._id as any });
-                              const status = (res as any)?.status;
-                              if ((res as any)?.success && status === "ready") {
-                                toast.success("3D model is ready!");
-                              } else if ((res as any)?.success) {
-                                toast.info(`Model status: ${status ?? "processing"}`);
-                              } else {
-                                toast.error((res as any)?.error ?? "Failed to check status");
-                              }
-                            } catch (e: any) {
-                              toast.error(e?.message ?? "Failed to check status");
-                            }
-                          }}
-                        >
-                          Check Status
-                        </Button>
-                      )}
-
-                      {f.modelStatus === "failed" && (
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={async () => {
-                            try {
-                              toast.info("Retrying 3D generation...");
-                              const res = await generate3D({ id: f._id as any });
-                              if ((res as any)?.pending) {
-                                toast.success("Model retry started. It may take a couple of minutes.");
-                              } else {
-                                toast.success("3D model ready!");
-                              }
-                            } catch (e: any) {
-                              toast.error(e?.message ?? "Retry failed");
-                            }
-                          }}
-                        >
-                          Retry
-                        </Button>
-                      )}
-
-                      {f.modelStatus === "ready" && f.modelPreviewUrl && (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => {
-                            try {
-                              window.open(f.modelPreviewUrl as string, "_blank");
-                            } catch {
-                              /* noop */
-                            }
-                          }}
-                        >
-                          Preview
-                        </Button>
-                      )}
-
-                      <Button size="sm" onClick={() => openSim(f._id as any)}>
-                        Enter Simulation
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              );
-            }) : <div className="text-sm text-muted-foreground">No farms yet.</div>}
           </CardContent>
         </Card>
 
