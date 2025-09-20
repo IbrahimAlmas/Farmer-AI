@@ -25,11 +25,9 @@ export default function Tasks() {
     | Array<{ at: number; item: string; details: string; technique?: string }>
     | undefined;
 
-  // ADD: selected form state BEFORE any use
-  const [selectedForm, setSelectedForm] = useState<string>("All");
-
   // Selected farm filter (must be declared before useMemo below)
-  // selectedForm state already declared above
+  // selectedForm state declared above to avoid initialization order issues
+  const [selectedForm, setSelectedForm] = useState<string>("All");
   const tasksAll = useQuery(api.tasks.list);
   // Determine selected farmId from farms + selectedForm
   const selectedFarmId = useMemo(() => {
@@ -56,6 +54,7 @@ export default function Tasks() {
     const names = (farms ?? []).map((f: any) => (f?.name as string) || "Farm");
     return names.length ? names : demoForms;
   }, [farms, demoForms]);
+  // selectedForm state declared above to avoid initialization order issues
 
   // Helpers to extract farm name from strings like "Task — Farm Name"
   const extractFarmName = (text: string): string | null => {
