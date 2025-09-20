@@ -55,7 +55,7 @@ export function AppShell({ children, title }: AppShellProps) {
   const isCommunityCreate = location.pathname === "/community/create";
 
   // Add: use white theme wrapper for dashboard to avoid dark strip at bottom
-  const isWhiteTheme = location.pathname === "/dashboard";
+  const isWhiteTheme = true;
 
   const [scrollProgress, setScrollProgress] = useState<number>(0);
 
