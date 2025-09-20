@@ -11,6 +11,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Progress } from "@/components/ui/progress";
 
 export default function MyFarm() {
+  // Router navigation hook for buttons
+  const navigate = useNavigate();
   const farms = useQuery(api.farms.list);
   const create = useMutation(api.farms.create);
   const setCornerPhotos = useMutation(api.farms.setCornerPhotos);
@@ -396,15 +398,7 @@ export default function MyFarm() {
           <h2 className="text-xl md:text-2xl font-bold">My Farms</h2>
           <Button
             variant="secondary"
-            onClick={() => {
-              // Navigate to the new multi-step creation page
-              const nav = (window as any).appNavigate as ((path: string) => void) | undefined;
-              // If we have router navigate hook in scope, use it
-              // otherwise fall back to window.location for reliability
-              try {
-                // we already have useNavigate imported; use it directly
-              } catch {}
-            }}
+            onClick={() => navigate("/farms/new")}
           >
             + Add New Farm
           </Button>
