@@ -97,6 +97,8 @@ const schema = defineSchema(
       dueDate: v.optional(v.number()),
       status: taskStatusValidator,
       notes: v.optional(v.string()),
+      // Add: optional priority for dashboard surfacing ("high" | "medium" | "low")
+      priority: v.optional(v.string()),
     }).index("by_userId", ["userId"])
      .index("by_userId_and_status", ["userId", "status"]),
 

@@ -23,22 +23,56 @@ import {
 } from "recharts";
 import { toast } from "sonner";
 import { useState } from "react";
+import { api } from "@/convex/_generated/api";
+import { useMutation, useQuery } from "convex/react";
 
 export default function Dashboard() {
   const navigate = useNavigate();
 
-  // Add: urgent tasks local state
-  const [urgentTasks, setUrgentTasks] = useState<Array<{ id: number; title: string; due: string; done: boolean; risk?: "low" | "high" | "critical"; icon?: "water" | "pest" | "price" }>>([
-    { id: 1, title: "Irrigate wheat plot (Block A)", due: "Today — Critically Low Moisture", done: false, risk: "critical", icon: "water" },
-    { id: 2, title: "Scout for aphids in maize strip", due: "Today — High Risk", done: false, risk: "high", icon: "pest" },
-    { id: 3, title: "Update market prices for soybeans", due: "Tomorrow", done: false, risk: "low", icon: "price" },
-  ]);
-  const toggleTask = (id: number) => {
-    setUrgentTasks((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, done: !t.done } : t)),
-    );
-    const t = urgentTasks.find((x) => x.id === id);
-    if (t) toast.success(`${t.done ? "Reopened" : "Completed"}: ${t.title}`);
+  // Replace local urgent tasks with live pending tasks (top 3, derive risk)
+  const pending = useQuery(api.tasks.listPending);
+  const markDone = useMutation(api.tasks.markDone);
+
+  const urgentTasks =
+    (pending ?? [])
+      .slice(0, 3)
+      .map((t: any) => {
+        // Derive risk level from priority/keywords
+        const pr = (t.priority as string | undefined)?.toLowerCase();
+        const title = (t.title as string).toLowerCase();
+        const notes = ((t.notes as string | undefined) ?? "").toLowerCase();
+
+        let risk: "low" | "high" | "critical" = "low";
+        if (pr === "high" || title.includes("irrigat") || notes.includes("low moisture")) {
+          risk = "critical";
+        } else if (pr === "medium" || title.includes("pest") || notes.includes("aphid")) {
+          risk = "high";
+        }
+
+        let icon: "water" | "pest" | "price" = "price";
+        if (title.includes("irrigat") || notes.includes("moisture")) icon = "water";
+        else if (title.includes("pest") || notes.includes("aphid")) icon = "pest";
+
+        return {
+          id: t._id,
+          title: t.title,
+          due:
+            t.dueDate != null
+              ? `Due ${new Date(t.dueDate).toLocaleDateString()}`
+              : "Today",
+          done: false,
+          risk,
+          icon,
+        };
+      }) ?? [];
+
+  const toggleTask = async (id: string) => {
+    try {
+      await markDone({ id: id as any });
+      toast.success("Completed");
+    } catch {
+      toast.error("Failed to complete");
+    }
   };
 
   // Add: demo chart data
