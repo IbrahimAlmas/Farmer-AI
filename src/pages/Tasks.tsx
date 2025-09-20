@@ -25,7 +25,7 @@ export default function Tasks() {
     | Array<{ at: number; item: string; details: string; technique?: string }>
     | undefined;
 
-  // Selected farm filter (declare before any use)
+  // Selected farm filter (must be declared before useMemo below)
   const [selectedForm, setSelectedForm] = useState<string>("All");
   const tasksAll = useQuery(api.tasks.list);
   // Determine selected farmId from farms + selectedForm
