@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { api } from "@/convex/_generated/api";
 import { useMutation, useQuery } from "convex/react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
@@ -12,6 +12,9 @@ export default function Tasks() {
   const tasks = useQuery(api.tasks.list);
   const create = useMutation(api.tasks.create);
   const markDone = useMutation(api.tasks.markDone);
+
+  // New: load forms (farms) to build dynamic buttons, fallback to demo list if none
+  const farms = useQuery((api as any).farms?.list as any) as Array<{ name: string }> | undefined;
 
   // New: AI hooks
   const suggestions = useQuery((api as any).tasks.aiSuggestions as any) as
@@ -24,6 +27,41 @@ export default function Tasks() {
 
   const [title, setTitle] = useState("");
   const [open, setOpen] = useState(false);
+
+  // NEW: selected form filter
+  const demoForms = useMemo(() => ["Farm A", "Farm B", "Farm C"], []);
+  const formNames = useMemo(() => {
+    const names = (farms ?? []).map((f: any) => (f?.name as string) || "Farm");
+    return names.length ? names : demoForms;
+  }, [farms, demoForms]);
+  const [selectedForm, setSelectedForm] = useState<string>("All");
+
+  // Helpers to extract farm name from strings like "Task — Farm Name"
+  const extractFarmName = (text: string): string | null => {
+    const idx = text.lastIndexOf("—");
+    if (idx === -1) return null;
+    const name = text.slice(idx + 1).trim();
+    return name || null;
+  };
+
+  // Filtered datasets based on selected form
+  const filteredSuggestions = useMemo(() => {
+    if (selectedForm === "All") return suggestions ?? [];
+    const target = selectedForm.toLowerCase();
+    return (suggestions ?? []).filter((s) => {
+      const fromTitle = extractFarmName(s.title);
+      return fromTitle ? fromTitle.toLowerCase() === target : s.title.toLowerCase().includes(target);
+    });
+  }, [suggestions, selectedForm]);
+
+  const filteredSchedule = useMemo(() => {
+    if (selectedForm === "All") return schedule ?? [];
+    const target = selectedForm.toLowerCase();
+    return (schedule ?? []).filter((it) => {
+      const fromItem = extractFarmName(it.item);
+      return fromItem ? fromItem.toLowerCase() === target : it.item.toLowerCase().includes(target);
+    });
+  }, [schedule, selectedForm]);
 
   const addTask = async () => {
     if (!title.trim()) return;
@@ -67,15 +105,38 @@ export default function Tasks() {
           </p>
         </div>
 
+        {/* NEW: Form selector buttons */}
+        <div className="flex flex-wrap items-center gap-2 justify-center">
+          <Button
+            variant={selectedForm === "All" ? "default" : "outline"}
+            className="rounded-xl"
+            onClick={() => setSelectedForm("All")}
+          >
+            All
+          </Button>
+          {formNames.map((name, idx) => (
+            <Button
+              key={`${name}-${idx}`}
+              variant={selectedForm === name ? "default" : "outline"}
+              className="rounded-xl"
+              onClick={() => setSelectedForm(name)}
+            >
+              {name}
+            </Button>
+          ))}
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* Left: AI Suggestions */}
           <Card className="lg:col-span-2 rounded-2xl bg-white ring-1 ring-black/5">
             <CardHeader className="flex-row items-center justify-between">
-              <CardTitle>AI Task Suggestions</CardTitle>
+              <CardTitle>
+                AI Task Suggestions{selectedForm !== "All" ? ` — ${selectedForm}` : ""}
+              </CardTitle>
               <div className="text-xs font-medium text-emerald-500">Analysis Complete ✨</div>
             </CardHeader>
             <CardContent className="space-y-3">
-              {(suggestions ?? []).map((s, idx) => (
+              {filteredSuggestions.map((s, idx) => (
                 <div
                   key={idx}
                   className="flex items-center justify-between gap-3 rounded-xl ring-1 ring-black/10 bg-[oklch(0.98_0.01_120)] px-3 py-3"
@@ -114,27 +175,34 @@ export default function Tasks() {
                   </DialogTrigger>
                   <DialogContent className="max-w-2xl">
                     <DialogHeader>
-                      <DialogTitle>Full Schedule Plan</DialogTitle>
+                      <DialogTitle>
+                        Full Schedule Plan{selectedForm !== "All" ? ` — ${selectedForm}` : ""}
+                      </DialogTitle>
                     </DialogHeader>
                     <div className="space-y-3 max-h-[60vh] overflow-auto">
-                      {(schedule ?? []).map((it, i) => (
-                        <div key={i} className="rounded-lg border p-3">
-                          <div className="text-sm font-semibold">
-                            {new Date(it.at).toLocaleString()}
-                          </div>
-                          <div className="font-medium">{it.item}</div>
-                          <div className="text-sm text-muted-foreground">{it.details}</div>
-                          {(it as any).farmName && (
-                            <div className="text-xs text-muted-foreground mt-1">
-                              Farm: {(it as any).farmName}
+                      {filteredSchedule.map((it, i) => {
+                        const farmName = extractFarmName(it.item);
+                        return (
+                          <div key={i} className="rounded-lg border p-3">
+                            <div className="text-sm font-semibold">
+                              {new Date(it.at).toLocaleString()}
                             </div>
-                          )}
-                          {it.technique && (
-                            <div className="text-xs text-primary mt-1">Technique: {it.technique}</div>
-                          )}
-                        </div>
-                      ))}
-                      {!schedule?.length && (
+                            <div className="font-medium">{it.item}</div>
+                            <div className="text-sm text-muted-foreground">{it.details}</div>
+                            {farmName && (
+                              <div className="text-xs text-muted-foreground mt-1">
+                                Farm: {farmName}
+                              </div>
+                            )}
+                            {it.technique && (
+                              <div className="text-xs text-primary mt-1">
+                                Technique: {it.technique}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                      {!filteredSchedule.length && (
                         <div className="text-sm text-muted-foreground">No schedule produced.</div>
                       )}
                     </div>
@@ -183,7 +251,7 @@ export default function Tasks() {
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => markDone({ id: t._id })}
+                          onClick={() => markDone({ id: t._id as any })}
                         >
                           Mark Done
                         </Button>
