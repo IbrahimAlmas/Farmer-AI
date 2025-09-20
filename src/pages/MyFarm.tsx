@@ -279,6 +279,16 @@ export default function MyFarm() {
     const generate3D = useAction((api as any).meshy.generateFromFarmPhoto as any);
     const checkStatus = useAction((api as any).meshy.checkStatus as any);
 
+    // Add: pull latest sim to show "Last Simulation"
+    const sim = useQuery(api.sims.get, { farmId: farmId as any } as any) as any;
+    const lastSim = sim
+      ? (() => {
+          const ms = Date.now() - ((sim as any)?._creationTime as number);
+          const days = Math.floor(ms / 86400000);
+          return days <= 0 ? "Today" : `${days} day${days > 1 ? "s" : ""} ago`;
+        })()
+      : null;
+
     // Upload handler
     const handleUpload = async () => {
       try {
@@ -339,8 +349,8 @@ export default function MyFarm() {
     };
 
     return (
-      <div className="rounded-2xl bg-white ring-1 ring-black/5 shadow-sm overflow-hidden flex flex-col">
-        <div className="h-40 w-full overflow-hidden">
+      <div className="rounded-2xl bg-white ring-1 ring-black/5 shadow-md overflow-hidden flex flex-col">
+        <div className="h-44 w-full overflow-hidden rounded-t-2xl">
           <img
             src={photoUrl || "/assets/Fild.jpeg"}
             alt={name}
@@ -356,9 +366,9 @@ export default function MyFarm() {
         <div className="p-4 flex flex-col gap-3">
           <div>
             <div className="text-base font-semibold">{name}</div>
-            {modelStatus && (
-              <div className="text-xs text-muted-foreground">Model: {modelStatus}</div>
-            )}
+            <div className="text-xs text-muted-foreground">
+              Last Simulation: {lastSim ?? "—"}
+            </div>
           </div>
 
           <div className="grid gap-2">
