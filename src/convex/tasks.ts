@@ -107,7 +107,47 @@ export const aiSuggestions = query({
   args: {},
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
-    if (!userId) return [];
+    // When not authenticated, return demo suggestions so the Tasks page is never empty
+    if (!userId) {
+      const now = Date.now();
+      const day = 24 * 60 * 60 * 1000;
+
+      // Minimal demo schedule to derive suggestions
+      const demoPlan: Array<{ at: number; item: string; details: string; technique?: string }> = [
+        {
+          at: now + 0 * day,
+          item: "Plant wheat — Farm A",
+          details: "Sow certified seeds at 3–5 cm depth; ensure fine tilth.",
+          technique: "Direct seeding / seed drill",
+        },
+        {
+          at: now + 1 * day,
+          item: "Irrigation — Farm B",
+          details: "Apply 8–12 mm depending on ET and rainfall.",
+          technique: "Drip (preferred) or Sprinkler",
+        },
+        {
+          at: now + 2 * day,
+          item: "Pest scouting — Farm C",
+          details: "Inspect 10 plants per block; look for aphids and leaf miners.",
+          technique: "Visual scouting",
+        },
+      ];
+
+      const suggestions = demoPlan.slice(0, 3).map((p, idx) => {
+        const lower = p.item.toLowerCase();
+        const priority: "high" | "medium" | "low" =
+          lower.includes("plant") || lower.includes("irrigation") ? "high" : idx === 1 ? "medium" : "low";
+        return {
+          title: p.item,
+          priority,
+          reason: p.technique ? `${p.details} (Technique: ${p.technique})` : p.details,
+          dueInDays: Math.max(0, Math.round((p.at - Date.now()) / day)),
+        };
+      });
+
+      return suggestions;
+    }
 
     // Build the same schedule used in `schedule` and derive suggestions from it
     const farms = await ctx.db
@@ -210,7 +250,68 @@ export const schedule = query({
   args: {},
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
-    if (!userId) return [];
+    // When not authenticated, return a comprehensive demo plan for 3 farms
+    if (!userId) {
+      const now = Date.now();
+      const day = 24 * 60 * 60 * 1000;
+
+      const demoFarms: Array<{ name: string; crop: string }> = [
+        { name: "Farm A", crop: "wheat" },
+        { name: "Farm B", crop: "rice" },
+        { name: "Farm C", crop: "maize" },
+      ];
+
+      function planForFarm(farm: { name: string; crop: string }) {
+        const items: Array<{ at: number; item: string; details: string; technique?: string }> = [
+          {
+            at: now + 0 * day,
+            item: `Plant ${farm.crop} — ${farm.name}`,
+            details: `Begin planting ${farm.crop}; ensure proper depth and spacing.`,
+            technique: "Direct seeding",
+          },
+          {
+            at: now + 1 * day,
+            item: `Irrigation — ${farm.name}`,
+            details: "Apply 8–12 mm based on ET and forecast.",
+            technique: "Drip (preferred) or Sprinkler",
+          },
+          {
+            at: now + 2 * day,
+            item: `Pest scouting — ${farm.name}`,
+            details: "Inspect leaves and stems; sample 10 plants per block.",
+            technique: "Visual scouting",
+          },
+          {
+            at: now + 5 * day,
+            item: `Fertilization — ${farm.name}`,
+            details: "Apply light NPK 10-26-26 if growth is lagging.",
+            technique: "Fertigation via drip",
+          },
+          {
+            at: now + 9 * day,
+            item: `Follow-up irrigation — ${farm.name}`,
+            details: "Recheck VWC; add 10 mm if < 35%.",
+            technique: "Drip",
+          },
+          {
+            at: now + 12 * day,
+            item: `Weed management — ${farm.name}`,
+            details: "Spot weed between rows to reduce competition.",
+            technique: "Manual or mechanical",
+          },
+          {
+            at: now + 14 * day,
+            item: `Harvest window review — ${farm.name}`,
+            details: `Review forecast and crop progress for ${farm.crop}.`,
+            technique: "Field scouting + forecast check",
+          },
+        ];
+        return items;
+      }
+
+      const plan = demoFarms.flatMap(planForFarm).sort((a, b) => a.at - b.at);
+      return plan;
+    }
 
     const now = Date.now();
     const day = 24 * 60 * 60 * 1000;

@@ -124,6 +124,11 @@ export default function Tasks() {
                           </div>
                           <div className="font-medium">{it.item}</div>
                           <div className="text-sm text-muted-foreground">{it.details}</div>
+                          {(it as any).farmName && (
+                            <div className="text-xs text-muted-foreground mt-1">
+                              Farm: {(it as any).farmName}
+                            </div>
+                          )}
                           {it.technique && (
                             <div className="text-xs text-primary mt-1">Technique: {it.technique}</div>
                           )}
