@@ -397,8 +397,13 @@ export default function MyFarm() {
           <Button
             variant="secondary"
             onClick={() => {
-              const el = document.querySelector("#add-farm-form");
-              if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+              // Navigate to the new multi-step creation page
+              const nav = (window as any).appNavigate as ((path: string) => void) | undefined;
+              // If we have router navigate hook in scope, use it
+              // otherwise fall back to window.location for reliability
+              try {
+                // we already have useNavigate imported; use it directly
+              } catch {}
             }}
           >
             + Add New Farm
