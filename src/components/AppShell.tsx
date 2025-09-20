@@ -310,7 +310,7 @@ export function AppShell({ children, title }: AppShellProps) {
                 {/* Ambient glow behind dock */}
                 <div className="absolute inset-0 bg-primary/5 rounded-[22px] blur-2xl scale-110 animate-glow-pulse" />
                 
-                <div className="relative flex items-end gap-6 rounded-[22px] border bg-white text-[oklch(0.35_0.03_120)] shadow-[0_28px_80px_-20px_rgba(0,0,0,0.25)] ring-1 ring-black/5 px-7 py-4">
+                <div className="relative flex items-end gap-5 rounded-[22px] border bg-white text-[oklch(0.35_0.03_120)] shadow-[0_28px_80px_-20px_rgba(0,0,0,0.25)] ring-1 ring-black/5 px-6 py-3">
                   {/* Left side items */}
                   {leftItems.map((item) => {
                     const isActive = location.pathname === item.path;
@@ -331,7 +331,7 @@ export function AppShell({ children, title }: AppShellProps) {
                         whileTap={{ scale: 0.95 }}
                       >
                         <div
-                          className={`grid place-items-center size-18 rounded-3xl transition-all duration-150 glow-sweep
+                          className={`grid place-items-center size-16 rounded-3xl transition-all duration-150 glow-sweep
                           ${isActive ? "bg-primary/20 text-primary shadow-[0_0_36px_-6px_theme(colors.primary/55)] ring-2 ring-primary/30" : "text-[oklch(0.45_0.03_120)] hover:text-[oklch(0.3_0.03_120)]"}
                           hover:shadow-[0_16px_40px_-12px_rgba(0,0,0,0.12)] ring-0 active:ring-2 active:ring-primary/50`}
                         >
@@ -362,7 +362,7 @@ export function AppShell({ children, title }: AppShellProps) {
                     title={ui(currentLang, "Voice")}
                   >
                     <motion.div 
-                      className="grid place-items-center size-18 rounded-3xl transition-all duration-150 text-[oklch(0.45_0.03_120)] hover:text-[oklch(0.3_0.03_120)] hover:shadow-[0_16px_40px_-12px_rgba(0,0,0,0.12)]"
+                      className="grid place-items-center size-16 rounded-3xl transition-all duration-150 text-[oklch(0.45_0.03_120)] hover:text-[oklch(0.3_0.03_120)] hover:shadow-[0_16px_40px_-12px_rgba(0,0,0,0.12)]"
                       whileHover={{ 
                         scale: 1.25, 
                         y: -8,
@@ -408,7 +408,7 @@ export function AppShell({ children, title }: AppShellProps) {
                         whileTap={{ scale: 0.95 }}
                       >
                         <div
-                          className={`grid place-items-center size-18 rounded-3xl transition-all duration-150 glow-sweep
+                          className={`grid place-items-center size-16 rounded-3xl transition-all duration-150 glow-sweep
                           ${isActive ? "bg-primary/20 text-primary shadow-[0_0_36px_-6px_theme(colors.primary/55)] ring-2 ring-primary/30" : "text-[oklch(0.45_0.03_120)] hover:text-[oklch(0.3_0.03_120)]"}
                           hover:shadow-[0_16px_40px_-12px_rgba(0,0,0,0.12)] ring-0 active:ring-2 active:ring-primary/50`}
                         >
