@@ -109,46 +109,100 @@ export const aiSuggestions = query({
     const userId = await getAuthUserId(ctx);
     if (!userId) return [];
 
-    // Pull a bit of context to tailor suggestions
+    // Build the same schedule used in `schedule` and derive suggestions from it
     const farms = await ctx.db
       .query("farms")
       .withIndex("by_userId", (q) => q.eq("userId", userId))
       .collect();
 
-    // Prefer the first farm for simple tailoring
-    const farm = farms[0] ?? null;
+    const now = Date.now();
+    const day = 24 * 60 * 60 * 1000;
 
-    // Lightweight heuristics; if farm exists and size/previousCrops hint wheat/rice, adapt copies
-    const hasWheat = !!farm?.previousCrops?.some((c) => c.toLowerCase().includes("wheat"));
-    const cropHint = hasWheat ? "wheat" : "your crop";
+    // Helper: plan for a single farm
+    function planForFarm(farm: any) {
+      const farmName = (farm?.name as string) || "Farm";
+      const sizeAcres = (farm?.size as number | undefined) ?? 1;
+      const crop = (farm?.previousCrops?.[0] as string | undefined) ?? "wheat";
 
-    const suggestions: Array<{
-      title: string;
-      priority: "high" | "medium" | "low";
-      reason: string;
-      dueInDays: number;
-    }> = [
-      {
-        title: "Check Irrigation System",
-        priority: "high",
-        reason: "Soil moisture may be low; verify lines, emitters, and pressure.",
-        dueInDays: 0,
-      },
-      {
-        title: "Pest Scouting in Zone B",
-        priority: "medium",
-        reason: "Weather favors aphid growth; inspect leaves and stems.",
-        dueInDays: 1,
-      },
-      {
-        title: `Fertilize ${cropHint} Fields`,
-        priority: "low",
-        reason: "Scheduled maintenance feeding for next week.",
-        dueInDays: 7,
-      },
-    ];
+      return [
+        {
+          at: now + 0 * day,
+          item: `Plant ${crop} — ${farmName}`,
+          details: `Direct seeding window begins. Target spacing for ${crop}.`,
+          technique: "Direct seeding",
+        },
+        {
+          at: now + 1 * day,
+          item: `Irrigation — ${farmName}`,
+          details: `Apply 8–12 mm depending on ET and rainfall.`,
+          technique: "Drip (preferred) or Sprinkler",
+        },
+        {
+          at: now + 2 * day,
+          item: `Pest scouting — ${farmName}`,
+          details: "Inspect 10 plants per block; look for aphids and leaf miners.",
+          technique: "Visual scouting",
+        },
+        {
+          at: now + 5 * day,
+          item: `Fertilization — ${farmName}`,
+          details: "Apply light NPK 10-26-26 if growth stalls.",
+          technique: "Fertigation via drip",
+        },
+        {
+          at: now + 9 * day,
+          item: `Follow-up irrigation — ${farmName}`,
+          details: "Re-evaluate soil moisture; apply 10 mm if < 35% VWC.",
+          technique: "Drip",
+        },
+        {
+          at: now + 12 * day,
+          item: `Weed management — ${farmName}`,
+          details: "Spot weeding between rows.",
+          technique: "Manual or mechanical",
+        },
+        {
+          at: now + 14 * day,
+          item: `Harvest window review — ${farmName}`,
+          details: `Check forecast; align best window for ${crop}.`,
+          technique: "Field scouting + forecast check",
+        },
+      ];
+    }
 
-    return suggestions;
+    // Limit to first 3 farms for concise plan
+    const selected = farms.slice(0, 3);
+    const all = selected.flatMap(planForFarm).sort((a, b) => a.at - b.at);
+
+    // Derive 3 suggestions from earliest items and map to priority
+    const suggestions = all.slice(0, 6).map((it) => {
+      const title = it.item;
+      const lower = title.toLowerCase();
+      let priority: "high" | "medium" | "low" = "low";
+      if (lower.includes("irrigation")) priority = "high";
+      else if (lower.includes("pest") || lower.includes("weed")) priority = "medium";
+      else if (lower.includes("plant") || lower.includes("fertiliz")) priority = "medium";
+
+      // Due sooner items get smaller dueInDays
+      const dueInDays = Math.max(0, Math.round((it.at - now) / day));
+
+      return {
+        title,
+        priority,
+        reason: it.details,
+        dueInDays,
+      };
+    });
+
+    // Keep unique by title and cap to 3
+    const seen = new Set<string>();
+    const uniqueTop3 = suggestions.filter((s) => {
+      if (seen.has(s.title)) return false;
+      seen.add(s.title);
+      return true;
+    }).slice(0, 3);
+
+    return uniqueTop3;
   },
 });
 
@@ -161,58 +215,73 @@ export const schedule = query({
     const now = Date.now();
     const day = 24 * 60 * 60 * 1000;
 
-    // Simple sample schedule; could be expanded or tied to sims state
-    const plan: Array<{
-      at: number;
-      item: string;
-      details: string;
-      technique?: string;
-    }> = [
-      {
-        at: now + 0 * day,
-        item: "Irrigation check",
-        details: "Inspect mainline, flush filters, spot-check moisture at 10 cm.",
-        technique: "Drip audit",
-      },
-      {
-        at: now + 1 * day,
-        item: "Pest scouting",
-        details: "Look for aphids and leaf miners; sample 10 plants per block.",
-        technique: "Visual scouting",
-      },
-      {
-        at: now + 2 * day,
-        item: "Irrigation",
-        details: "Apply 8–12 mm depending on ET and rainfall.",
-        technique: "Sprinkler or drip (preferred drip for efficiency)",
-      },
-      {
-        at: now + 5 * day,
-        item: "Fertilization",
-        details: "Apply NPK 10-26-26 light dose if growth stalls.",
-        technique: "Fertigation via drip",
-      },
-      {
-        at: now + 9 * day,
-        item: "Weed management",
-        details: "Spot weeding between rows.",
-        technique: "Manual or mechanical",
-      },
-      {
-        at: now + 12 * day,
-        item: "Irrigation",
-        details: "Re-evaluate soil moisture; apply 10 mm if < 35% VWC.",
-        technique: "Drip",
-      },
-      {
-        at: now + 14 * day,
-        item: "Planting window review",
-        details: "Check local forecast; best window in next week for wheat if temps 15–25°C.",
-        technique: "Direct seeding",
-      },
-    ];
+    // Build a detailed 2-week plan per farm (first 3 farms)
+    const farms = await ctx.db
+      .query("farms")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .collect();
 
-    return plan.sort((a, b) => a.at - b.at);
+    function planForFarm(farm: any) {
+      const farmName = (farm?.name as string) || "Farm";
+      const crop = (farm?.previousCrops?.[0] as string | undefined) ?? "wheat";
+
+      const items: Array<{
+        at: number;
+        item: string;
+        details: string;
+        technique?: string;
+      }> = [
+        {
+          at: now + 0 * day,
+          item: `Plant ${crop} — ${farmName}`,
+          details: `Begin planting ${crop}; ensure proper depth and spacing.`,
+          technique: "Direct seeding",
+        },
+        {
+          at: now + 1 * day,
+          item: `Irrigation — ${farmName}`,
+          details: "Apply 8–12 mm based on ET and forecast.",
+          technique: "Drip (preferred) or Sprinkler",
+        },
+        {
+          at: now + 2 * day,
+          item: `Pest scouting — ${farmName}`,
+          details: "Inspect leaves and stems; sample 10 plants per block.",
+          technique: "Visual scouting",
+        },
+        {
+          at: now + 5 * day,
+          item: `Fertilization — ${farmName}`,
+          details: "Apply light NPK 10-26-26 if growth is lagging.",
+          technique: "Fertigation via drip",
+        },
+        {
+          at: now + 9 * day,
+          item: `Follow-up irrigation — ${farmName}`,
+          details: "Recheck VWC; add 10 mm if < 35%.",
+          technique: "Drip",
+        },
+        {
+          at: now + 12 * day,
+          item: `Weed management — ${farmName}`,
+          details: "Spot weed between rows to reduce competition.",
+          technique: "Manual or mechanical",
+        },
+        {
+          at: now + 14 * day,
+          item: `Harvest window review — ${farmName}`,
+          details: `Review forecast and crop progress for ${crop}.`,
+          technique: "Field scouting + forecast check",
+        },
+      ];
+
+      return items;
+    }
+
+    const selected = farms.slice(0, 3);
+    const plan = selected.flatMap(planForFarm).sort((a, b) => a.at - b.at);
+
+    return plan;
   },
 });
 
