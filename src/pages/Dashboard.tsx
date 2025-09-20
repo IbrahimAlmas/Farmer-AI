@@ -1,7 +1,7 @@
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { ArrowLeft, Droplets, Thermometer, Home as HomeIcon, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Droplets, Thermometer, Home as HomeIcon, AlertTriangle, Search, Bell } from "lucide-react";
 import { useNavigate } from "react-router";
 import {
   ChartContainer,
@@ -98,44 +98,61 @@ export default function Dashboard() {
 
   return (
     <AppShell title="Dashboard">
-      <div className="p-4 space-y-6">
-
-        {/* Floating/glassy header */}
-        <div className="sticky top-3 z-30 mx-auto max-w-3xl flex items-center justify-between gap-3 rounded-3xl border bg-card/80 backdrop-blur px-3 py-2 shadow-[0_10px_25px_-10px_rgba(0,0,0,0.45)]">
+      <div className="p-6 md:p-8 space-y-8 bg-[oklch(0.98_0.01_120)] text-[oklch(0.22_0.02_120)] min-h-[calc(100vh-6rem)]">
+        {/* Floating/light header updated to white theme and wider */}
+        <div className="sticky top-4 z-30 mx-auto max-w-6xl flex items-center justify-between gap-3 rounded-2xl bg-white shadow-sm ring-1 ring-black/5 px-3 py-2">
           {/* Left: Go Back to Landing */}
           <Button
             variant="ghost"
-            className="rounded-2xl px-4 py-3 text-sm md:text-base font-semibold"
+            className="rounded-xl px-4 py-3 text-sm md:text-base font-semibold text-[oklch(0.3_0.03_120)]"
             onClick={() => navigate("/")}
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Go Back
           </Button>
 
-          {/* Center: Brand — make text white for visibility */}
+          {/* Center: Brand logo + name (use project logo asset) */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div className="flex items-center gap-2">
               <img
-                src="https://harmless-tapir-303.convex.cloud/api/storage/a4af3a5d-e126-420d-b31d-c1929a3c833b"
+                src="/assets/Logo_.png"
                 alt="Root AI"
-                className="h-8 w-8 md:h-9 md:w-9 rounded-full object-cover"
+                className="h-8 w-8 md:h-9 md:w-9 rounded-lg object-cover ring-1 ring-black/5"
                 onError={(e) => {
                   const t = e.currentTarget as HTMLImageElement;
                   if (t.src !== '/logo.svg') t.src = '/logo.svg';
                   t.onerror = null;
                 }}
               />
-              <span className="text-base md:text-lg font-bold tracking-wide text-white">Root AI</span>
+              <span className="text-base md:text-lg font-bold tracking-wide text-[oklch(0.22_0.02_120)]">Root AI</span>
             </div>
           </div>
 
-          {/* Right: CTA */}
-          <Button
-            className="rounded-full px-5 py-3 text-sm md:text-base bg-[oklch(0.42_0.12_130)] hover:bg-[oklch(0.42_0.12_130_/_90%)] text-white"
-            onClick={() => navigate("/learn-more")}
-          >
-            Learn More →
-          </Button>
+          {/* Right: Icons to match light header style */}
+          <div className="flex items-center gap-2">
+            <Button variant="outline" className="rounded-xl" onClick={() => navigate("/learn-more")}>
+              Learn More →
+            </Button>
+            <button
+              className="grid place-items-center size-9 rounded-xl bg-[oklch(0.97_0.01_120)] ring-1 ring-black/5 text-[oklch(0.35_0.03_120)]"
+              aria-label="Search"
+              title="Search"
+            >
+              <Search className="h-4 w-4" />
+            </button>
+            <button
+              className="grid place-items-center size-9 rounded-xl bg-[oklch(0.97_0.01_120)] ring-1 ring-black/5 text-[oklch(0.35_0.03_120)]"
+              aria-label="Notifications"
+              title="Notifications"
+            >
+              <Bell className="h-4 w-4" />
+            </button>
+            <img
+              src="https://images.unsplash.com/photo-1607746882042-944635dfe10e?q=80&w=80&auto=format&fit=crop"
+              alt="Profile"
+              className="h-9 w-9 rounded-full object-cover ring-1 ring-black/5"
+            />
+          </div>
         </div>
 
         {/* Greeting */}
@@ -152,13 +169,13 @@ export default function Dashboard() {
           </p>
         </motion.div>
 
-        {/* KPI strip - refined to match screenshot with icons and deltas */}
+        {/* KPI strip - switch to white cards */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-3"
+          className="grid grid-cols-2 md:grid-cols-4 gap-4"
         >
-          <div className="panel-glass rounded-xl p-4">
+          <div className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-black/5">
             <div className="flex items-center justify-between">
               <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Today's ET0</div>
               <Droplets className="h-4 w-4 text-primary/80" />
@@ -166,7 +183,7 @@ export default function Dashboard() {
             <div className="mt-1 text-2xl font-extrabold">4.2 mm</div>
             <div className="text-xs text-emerald-400">+0.2 mm vs avg</div>
           </div>
-          <div className="panel-glass rounded-xl p-4">
+          <div className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-black/5">
             <div className="flex items-center justify-between">
               <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Avg. Moisture</div>
               <Thermometer className="h-4 w-4 text-primary/80" />
@@ -174,12 +191,12 @@ export default function Dashboard() {
             <div className="mt-1 text-2xl font-extrabold">46%</div>
             <div className="text-xs text-muted-foreground">Last 7 days</div>
           </div>
-          <div className="panel-glass rounded-xl p-4">
+          <div className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-black/5">
             <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Active Farms</div>
             <div className="mt-1 text-2xl font-extrabold">3</div>
             <div className="text-xs text-muted-foreground">Managed</div>
           </div>
-          <div className="panel-glass rounded-xl p-4">
+          <div className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-black/5">
             <div className="flex items-center justify-between">
               <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Alerts</div>
               <AlertTriangle className="h-4 w-4 text-amber-400" />
@@ -189,11 +206,11 @@ export default function Dashboard() {
           </div>
         </motion.div>
 
-        {/* Urgent Tasks — inline cards with icons + View Details */}
+        {/* Urgent Tasks — light card container and light item cards */}
         <motion.div
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
-          className="panel-glass rounded-2xl p-4"
+          className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-black/5"
         >
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-semibold">Urgent Tasks</h3>
@@ -205,11 +222,11 @@ export default function Dashboard() {
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {urgentTasks.map((t) => (
               <div
                 key={t.id}
-                className="rounded-xl border px-3 py-3 bg-card/70 flex items-start justify-between gap-3"
+                className="rounded-xl px-3 py-3 bg-[oklch(0.98_0.01_120)] ring-1 ring-black/5 flex items-start justify-between gap-3"
               >
                 <div className="flex items-start gap-3">
                   <div className="grid place-items-center size-8 rounded-lg bg-primary/15 text-primary">
@@ -247,14 +264,14 @@ export default function Dashboard() {
           </div>
         </motion.div>
 
-        {/* Replace analytics with Environmental Factors + Crop Share */}
+        {/* Analytics row — light cards */}
         <motion.div
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           className="grid grid-cols-1 md:grid-cols-2 gap-4"
         >
-          {/* Environmental Factors (7 days) — temp line + rainfall bars */}
-          <div className="panel-glass rounded-2xl p-4">
+          <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-black/5">
+            {/* Environmental Factors (7 days) — temp line + rainfall bars */}
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-sm font-semibold">Environmental Factors (7 days)</h3>
               <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Temp • Rain</span>
@@ -292,8 +309,7 @@ export default function Dashboard() {
             </ChartContainer>
           </div>
 
-          {/* Crop Share — doughnut */}
-          <div className="panel-glass rounded-2xl p-4">
+          <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-black/5">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-sm font-semibold">Crop Share</h3>
               <span className="text-[10px] uppercase tracking-widest text-muted-foreground">% Area</span>
@@ -318,7 +334,7 @@ export default function Dashboard() {
                   outerRadius={95}
                   paddingAngle={3}
                   cornerRadius={6}
-                  stroke="hsl(var(--background))"
+                  stroke="#fff"
                   strokeWidth={3}
                   label={({ name, value }) => `${name} ${value}%`}
                 >
