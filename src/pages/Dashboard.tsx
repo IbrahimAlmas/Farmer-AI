@@ -98,13 +98,13 @@ export default function Dashboard() {
 
   return (
     <AppShell title="Dashboard">
-      <div className="p-6 md:p-8 space-y-8 bg-[oklch(0.98_0.01_120)] text-[oklch(0.22_0.02_120)] min-h-[calc(100vh-6rem)]">
+      <div className="p-4 md:p-6 space-y-6 bg-[oklch(0.98_0.01_120)] text-[oklch(0.22_0.02_120)]">
         {/* Floating/light header updated to white theme and wider */}
-        <div className="sticky top-4 z-30 mx-auto max-w-6xl flex items-center justify-between gap-3 rounded-2xl bg-white shadow-sm ring-1 ring-black/5 px-3 py-2">
+        <div className="sticky top-2 z-30 mx-auto max-w-6xl flex items-center justify-between gap-3 rounded-2xl bg-white shadow-sm ring-1 ring-black/5 px-3 py-2">
           {/* Left: Go Back to Landing */}
           <Button
             variant="ghost"
-            className="rounded-xl px-4 py-3 text-sm md:text-base font-semibold text-[oklch(0.3_0.03_120)]"
+            className="rounded-xl px-3 py-2.5 text-sm md:text-base font-semibold text-[oklch(0.3_0.03_120)]"
             onClick={() => navigate("/")}
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -159,7 +159,7 @@ export default function Dashboard() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center"
+          className="text-center mt-2"
         >
           <h2 className="text-2xl font-bold mb-2">
             Welcome back, Farmer! 🌾
