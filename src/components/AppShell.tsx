@@ -147,20 +147,10 @@ export function AppShell({ children, title }: AppShellProps) {
           <div className="mx-auto w-full max-w-6xl">
             {/* Enhanced glass header with animations */}
             <motion.div 
-              className="mx-3 md:mx-0 rounded-[22px] panel-glass bg-white/10 backdrop-blur-xl supports-[backdrop-filter]:bg-white/10 gradient-border animate-gradient-shift ring-2 ring-emerald-400/35 shadow-[0_0_40px_-10px_theme(colors.emerald.400/45)] relative overflow-visible border-beam"
+              className="mx-3 md:mx-0 rounded-2xl bg-white shadow-sm ring-1 ring-black/5 relative overflow-hidden"
               whileHover={{ y: -2 }}
               transition={{ duration: 0.2 }}
             >
-              {/* Subtle moving green beam around header (blunt, rounded edge) */}
-              <div
-                className="pointer-events-none absolute -inset-[2px] rounded-[24px] opacity-45 bg-[conic-gradient(from_0deg,theme(colors.emerald.400)_0%,theme(colors.green.300)_25%,transparent_40%,transparent_60%,theme(colors.green.300)_75%,theme(colors.emerald.400)_100%)] animate-ring-rotate"
-                aria-hidden
-              />
-              {/* Gentle glossy green glow behind border */}
-              <div
-                className="pointer-events-none absolute -inset-[3px] rounded-[26px] blur-xl opacity-80 bg-[linear-gradient(90deg,theme(colors.emerald.400/20),theme(colors.green.300/14),theme(colors.emerald.400/20))] animate-gradient-shift"
-                aria-hidden
-              />
               <div className="flex items-center justify-between px-4 py-3 relative">
                 <LogoDropdown />
                 {/* Replace title with contextual nav for Learn More section pages */}
@@ -169,7 +159,7 @@ export function AppShell({ children, title }: AppShellProps) {
                     <Button
                       variant={location.pathname === "/our-team" ? "secondary" : "ghost"}
                       size="sm"
-                      className="rounded-xl px-3 py-2 magnetic-hover"
+                      className="rounded-xl px-3 py-2"
                       onClick={() => navigate("/our-team")}
                     >
                       {ui(currentLang, "Our Team")}
@@ -177,7 +167,7 @@ export function AppShell({ children, title }: AppShellProps) {
                     <Button
                       variant={location.pathname === "/our-mission" ? "secondary" : "ghost"}
                       size="sm"
-                      className="rounded-xl px-3 py-2 magnetic-hover"
+                      className="rounded-xl px-3 py-2"
                       onClick={() => navigate("/our-mission")}
                     >
                       {ui(currentLang, "Our Mission")}
@@ -185,7 +175,7 @@ export function AppShell({ children, title }: AppShellProps) {
                     <Button
                       variant={location.pathname === "/future-plan" ? "secondary" : "ghost"}
                       size="sm"
-                      className="rounded-xl px-3 py-2 magnetic-hover"
+                      className="rounded-xl px-3 py-2"
                       onClick={() => navigate("/future-plan")}
                     >
                       {ui(currentLang, "Future Plan")}
@@ -207,7 +197,7 @@ export function AppShell({ children, title }: AppShellProps) {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="rounded-xl px-3 py-2 magnetic-hover"
+                      className="rounded-xl px-3 py-2"
                       onClick={() => navigate("/dashboard")}
                       aria-label="Home"
                     >
@@ -220,7 +210,7 @@ export function AppShell({ children, title }: AppShellProps) {
                       {isCommunity && myCommunity?.community && (
                         <motion.button
                           onClick={() => navigate("/community")}
-                          className="flex items-center gap-2 rounded-xl border bg-card/70 hover:bg-card/90 transition-colors px-2.5 py-1.5 magnetic-hover"
+                          className="flex items-center gap-2 rounded-xl border bg-card/70 hover:bg-card/90 transition-colors px-2.5 py-1.5"
                           aria-label="Current Community"
                           title={myCommunity.community.name}
                           whileHover={{ scale: 1.05 }}
@@ -245,7 +235,7 @@ export function AppShell({ children, title }: AppShellProps) {
                         <Button
                           variant="secondary"
                           size="sm"
-                          className="rounded-xl px-3 py-2 magnetic-hover"
+                          className="rounded-xl px-3 py-2"
                           onClick={() => {
                             navigate("/community/create");
                           }}
@@ -259,7 +249,7 @@ export function AppShell({ children, title }: AppShellProps) {
                         <Button
                           variant="outline"
                           size="sm"
-                          className="rounded-xl px-3 py-2 magnetic-hover"
+                          className="rounded-xl px-3 py-2"
                           onClick={() => navigate("/community")}
                           aria-label="Back to Community"
                         >
