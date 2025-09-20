@@ -22,12 +22,12 @@ export default function Landing() {
             {/* Left: Logo */}
             <a href="/" className="flex items-center gap-2">
               <img
-                src="/logo.svg"
+                src="/assets/Logo_.png"
                 alt="Root AI"
                 className="h-7 w-7 rounded-lg object-cover ring-1 ring-black/5"
                 onError={(e) => {
                   const t = e.currentTarget as HTMLImageElement;
-                  if (t.src !== '/logo.png') t.src = '/logo.png';
+                  if (t.src !== '/logo.svg') t.src = '/logo.svg';
                   t.onerror = null;
                 }}
               />
@@ -59,7 +59,7 @@ export default function Landing() {
 
       {/* Hero */}
       <section className="relative mt-6">
-        <div className="relative h-[58vh] min-h-[520px] w-full">
+        <div className="relative h-screen min-h-[640px] w-full">
           <img
             src="/assets/Fild.jpeg"
             alt="Farm field"
@@ -88,9 +88,9 @@ export default function Landing() {
               <Button
                 variant="secondary"
                 className="rounded-xl bg-white/90 text-[oklch(0.3_0.03_120)] hover:bg-white"
-                onClick={() => navigate("/learn")}
+                onClick={() => navigate("/settings")}
               >
-                Learn More
+                Change Language
               </Button>
             </div>
           </div>
@@ -98,15 +98,15 @@ export default function Landing() {
       </section>
 
       {/* Core Tools Hub */}
-      <section id="features" className="mx-auto w-full max-w-6xl px-4 py-14">
+      <section id="features" className="mx-auto w-full max-w-6xl px-4 py-20">
         <div className="text-center">
           <h2 className="text-3xl md:text-4xl font-extrabold">Core Tools Hub</h2>
-          <p className="mt-1 text-[oklch(0.45_0.03_120)]">
+          <p className="mt-2 text-[oklch(0.45_0.03_120)]">
             Easy, fast, and simple for everyone.
           </p>
         </div>
 
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Voice Commands */}
           <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5">
             <div className="inline-flex items-center justify-center rounded-xl bg-[oklch(0.97_0.01_120)] p-3 ring-1 ring-black/5">
@@ -152,7 +152,7 @@ export default function Landing() {
       </section>
 
       {/* Under the Hood */}
-      <section id="stack" className="bg-[oklch(0.97_0.01_120)] py-14">
+      <section id="stack" className="bg-[oklch(0.97_0.01_120)] py-20">
         <div className="mx-auto w-full max-w-6xl px-4">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Left copy */}
@@ -209,15 +209,15 @@ export default function Landing() {
       </section>
 
       {/* Testimonials */}
-      <section className="mx-auto w-full max-w-6xl px-4 py-14">
+      <section className="mx-auto w-full max-w-6xl px-4 py-20">
         <div className="text-center">
           <h3 className="text-3xl md:text-4xl font-extrabold">What Farmers Say</h3>
-          <p className="mt-1 text-[oklch(0.45_0.03_120)]">
+          <p className="mt-2 text-[oklch(0.45_0.03_120)]">
             Real stories from farmers transforming their operations with Root AI.
           </p>
         </div>
 
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-8">
           {[
             {
               quote:
@@ -255,12 +255,12 @@ export default function Landing() {
           <div>
             <div className="flex items-center gap-2">
               <img
-                src="/logo.svg"
+                src="/assets/Logo_.png"
                 alt="Root AI"
                 className="h-8 w-8 rounded-lg ring-1 ring-black/5"
                 onError={(e) => {
                   const t = e.currentTarget as HTMLImageElement;
-                  if (t.src !== '/logo.png') t.src = '/logo.png';
+                  if (t.src !== '/logo.svg') t.src = '/logo.svg';
                   t.onerror = null;
                 }}
               />
