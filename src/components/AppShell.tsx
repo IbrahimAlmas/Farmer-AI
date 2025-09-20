@@ -54,6 +54,9 @@ export function AppShell({ children, title }: AppShellProps) {
   const isCommunity = location.pathname === "/community";
   const isCommunityCreate = location.pathname === "/community/create";
 
+  // Add: use white theme wrapper for dashboard to avoid dark strip at bottom
+  const isWhiteTheme = location.pathname === "/dashboard";
+
   const [scrollProgress, setScrollProgress] = useState<number>(0);
 
   // Add: Mac-style Dock visibility and items (desktop)
@@ -131,7 +134,7 @@ export function AppShell({ children, title }: AppShellProps) {
   const currentLang = (profile?.preferredLang as LangKey) || "en";
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className={`min-h-screen flex flex-col ${isWhiteTheme ? "bg-[oklch(0.98_0.01_120)] text-[oklch(0.22_0.02_120)]" : "bg-background"}`}>
       {/* Top Bar - hidden on dashboard */}
       {!hideTopBar && (
         <motion.header 
@@ -287,6 +290,11 @@ export function AppShell({ children, title }: AppShellProps) {
       <main className="flex-1 pb-24">
         {children}
       </main>
+
+      {/* Light backdrop under dock to fully cover bottom area on white theme */}
+      {isWhiteTheme && (
+        <div className="fixed inset-x-0 bottom-0 h-24 bg-[oklch(0.98_0.01_120)] z-10 pointer-events-none" />
+      )}
 
       {/* Enhanced Mac-style Dock (desktop) */}
       {!isOurTeam && (
