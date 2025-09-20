@@ -310,7 +310,7 @@ export function AppShell({ children, title }: AppShellProps) {
                 {/* Ambient glow behind dock */}
                 <div className="absolute inset-0 bg-primary/5 rounded-[22px] blur-2xl scale-110 animate-glow-pulse" />
                 
-                <div className="relative flex items-end gap-6 rounded-[22px] border bg-card/80 backdrop-blur-xl supports-[backdrop-filter]:bg-card/70 shadow-[0_28px_80px_-20px_rgba(0,0,0,0.6)] px-7 py-4">
+                <div className="relative flex items-end gap-6 rounded-[22px] border bg-white text-[oklch(0.35_0.03_120)] shadow-[0_28px_80px_-20px_rgba(0,0,0,0.25)] ring-1 ring-black/5 px-7 py-4">
                   {/* Left side items */}
                   {leftItems.map((item) => {
                     const isActive = location.pathname === item.path;
@@ -332,8 +332,8 @@ export function AppShell({ children, title }: AppShellProps) {
                       >
                         <div
                           className={`grid place-items-center size-18 rounded-3xl transition-all duration-150 glow-sweep
-                          ${isActive ? "bg-primary/20 text-primary shadow-[0_0_36px_-6px_theme(colors.primary/55)] ring-2 ring-primary/30" : "text-foreground/80 hover:text-foreground"}
-                          hover:shadow-[0_16px_40px_-12px_rgba(0,0,0,0.55)] ring-0 active:ring-2 active:ring-primary/50`}
+                          ${isActive ? "bg-primary/20 text-primary shadow-[0_0_36px_-6px_theme(colors.primary/55)] ring-2 ring-primary/30" : "text-[oklch(0.45_0.03_120)] hover:text-[oklch(0.3_0.03_120)]"}
+                          hover:shadow-[0_16px_40px_-12px_rgba(0,0,0,0.12)] ring-0 active:ring-2 active:ring-primary/50`}
                         >
                           <Icon className="h-7 w-7" />
                           {isActive && (
@@ -353,7 +353,7 @@ export function AppShell({ children, title }: AppShellProps) {
                   })}
 
                   {/* Left Divider */}
-                  <div className="h-16 w-px bg-border/40 mx-2 shrink-0" aria-hidden />
+                  <div className="h-16 w-px bg-black/10 mx-2 shrink-0" aria-hidden />
 
                   {/* Enhanced Embedded Voice Button centered */}
                   <div
@@ -362,7 +362,7 @@ export function AppShell({ children, title }: AppShellProps) {
                     title={ui(currentLang, "Voice")}
                   >
                     <motion.div 
-                      className="grid place-items-center size-18 rounded-3xl transition-all duration-150 text-foreground/80 hover:text-foreground hover:shadow-[0_16px_40px_-12px_rgba(0,0,0,0.55)]"
+                      className="grid place-items-center size-18 rounded-3xl transition-all duration-150 text-[oklch(0.45_0.03_120)] hover:text-[oklch(0.3_0.03_120)] hover:shadow-[0_16px_40px_-12px_rgba(0,0,0,0.12)]"
                       whileHover={{ 
                         scale: 1.25, 
                         y: -8,
@@ -386,7 +386,7 @@ export function AppShell({ children, title }: AppShellProps) {
                   </div>
 
                   {/* Right Divider */}
-                  <div className="h-16 w-px bg-border/40 mx-2 shrink-0" aria-hidden />
+                  <div className="h-16 w-px bg-black/10 mx-2 shrink-0" aria-hidden />
 
                   {/* Right side items */}
                   {rightItems.map((item) => {
@@ -409,8 +409,8 @@ export function AppShell({ children, title }: AppShellProps) {
                       >
                         <div
                           className={`grid place-items-center size-18 rounded-3xl transition-all duration-150 glow-sweep
-                          ${isActive ? "bg-primary/20 text-primary shadow-[0_0_36px_-6px_theme(colors.primary/55)] ring-2 ring-primary/30" : "text-foreground/80 hover:text-foreground"}
-                          hover:shadow-[0_16px_40px_-12px_rgba(0,0,0,0.55)] ring-0 active:ring-2 active:ring-primary/50`}
+                          ${isActive ? "bg-primary/20 text-primary shadow-[0_0_36px_-6px_theme(colors.primary/55)] ring-2 ring-primary/30" : "text-[oklch(0.45_0.03_120)] hover:text-[oklch(0.3_0.03_120)]"}
+                          hover:shadow-[0_16px_40px_-12px_rgba(0,0,0,0.12)] ring-0 active:ring-2 active:ring-primary/50`}
                         >
                           <Icon className="h-7 w-7" />
                           {isActive && (
