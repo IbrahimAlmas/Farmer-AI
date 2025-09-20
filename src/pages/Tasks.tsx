@@ -53,7 +53,6 @@ export default function Tasks() {
     const names = (farms ?? []).map((f: any) => (f?.name as string) || "Farm");
     return names.length ? names : demoForms;
   }, [farms, demoForms]);
-  // selectedForm state declared above to avoid initialization order issues
 
   // Helpers to extract farm name from strings like "Task — Farm Name"
   const extractFarmName = (text: string): string | null => {
