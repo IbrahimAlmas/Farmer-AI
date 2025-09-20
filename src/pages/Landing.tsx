@@ -1,7 +1,7 @@
 import { motion, useScroll, useTransform, useInView } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowRight, Mic, Sprout, Camera, ShoppingCart, Languages, ShieldCheck, Loader2, Cloud, Sparkles, MapPin, Leaf, BarChart3, Shield, Users2, Zap, Droplets, Sun, Cpu, Globe, TrendingUp, CheckCircle } from "lucide-react";
+import { ArrowRight, Mic, Sprout, Camera, ShoppingCart, Languages, ShieldCheck, Loader2, Cloud, Sparkles, MapPin, Leaf, BarChart3, Shield, Users2, Zap, Droplets, Sun, Cpu, Globe, TrendingUp, CheckCircle, FlaskConical } from "lucide-react";
 import { useNavigate } from "react-router";
 import { useMemo, useEffect, useState, useRef } from "react";
 import { api } from "@/convex/_generated/api";
@@ -12,1084 +12,276 @@ import { ui, type LangKey } from "@/lib/i18n";
 
 export default function Landing() {
   const navigate = useNavigate();
-  const updateProfile = useMutation(api.profiles.update);
-  const tts = useAction(api.voice.tts);
-  const reverseGeocode = useAction(api.location.reverseGeocode);
-  const heroRef = useRef<HTMLDivElement>(null);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-
-  // Setup progress UI
-  const [setupLoading, setSetupLoading] = useState(false);
-
-  // Add: Language gate state for first screen selection
-  const [gateOpen, setGateOpen] = useState<boolean>(false);
-  const [selectedLang, setSelectedLang] = useState<string>("en");
-  const [guestLang, setGuestLang] = useState<string | null>(null);
-  // Add: show minimal CTA page right after language selection
-  const [postGate, setPostGate] = useState<boolean>(false);
-  // New: simple two-step slider for gate (0 = welcome, 1 = language select)
-  const [gateSlide, setGateSlide] = useState<number>(0);
-
-  // Scroll-based animations
-  const { scrollYProgress } = useScroll();
-  const heroY = useTransform(scrollYProgress, [0, 0.5], [0, -100]);
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0.8]);
-
-  // Live background images for the gate (rotating, mobile-first)
-  const bgImages: Array<string> = [
-    "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1600&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?q=80&w=1600&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1499529112087-3cb3b73cec95?q=80&w=1600&auto=format&fit=crop",
-  ];
-  const [bgIndex, setBgIndex] = useState<number>(0);
-  useEffect(() => {
-    if (!gateOpen) return;
-    const id = setInterval(() => {
-      setBgIndex((i) => (i + 1) % bgImages.length);
-    }, 5000);
-    return () => clearInterval(id);
-  }, [gateOpen]);
-
-  // Spotlight effect
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!heroRef.current) return;
-    const rect = heroRef.current.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
-    setMousePosition({ x, y });
-    
-    heroRef.current.style.setProperty('--spot-x', `${x}%`);
-    heroRef.current.style.setProperty('--spot-y', `${y}%`);
-    heroRef.current.style.setProperty('--spot-opacity', '1');
-  };
-
-  const handleMouseLeave = () => {
-    if (!heroRef.current) return;
-    heroRef.current.style.setProperty('--spot-opacity', '0');
-  };
-
-  // Map Indian states to regional language codes (fallbacks to Hindi for some)
-  const stateToLang = (state?: string): string | null => {
-    if (!state) return null;
-    const s = state.toLowerCase();
-    const map: Record<string, string> = {
-      "tamil nadu": "ta",
-      "andhra pradesh": "te",
-      "telangana": "te",
-      "kerala": "ml",
-      "karnataka": "kn",
-      "delhi": "hi",
-      "nct of delhi": "hi",
-      "uttar pradesh": "hi",
-      "uttarakhand": "hi",
-      "haryana": "hi",
-      "punjab": "pa",
-      "west bengal": "bn",
-      "maharashtra": "mr",
-      "gujarat": "gu",
-      "odisha": "or",
-      "assam": "as",
-      "bihar": "hi", // Bhojpuri optional; keep Hindi for stability
-      "madhya pradesh": "hi",
-      "rajasthan": "hi",
-      "chandigarh": "hi",
-      "goa": "mr",
-    };
-    return map[s] ?? null;
-  };
-
-  // Normalize browser locale to our short code
-  const localeToLang = (loc: string | undefined | null): string => {
-    const l = String(loc || "").toLowerCase();
-    const known = ["te","ta","ml","kn","hi","bn","mr","gu","pa","or","as","bho","en"];
-    const found = known.find((k) => l.startsWith(k));
-    return found || "en";
-  };
-
-  // Auto-localize: if user is logged in and prefers English, set to regional language based on saved state or browser locale
-  // Do NOT run for unauthenticated users (profile === null) to avoid errors
-  // Do NOT override if user already picked a non-English language
-  // Runs once when profile is loaded
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const profile = useQuery(api.profiles.get);
-  const currentLang = String(profile?.preferredLang || "en");
-
-  // Initialize language gate for guests and set selected language source
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem("km.lang");
-      if (stored) {
-        setGuestLang(stored);
-        setSelectedLang(stored);
-        setGateOpen(false);
-        // Show the post-gate CTA when a guest language is already saved
-        if (!profile) {
-          setPostGate(true);
-        }
-      } else {
-        // Do NOT auto-open the language gate; landing remains the main page
-        setGateOpen(false);
-        if (!profile) {
-          setPostGate(false);
-        }
-      }
-    } catch {
-      // ignore storage errors
-    }
-  }, [profile]);
-
-  // When profile is available, prefer its language
-  useEffect(() => {
-    if (profile?.preferredLang) {
-      setSelectedLang(String(profile.preferredLang));
-      setGateOpen(false);
-    }
-  }, [profile?.preferredLang]);
-
-  // Auto-set preferred language once based on profile state or browser locale
-  // Only if profile exists (authenticated) and currently "en"
-  // This avoids surprise changes for users who already chose a language.
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  useMemo(() => {
-    (async () => {
-      if (!profile) return; // not authenticated
-      const current = String(profile.preferredLang || "en");
-      if (current !== "en") return;
-
-      const fromState = stateToLang(profile.location?.state);
-      const nextLang = fromState || localeToLang(navigator.language);
-      if (nextLang && nextLang !== current) {
-        try {
-          await updateProfile({ preferredLang: nextLang });
-          toast.success("Language set based on your region");
-        } catch (e: any) {
-          // non-blocking
-        }
-      }
-    })();
-  }, [profile, updateProfile]);
-
-  // Detect location via GPS and set profile.location with state; auto-set language if still "en"
-  useEffect(() => {
-    (async () => {
-      // Only for authenticated users with no saved location state
-      if (!profile) return; // not authenticated
-      const hasState = !!profile.location?.state;
-      if (hasState) return;
-
-      // Avoid double-running if already in progress
-      if (setupLoading) return;
-      setSetupLoading(true);
-      try {
-        if (!navigator.geolocation) {
-          setSetupLoading(false);
-          return;
-        }
-        await new Promise<void>((resolve, reject) => {
-          const onSuccess = async (pos: GeolocationPosition) => {
-            try {
-              const lat = pos.coords.latitude;
-              const lng = pos.coords.longitude;
-              const result = await reverseGeocode({ lat, lng });
-              const detectedState = (result as any)?.state as string | null;
-
-              // Build location object for profile
-              const location = { lat, lng, state: detectedState || undefined };
-
-              // If current language is still "en", compute a regional one
-              const current = String(profile.preferredLang || "en");
-              let nextLang: string | null = null;
-              if (current === "en") {
-                nextLang = stateToLang(detectedState || undefined) || localeToLang(navigator.language);
-              }
-
-              // Update profile with location (and language if decided)
-              try {
-                await updateProfile(
-                  nextLang
-                    ? { location, preferredLang: nextLang }
-                    : { location }
-                );
-                if (nextLang) {
-                  toast.success("Language set based on your region");
-                } else {
-                  toast.success("Location saved");
-                }
-              } catch (e: any) {
-                // non-blocking
-              }
-              resolve();
-            } catch (e) {
-              reject(e);
-            }
-          };
-          const onError = () => resolve(); // Ignore errors silently for now
-          navigator.geolocation.getCurrentPosition(onSuccess, onError, {
-            enableHighAccuracy: true,
-            maximumAge: 0,
-            timeout: 15000,
-          });
-        });
-      } finally {
-        setSetupLoading(false);
-      }
-    })();
-  }, [profile, reverseGeocode, updateProfile, setupLoading]);
-
-  // Localized voice intro strings
-  const greetings: Record<string, string> = {
-    ta: "வணக்கம்! நான் Root AI, உங்கள் விவசாய உதவியாளர்!",
-    te: "నమస్కారం! నేను Root AI, మీ వ్యవసాయ సహాయకుడు!",
-    ml: "നമസ്കാരं! ഞാൻ Root AI, നിങ്ങളുടെ കൃഷി സഹായി!",
-    kn: "ನಮಸ್ಕಾರ! ನಾನು Root AI, ನಿಮ್ಮ ಕೃಷಿ ಸಹಾಯಕ!",
-    hi: "नमस्कार! मैं Root AI, आपका कृषि सहायक हूँ!",
-    bn: "নমস্কার! আমি Root AI, আপনার কৃষি সহকারী!",
-    mr: "नमस्कार! मी Root AI, तुमचा शेती सहाय्यक!",
-    gu: "નમસ્કાર! હું Root AI, તમારો કૃષિ સહાયક!",
-    pa: "ਸਤ ਸ੍ਰੀ ਅਕਾਲ! ਮੈਂ Root AI, ਤੁਹਾડਾ ਖੇਤੀ ਸਹਾਇਕ!",
-    or: "ନମସ୍କାର! ମୁଁ Root AI, ଆପଣଙ୍କ କୃଷି ସହାୟକ!",
-    as: "নমস্কাৰ! মই Root AI, আপোনাৰ কৃষি সহায়ক!",
-    bho: "प्रणाम! हम Root AI, तोहार खेती सहायक बानी!",
-    en: "Hello! I am Root AI, your farming assistant!",
-  };
-
-  const langToBCP47: Record<string, string> = {
-    te: "te-IN",
-    ta: "ta-IN",
-    ml: "ml-IN",
-    kn: "kn-IN",
-    hi: "hi-IN",
-    bn: "bn-IN",
-    mr: "mr-IN",
-    gu: "gu-IN",
-    pa: "pa-IN",
-    or: "or-IN",
-    as: "as-IN",
-    bho: "hi-IN", // fallback for TTS
-    en: "en-IN",
-  };
-
-  const playIntro = async () => {
-    try {
-      // Use the live selection during the language gate; otherwise use profile language
-      const lang = gateOpen ? selectedLang : (currentLang || "en");
-      const text = greetings[lang] || greetings.en;
-      const bcp = langToBCP47[lang] || "en-IN";
-      const base64 = await tts({ text, language: bcp });
-      const audio = new Audio(`data:audio/mp3;base64,${base64}`);
-      await audio.play();
-    } catch (e: any) {
-      toast.error(e?.message ?? "Failed to play intro");
-    }
-  };
-
-  const tr = (s: string) => {
-    if (currentLang.startsWith("te")) {
-      const te: Record<string, string> = {
-        "Root AI — Intelligent Agriculture Companion": "Root AI — మేధావి వ్యవసాయ సహాయకుడు",
-        "Speak in your language, manage farms, test soil with camera, and track market prices — all in a simple, mobile‑first app.":
-          "మీ భాషలో మాట్లాడండి, ఫార్మ్‌లను నిర్వహించండి, కెమెరాతో మట్టి పరీక్ష చేయండి, మరియు మార్కెట్ ధరలు ట్రాక్ చేయండి — ఇవన్నీ ఒక సాధారణ, మొబైల్‑ఫస్ట్ యాప్‌లో.",
-        "Open App": "యాప్ ఓపెన్ చేయండి",
-        "See Market Prices": "మార్కెట్ ధరలు చూడండి",
-        "Private & secure. You control your data.": "గోప్యత & భద్రత. మీ డేటా మీదే నియంత్రణ.",
-        "Voice‑First & Multilingual": "వాయిస్‑ఫస్ట్ & బహుభాషా",
-        "Navigate, add tasks, and get answers with your voice in Telugu, Hindi, English, and more.":
-          "తెలుగు, హిందీ, ఇంగ్లీష్ తదితర భాషల్లో మీ వాయిస్‌తో నావిగేట్ చేయండి, టాస్క్‌లు జోడించండి, సమాధానాలు పొందండి.",
-        "Camera‑Powered Soil Test": "కెమెరా ఆధారిత మట్టి పరీక్ష",
-        "Click or upload soil photos for instant AI insights and actionable recommendations.":
-          "తక్షణ AI విశ్లేషణలు మరియు సూచనల కోసం మట్టి ఫోటోలు క్యాప్చర్ చేయండి లేదా అప్‌లోడ్ చేయండి.",
-        "Region‑Aware Market Prices": "ప్రాంతానికి అనుగుణమైన మార్కెట్ ధరలు",
-        "See indicative local retail prices (₹/kg) for vegetables in your state.":
-          "మీ రాష్ట్రంలో కూరగాయల సూచకీయ స్థానిక రిటైల్ ధరలు (₹/kg) చూడండి.",
-        "Manage Farms & Simulate Growth": "ఫార్మ్‌లను నిర్వహించండి & పంట పెరుగుదల సిమ్యులేట్ చేయండి",
-        "Add farms, capture 3D context (corner photos + GPS walk), and run simple per‑farm simulations: plant, water, advance, harvest.":
-          "ఫార్మ్‌లు జోడించండి, 3D కాంటెక్స్ట్ (కోన ఫొటోలు + GPS వాక్) క్యాప్చర్ చేయండి, మరియు ప్రతీ ఫార్మ్‌కు సిమ్పుల్ సిమ్యులేషన్లు నడపండి: నాటడం, నీరు పెట్టడం, ముందుకు తీసుకెళ్లడం, కోత.",
-        "Go to My Farm": "నా ఫార్మ్‌కి వెళ్ళండి",
-        "Local Language Experience": "స్థానిక భాషా అనుభవం",
-        "Choose your preferred language from Settings. The app adapts navigation and key screens automatically.":
-          "సెట్టింగ్స్‌లో మీకు నచ్చిన భాషను ఎంచుకోండి. యాప్ ఆటోమేటిక్‌గా నావిగేషన్ మరియు ముఖ్య స్క్రీన్‌లను మార్చుతుంది.",
-        "Set Language": "భాష సెట్ చేయండి",
-        "Start with your voice": "మీ వాయిస్‌తో ప్రారంభించండి",
-        "Say \"Open Market\", \"Add Task\", or \"Test Soil\" — it's that simple.":
-          "\"మార్కెట్ ఓపెన్ చేయి\", \"టాస్క్ జోడించు\", లేదా \"మట్టి పరీక్ష\" అని చెప్పండి — అంతే చాలు.",
-        "Get Started": "ప్రారంభించండి",
-        "Try Soil Test": "మట్టి పరీక్ష ప్రయత్నించండి",
-      };
-      return te[s] ?? s;
-    }
-    return s;
-  };
-
-  // Add: simple language map for the gate
-  const langOptions: Array<{ label: string; value: string }> = [
-    { label: "English", value: "en" },
-    { label: "தமிழ்", value: "ta" },
-    { label: "తెలుగు", value: "te" },
-    { label: "മലയാളം", value: "ml" },
-    { label: "ಕನ್ನಡ", value: "kn" },
-    { label: "हिन्दी", value: "hi" },
-    { label: "বাংলা", value: "bn" },
-    { label: "मराठी", value: "mr" },
-    { label: "ગુજરાતી", value: "gu" },
-    { label: "ਪੰਜਾਬੀ", value: "pa" },
-    { label: "ଓଡ଼ିଆ", value: "or" },
-    { label: "অসমীয়া", value: "as" },
-    { label: "भोजपुरी", value: "bho" },
-    { label: "اردو", value: "ur" },
-    { label: "नेपाली", value: "ne" },
-    { label: "සිංහල", value: "si" },
-    { label: "मैथिली", value: "mai" },
-    { label: "कोंकणी", value: "kok" },
-    { label: "سنڌي (Sindhi)", value: "sd" },
-    { label: "کٲشُر (Kashmiri)", value: "ks" },
-  ];
-
-  // Confirm selected language: save to profile if signed in, else to localStorage
-  const confirmLanguage = async () => {
-    const lang = selectedLang || "en";
-    try {
-      if (profile?._id) {
-        await updateProfile({ preferredLang: lang });
-      } else {
-        localStorage.setItem("km.lang", lang);
-      }
-      setGateOpen(false);
-      setPostGate(true); // show the second landing with minimal buttons
-      toast.success("Language set");
-    } catch (e: any) {
-      toast.error(e?.message ?? "Failed to set language");
-    }
-  };
-
-  const activeLang: LangKey = (String(profile?.preferredLang || guestLang || selectedLang || "en") as LangKey);
-  const langForGate: LangKey = (gateOpen ? (selectedLang as LangKey) : activeLang);
-
-  // Dynamic feature grid data
-  const dynamicFeatures = [
-    {
-      icon: Sparkles,
-      title: "AI-Powered Insights",
-      description: "Smart recommendations powered by machine learning algorithms",
-      gradient: "from-blue-500 to-cyan-500"
-    },
-    {
-      icon: Cloud,
-      title: "Weather Integration",
-      description: "Real-time weather data for precise irrigation timing",
-      gradient: "from-purple-500 to-pink-500"
-    },
-    {
-      icon: Camera,
-      title: "Visual Soil Analysis",
-      description: "Instant soil health assessment through camera technology",
-      gradient: "from-green-500 to-emerald-500"
-    },
-    {
-      icon: BarChart3,
-      title: "Growth Analytics",
-      description: "Track crop performance with detailed metrics and insights",
-      gradient: "from-orange-500 to-red-500"
-    },
-    {
-      icon: Globe,
-      title: "Multi-Language Support",
-      description: "Native language experience across 20+ regional languages",
-      gradient: "from-indigo-500 to-purple-500"
-    },
-    {
-      icon: Shield,
-      title: "Data Privacy",
-      description: "Your farming data stays secure and under your control",
-      gradient: "from-teal-500 to-green-500"
-    },
-    {
-      icon: Zap,
-      title: "Voice Commands",
-      description: "Navigate and control the app using natural voice interactions",
-      gradient: "from-yellow-500 to-orange-500"
-    },
-    {
-      icon: TrendingUp,
-      title: "Yield Optimization",
-      description: "Maximize harvest potential with data-driven recommendations",
-      gradient: "from-rose-500 to-pink-500"
-    },
-    {
-      icon: Droplets,
-      title: "Smart Irrigation",
-      description: "Optimize water usage based on crop needs and weather patterns",
-      gradient: "from-cyan-500 to-blue-500"
-    }
-  ];
-
-  // Live preview tiles data
-  const livePreviewTiles = [
-    { icon: Droplets, label: "Soil Moisture", color: "text-blue-500" },
-    { icon: Sun, label: "Weather", color: "text-yellow-500" },
-    { icon: Sprout, label: "Growth Stage", color: "text-green-500" },
-    { icon: BarChart3, label: "Analytics", color: "text-purple-500" },
-    { icon: Camera, label: "Soil Test", color: "text-orange-500" },
-    { icon: Globe, label: "Market", color: "text-indigo-500" }
-  ];
-
-  // Motion timeline steps
-  const timelineSteps = [
-    { title: "Create Farm", description: "Add your farm details and location" },
-    { title: "Capture Context", description: "Upload photos and GPS data" },
-    { title: "AI Analysis", description: "Get intelligent recommendations" },
-    { title: "Track Progress", description: "Monitor growth and health metrics" },
-    { title: "Optimize Yield", description: "Harvest better results" }
-  ];
-
-  if (gateOpen) {
-    return (
-      <div className="min-h-screen relative overflow-hidden bg-background text-foreground flex items-center justify-center px-4">
-        {/* Patterned background to match landing */}
-        <div className="absolute inset-0 z-0">
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                "radial-gradient(1000px 600px at 20% 20%, color-mix(in oklab, var(--color-primary) 18%, transparent 82%), transparent 60%), radial-gradient(900px 500px at 80% 80%, color-mix(in oklab, var(--color-accent) 16%, transparent 84%), transparent 60%)",
-            }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/70 to-background z-10" />
-        </div>
-
-        <div className="relative z-20 w-full max-w-3xl">
-          {/* Header */}
-          <div className="flex items-center gap-3 justify-center mb-6">
-            <img
-              src="https://harmless-tapir-303.convex.cloud/api/storage/a4af3a5d-e126-420d-b31d-c1929a3c833b"
-              alt="Root AI"
-              className="h-12 w-12 rounded-lg object-cover border"
-              onError={(e) => {
-                const t = e.currentTarget as HTMLImageElement;
-                if (t.src !== '/logo.svg') t.src = '/logo.svg';
-                t.onerror = null;
-              }}
-            />
-            <div className="text-xs uppercase tracking-widest text-muted-foreground">{ui(langForGate, "Choose Language")}</div>
-          </div>
-
-          {/* Card */}
-          <div className="rounded-2xl border bg-card shadow-none">
-            <div className="p-5 md:p-6">
-              <h2 className="text-xl font-extrabold">{ui(langForGate, "Select Preferred Language")}</h2>
-              <p className="text-muted-foreground text-sm mt-1">
-                {ui(langForGate, "Language Change Note")}
-              </p>
-
-              {/* Grid with scroll to accommodate 18+ languages */}
-              <div className="mt-5">
-                <div className="max-h-[360px] overflow-auto pr-1">
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    {langOptions.map((opt) => (
-                      <button
-                        key={opt.value}
-                        onClick={() => setSelectedLang(opt.value)}
-                        className={`rounded-xl border px-3 py-3 text-sm text-left transition-all
-                          ${
-                            selectedLang === opt.value
-                              ? "border-primary bg-primary/10 ring-2 ring-primary/30"
-                              : "hover:bg-muted/60"
-                          }`}
-                        aria-pressed={selectedLang === opt.value}
-                        aria-label={`Select ${opt.label}`}
-                      >
-                        {opt.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Actions */}
-              <div className="mt-5 flex items-center justify-between gap-3">
-                <button
-                  className="rounded-xl border px-4 py-3 text-sm hover:bg-muted/60"
-                  onClick={() => {
-                    // go back to landing without saving
-                    setGateOpen(false);
-                  }}
-                >
-                  {ui(langForGate, "Back")}
-                </button>
-                <Button
-                  className="rounded-xl px-5 py-5 text-base bg-primary text-primary-foreground hover:opacity-95 animate-shimmer shadow-lg shadow-primary/30"
-                  onClick={confirmLanguage}
-                >
-                  {ui(langForGate, "Continue")}
-                </Button>
-              </div>
-            </div>
-
-            {/* Footer note */}
-            <div className="border-t px-5 py-3 text-center text-xs text-muted-foreground">
-              {ui(langForGate, "SecurityNote")}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  const SHOW_PREVIEW = false;
-  const SHOW_TIMELINE = false;
-  const SHOW_TESTIMONIALS = false;
 
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* Announcement ribbon removed per feedback for cleaner look and better space usage */}
+    <div className="min-h-screen bg-[oklch(0.98_0.01_120)] text-[oklch(0.22_0.02_120)]">
+      {/* Top Header */}
+      <header className="sticky top-4 z-30">
+        <div className="mx-auto w-full max-w-6xl px-4">
+          <div className="flex items-center justify-between rounded-2xl bg-white shadow-sm ring-1 ring-black/5 px-3 py-2">
+            {/* Left: Logo */}
+            <a href="/" className="flex items-center gap-2">
+              <img
+                src="/logo.svg"
+                alt="Root AI"
+                className="h-7 w-7 rounded-lg object-cover ring-1 ring-black/5"
+                onError={(e) => {
+                  const t = e.currentTarget as HTMLImageElement;
+                  if (t.src !== '/logo.png') t.src = '/logo.png';
+                  t.onerror = null;
+                }}
+              />
+              <span className="font-semibold">Root AI</span>
+            </a>
 
-      {/* Hero Section with Spotlight Effect */}
-      <section className="relative overflow-hidden border-b">
-        <motion.div 
-          ref={heroRef}
-          className="spotlight-container absolute inset-0 z-0"
-          onMouseMove={handleMouseMove}
-          onMouseLeave={handleMouseLeave}
-          style={{ y: heroY, opacity: heroOpacity }}
-        >
-          {/* Multi-layer animated background */}
-          <div className="absolute inset-0">
-            {/* Base pattern layer */}
-            <div
-              className="absolute inset-0 animate-drift-slower"
-              style={{
-                background:
-                  "radial-gradient(80% 80% at 20% 20%, color-mix(in oklab, var(--color-primary) 20%, transparent 80%), transparent 60%), radial-gradient(80% 80% at 80% 80%, color-mix(in oklab, var(--color-accent) 18%, transparent 82%), transparent 60%)",
-              }}
-            />
-            
-            {/* Animated gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background/80 to-accent/10 animate-gradient-shift" />
-            
-            {/* Floating particles */}
-            <div className="absolute inset-0">
-              {[...Array(12)].map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="absolute w-2 h-2 bg-primary/30 rounded-full animate-particle-float"
-                  style={{
-                    left: `${Math.random() * 100}%`,
-                    top: `${Math.random() * 100}%`,
-                    animationDelay: `${i * 0.5}s`,
-                  }}
-                  aria-hidden
-                />
-              ))}
+            {/* Center: Nav */}
+            <nav className="hidden md:flex items-center gap-6 text-sm">
+              <a href="#features" className="text-[oklch(0.4_0.02_120)] hover:text-[oklch(0.3_0.03_120)]">Features</a>
+              <a href="#stack" className="text-[oklch(0.4_0.02_120)] hover:text-[oklch(0.3_0.03_120)]">Tech Stack</a>
+              <a href="/reviews" className="text-[oklch(0.4_0.02_120)] hover:text-[oklch(0.3_0.03_120)]">Reviews</a>
+            </nav>
+
+            {/* Right: Lang + CTA */}
+            <div className="flex items-center gap-2">
+              <div className="hidden sm:flex items-center gap-2 rounded-xl bg-[oklch(0.97_0.01_120)] px-3 py-1.5 text-xs text-[oklch(0.45_0.03_120)] ring-1 ring-black/5">
+                EN
+              </div>
+              <Button
+                className="rounded-xl bg-[oklch(0.69_0.17_145)] text-white hover:bg-[oklch(0.64_0.17_145)]"
+                onClick={() => navigate("/dashboard")}
+              >
+                Open App
+              </Button>
             </div>
           </div>
-          
-          {/* Animated orbs */}
-          <motion.div
-            className="absolute -top-20 -left-10 size-72 rounded-full bg-primary/10 blur-3xl animate-float-slow"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 2, ease: 'easeOut' }}
-            aria-hidden
-          />
-          <motion.div
-            className="absolute -bottom-28 -right-10 size-80 rounded-full bg-accent/10 blur-3xl animate-drift-slower"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 2.5, ease: 'easeOut', delay: 0.3 }}
-            aria-hidden
-          />
-          <motion.div
-            className="absolute top-1/2 left-1/4 size-40 rounded-full bg-cyan-400/5 blur-2xl animate-float-slow"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 3, delay: 0.8 }}
-            style={{ animationDelay: '2s' }}
-            aria-hidden
-          />
-        </motion.div>
+        </div>
+      </header>
 
-        <div className="relative z-20 mx-auto w-full max-w-6xl px-4 pt-8 pb-8">
-          {/* Local header inside hero */}
-          <div className="relative panel-glass rounded-2xl px-3 py-2 flex items-center justify-between gap-3 gradient-border animate-gradient-shift ring-2 ring-primary/40 shadow-[0_0_36px_-10px_theme(colors.primary/55)] border-beam bg-white/10">
-            {/* Glossy animated border glow */}
-            <div
-              className="pointer-events-none absolute -inset-[2px] rounded-[16px] blur-lg opacity-90 bg-[linear-gradient(90deg,theme(colors.primary/22),theme(colors.cyan.400/18),theme(colors.primary/22))] animate-gradient-shift"
-              aria-hidden
-            />
+      {/* Hero */}
+      <section className="relative mt-6">
+        <div className="relative h-[58vh] min-h-[520px] w-full">
+          <img
+            src="/assets/Fild.jpeg"
+            alt="Farm field"
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+          <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(0,0,0,0.25),rgba(0,0,0,0.35))]" />
+          <div className="relative z-10 mx-auto max-w-6xl h-full px-4 flex flex-col items-center justify-center text-center">
+            <div className="mb-4 inline-flex items-center rounded-full bg-white/80 px-4 py-1.5 text-xs font-medium text-[oklch(0.35_0.03_120)] shadow">
+              Welcome to the future of farming!
+            </div>
+            <h1 className="text-white text-4xl md:text-6xl font-extrabold leading-tight">
+              Root AI — Farming, <br className="hidden md:block" />
+              Simplified.
+            </h1>
+            <p className="mt-3 max-w-3xl text-white/90">
+              Speak in your language, manage farms, test soil with your camera,
+              and track market prices — all in a simple, fast experience.
+            </p>
+            <div className="mt-6 flex items-center gap-3">
+              <Button
+                className="rounded-xl bg-[oklch(0.69_0.17_145)] text-white hover:bg-[oklch(0.64_0.17_145)]"
+                onClick={() => navigate("/dashboard")}
+              >
+                Open App
+              </Button>
+              <Button
+                variant="secondary"
+                className="rounded-xl bg-white/90 text-[oklch(0.3_0.03_120)] hover:bg-white"
+                onClick={() => navigate("/learn")}
+              >
+                Learn More
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Core Tools Hub */}
+      <section id="features" className="mx-auto w-full max-w-6xl px-4 py-14">
+        <div className="text-center">
+          <h2 className="text-3xl md:text-4xl font-extrabold">Core Tools Hub</h2>
+          <p className="mt-1 text-[oklch(0.45_0.03_120)]">
+            Easy, fast, and simple for everyone.
+          </p>
+        </div>
+
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Voice Commands */}
+          <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5">
+            <div className="inline-flex items-center justify-center rounded-xl bg-[oklch(0.97_0.01_120)] p-3 ring-1 ring-black/5">
+              <Mic className="h-5 w-5 text-[oklch(0.69_0.17_145)]" />
+            </div>
+            <div className="mt-4 font-semibold">Voice Commands</div>
+            <p className="mt-1 text-sm text-[oklch(0.45_0.03_120)]">
+              Get answers to commands in your language. Works in over 20 languages seamlessly.
+            </p>
+            <a href="/dashboard" className="mt-3 inline-block text-sm font-medium text-[oklch(0.56_0.14_145)] hover:underline">
+              Try Now →
+            </a>
+          </div>
+
+          {/* Soil Test */}
+          <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5">
+            <div className="inline-flex items-center justify-center rounded-xl bg-[oklch(0.97_0.01_120)] p-3 ring-1 ring-black/5">
+              <FlaskConical className="h-5 w-5 text-[oklch(0.69_0.17_145)]" />
+            </div>
+            <div className="mt-4 font-semibold">Soil Test</div>
+            <p className="mt-1 text-sm text-[oklch(0.45_0.03_120)]">
+              Simply use your camera to capture soil photos for instant insights.
+            </p>
+            <a href="/soil-test" className="mt-3 inline-block text-sm font-medium text-[oklch(0.56_0.14_145)] hover:underline">
+              Test Your Soil →
+            </a>
+          </div>
+
+          {/* My Farm */}
+          <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5">
+            <div className="inline-flex items-center justify-center rounded-xl bg-[oklch(0.97_0.01_120)] p-3 ring-1 ring-black/5">
+              <Sprout className="h-5 w-5 text-[oklch(0.69_0.17_145)]" />
+            </div>
+            <div className="mt-4 font-semibold">My Farm</div>
+            <p className="mt-1 text-sm text-[oklch(0.45_0.03_120)]">
+              Manage your farm and run simulations with real-time weather data.
+            </p>
+            <a href="/my-farm" className="mt-3 inline-block text-sm font-medium text-[oklch(0.56_0.14_145)] hover:underline">
+              Go to My Farm →
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Under the Hood */}
+      <section id="stack" className="bg-[oklch(0.97_0.01_120)] py-14">
+        <div className="mx-auto w-full max-w-6xl px-4">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left copy */}
+            <div className="space-y-4">
+              <h3 className="text-3xl font-extrabold">Under the Hood</h3>
+              <p className="text-[oklch(0.45_0.03_120)]">
+                We use modern, scalable technologies to deliver a seamless experience.
+                Our stack is built for performance, reliability, and continuous innovation.
+              </p>
+              <div className="rounded-xl bg-white text-[oklch(0.3_0.03_120)] px-4 py-3 shadow-sm ring-1 ring-black/5 text-sm">
+                Say "Open Market", "Add Task", or "Test Soil" — it's that simple.
+              </div>
+            </div>
+
+            {/* Frontend */}
+            <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5">
+              <div className="font-bold text-lg">Frontend</div>
+              <ul className="mt-3 space-y-2 text-sm">
+                {[
+                  "TypeScript + React",
+                  "Vite + React-Router",
+                  "TailwindCSS",
+                  "Framer Motion",
+                  "OpenAI TTS",
+                ].map((item) => (
+                  <li key={item} className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-[oklch(0.69_0.17_145)]" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Backend */}
+            <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5">
+              <div className="font-bold text-lg">Backend</div>
+              <ul className="mt-3 space-y-2 text-sm">
+                {[
+                  "Convex",
+                  "Clerk Auth",
+                  "Replicate/HuggingFace",
+                  "OpenAI GPT-4o",
+                  "Open-Meteo",
+                ].map((item) => (
+                  <li key={item} className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-[oklch(0.69_0.17_145)]" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="mx-auto w-full max-w-6xl px-4 py-14">
+        <div className="text-center">
+          <h3 className="text-3xl md:text-4xl font-extrabold">What Farmers Say</h3>
+          <p className="mt-1 text-[oklch(0.45_0.03_120)]">
+            Real stories from farmers transforming their operations with Root AI.
+          </p>
+        </div>
+
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[
+            {
+              quote:
+                "Root AI has completely changed how I manage my crops. The voice commands are a game-changer, especially when my hands are dirty.",
+              author: "Maria S., Corn Farmer",
+              loc: "California, USA",
+            },
+            {
+              quote:
+                "The soil testing feature is incredibly accurate. It saved me a fortune on fertilizers this season by giving me precise data.",
+              author: "John D., Wheat Farmer",
+              loc: "Kansas, USA",
+            },
+            {
+              quote:
+                "As a small-scale organic farmer, 'My Farm' simulations are invaluable for planning. Root AI is an essential tool for modern agriculture.",
+              author: "Aisha K., Organic Farmer",
+              loc: "Punjab, India",
+            },
+          ].map((t, i) => (
+            <div key={i} className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5">
+              <div className="text-[oklch(0.69_0.17_145)]">★★★★★</div>
+              <p className="mt-3 text-[oklch(0.3_0.03_120)]">"{t.quote}"</p>
+              <div className="mt-4 text-sm font-medium">{t.author}</div>
+              <div className="text-xs text-[oklch(0.45_0.03_120)]">{t.loc}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-[oklch(0.97_0.01_120)]">
+        <div className="mx-auto w-full max-w-6xl px-4 py-12 grid grid-cols-1 md:grid-cols-4 gap-6">
+          {/* Brand + subscribe */}
+          <div>
             <div className="flex items-center gap-2">
               <img
                 src="/logo.svg"
                 alt="Root AI"
-                className="h-8 w-8 rounded-md object-cover ring-1 ring-white/15"
+                className="h-8 w-8 rounded-lg ring-1 ring-black/5"
                 onError={(e) => {
                   const t = e.currentTarget as HTMLImageElement;
                   if (t.src !== '/logo.png') t.src = '/logo.png';
                   t.onerror = null;
                 }}
               />
-              <span className="text-sm font-semibold">Welcome to Root AI</span>
+              <span className="font-extrabold">Root AI</span>
             </div>
-            {/* Center nav + Right CTA */}
-            <nav className="hidden md:flex items-center gap-5 text-sm">
-              <a href="#features" className="hover:text-primary transition-colors">Features</a>
-              <a href="#stack" className="hover:text-primary transition-colors">Tech Stack</a>
-              <a href="/reviews" className="hover:text-primary transition-colors">Reviews</a>
-            </nav>
-            <Button
-              className="rounded-xl"
-              onClick={() => navigate("/dashboard")}
-            >
-              Open App
-            </Button>
-          </div>
-
-          {/* Top-right language selector for landing */}
-          <motion.div 
-            className="flex justify-end mt-3"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.5 }}
-          >
-            <LanguageSelect size="sm" />
-          </motion.div>
-
-          <div className="mt-4">
-            {/* New unified glass hero — removed split grid and side image */}
-            <motion.div
-              className="panel-glass rounded-3xl px-5 py-6 md:px-8 md:py-8 shadow-[0_12px_60px_-10px_rgba(0,0,0,0.25)] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_20px_70px_-18px_rgba(0,0,0,0.35)]"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-            >
-              {/* Compact two-column banner: content + hero visual, no hard borders */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-7 items-center">
-                {/* Left: Logo row + Title + Tagline + CTAs */}
-                <div>
-                  {/* Welcome element for a friendlier app entry */}
-                  <div className="mt-2 inline-flex items-center gap-2 panel-glass rounded-full px-3 py-1.5 text-xs shadow-[0_6px_20px_-8px_rgba(0,0,0,0.35)]">
-                    <Sparkles className="h-3.5 w-3.5 text-accent" />
-                    <span>Welcome to Root AI</span>
-                  </div>
-
-                  {/* Top row: logo badge + small label and compact language */}
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      <motion.img
-                        src="https://harmless-tapir-303.convex.cloud/api/storage/a4af3a5d-e126-420d-b31d-c1929a3c833b"
-                        alt="Root AI"
-                        className="h-10 w-10 rounded-xl object-cover ring-1 ring-white/15 shadow-md"
-                        whileHover={{ scale: 1.06, rotate: 2 }}
-                        onError={(e) => {
-                          const t = e.currentTarget as HTMLImageElement;
-                          if (t.src !== '/logo.svg') t.src = '/logo.svg';
-                          t.onerror = null;
-                        }}
-                      />
-                      <span className="text-[10px] md:text-xs uppercase tracking-widest text-muted-foreground">
-                        {ui(activeLang, "Farming Companion")}
-                      </span>
-                    </div>
-                    <div className="hidden md:block">
-                      <LanguageSelect size="sm" />
-                    </div>
-                  </div>
-
-                  {/* (cards removed per request) */}
-
-                  {/* Title + tagline with tighter spacing */}
-                  <motion.h1
-                    className="mt-2 text-3xl md:text-5xl font-extrabold leading-tight text-green-400"
-                    initial={{ opacity: 0, y: 14 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4, duration: 0.6 }}
-                  >
-                    {ui(activeLang, "AppTitle")}
-                  </motion.h1>
-
-                  <motion.p
-                    className="mt-1 text-base md:text-lg text-muted-foreground max-w-2xl"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.55 }}
-                  >
-                    {ui(activeLang, "AppTagline")}
-                  </motion.p>
-
-                  {/* CTAs: Open App + Change Language */}
-                  <motion.div
-                    className="mt-3 flex flex-wrap items-center gap-3"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.7 }}
-                  >
-                    <Button
-                      className="btn-neon rounded-xl px-5 py-5 text-base"
-                      onClick={() => navigate("/dashboard")}
-                    >
-                      {ui(activeLang, "Open App")}
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="secondary"
-                      className="rounded-xl px-5 py-5 text-base"
-                      onClick={() => navigate("/learn")}
-                    >
-                      Learn More
-                    </Button>
-                  </motion.div>
-
-                  {/* Compact credibility row */}
-                  <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div className="panel-glass rounded-2xl p-4 shadow-[0_8px_30px_rgba(0,0,0,0.15)]">
-                      <div className="text-sm font-semibold flex items-center gap-2">
-                        <CheckCircle className="h-4 w-4 text-green-500" />
-                        Real Impact, No Hype
-                      </div>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        Weather‑based irrigation guidance and simple records—no clutter.
-                      </p>
-                    </div>
-                    <div className="panel-glass rounded-2xl p-4 shadow-[0_8px_30px_rgba(0,0,0,0.15)]">
-                      <div className="text-sm font-semibold mb-1 flex items-center gap-2">
-                        <Shield className="h-4 w-4 text-accent" />
-                        Data sources
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        Open‑Meteo for weather/ET0 + your farm inputs.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Right: Glassy hero visual (replaces old side image/card) */}
-                <div className="relative">
-                  <div className="panel-glass rounded-2xl overflow-hidden shadow-[0_14px_60px_-12px_rgba(0,0,0,0.35)]">
-                    {/* Taller aspect to reduce perceived black space and better fill */}
-                    <div className="relative aspect-[4/3] md:aspect-[16/9] min-h-[300px] md:min-h-[400px]">
-                      <img
-                        src="/assets/Fild.jpeg"
-                        alt="Modern farming"
-                        className="absolute inset-0 h-full w-full object-cover object-center"
-                        loading="eager"
-                      />
-                      {/* Matte gradient overlay without borders/lines */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-black/10 to-transparent" />
-                    </div>
-                  </div>
-
-                  {/* Soft glow decoration, no border */}
-                  <div className="pointer-events-none absolute -inset-2 rounded-3xl blur-2xl bg-primary/10 animate-glow-pulse" />
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Live Preview Strip */}
-      {SHOW_PREVIEW && (
-        <section className="mx-auto w-full max-w-6xl px-4 py-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <h2 className="text-2xl font-bold text-center mb-6 text-gradient-animated">Live Farm Intelligence</h2>
-            <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
-              {livePreviewTiles.map((tile, index) => {
-                const Icon = tile.icon;
-                return (
-                  <motion.div
-                    key={tile.label}
-                    className="gradient-border min-w-[140px] p-4 rounded-xl hover-parallax glow-sweep"
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.1, duration: 0.4 }}
-                    whileHover={{ y: -5 }}
-                  >
-                    <Icon className={`h-8 w-8 ${tile.color} mb-2 animate-float-slow`} />
-                    <div className="text-sm font-medium">{tile.label}</div>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </motion.div>
-        </section>
-      )}
-
-      {/* Core Tools Hub */}
-      <section className="mx-auto w-full max-w-6xl px-4 py-8">
-        <div className="mb-8 flex items-center justify-between">
-          <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight">
-            Core Tools Hub
-          </h2>
-          <div className="text-xs uppercase tracking-widest text-muted-foreground">
-            Built for speed • No fluff
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Voice */}
-          <div className="panel-glass rounded-3xl p-0 overflow-hidden hover:-translate-y-1 hover:scale-[1.01] hover:shadow-[0_24px_80px_-24px_rgba(0,0,0,0.45)] transition-all">
-            <div className="h-40 relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/15 via-background to-accent/15" />
-              <div className="absolute inset-0 grid place-items-center">
-                <Mic className="h-10 w-10 text-primary animate-float-slow" />
-              </div>
-            </div>
-            <div className="p-5">
-              <div className="flex items-center justify-between">
-                <h3 className="font-bold text-lg">Voice Commands</h3>
-                <span className="text-[10px] uppercase text-muted-foreground">Fast</span>
-              </div>
-              <p className="text-sm text-muted-foreground mt-1">
-                Navigate and act hands‑free in your language.
-              </p>
-              <div className="mt-4 flex items-center gap-2">
-                <Button
-                  className="rounded-xl shadow-md shadow-primary/20"
-                  onClick={() => navigate("/dashboard")}
-                >
-                  Open App <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-                <Button
-                  variant="secondary"
-                  className="rounded-xl shadow-md shadow-primary/10"
-                  onClick={() => navigate("/settings")}
-                >
-                  Change Language
-                </Button>
-              </div>
-            </div>
-          </div>
-
-          {/* Soil Test */}
-          <div className="panel-glass rounded-3xl p-0 overflow-hidden hover:-translate-y-1 hover:scale-[1.01] hover:shadow-[0_24px_80px_-24px_rgba(0,0,0,0.45)] transition-all">
-            <div className="h-40 relative">
-              <img
-                src="/assets/Soil.webp"
-                alt="Soil"
-                className="absolute inset-0 h-full w-full object-cover"
-                loading="lazy"
+            <p className="mt-3 text-sm text-[oklch(0.45_0.03_120)]">
+              Farming, simplified. Grow smarter with our intuitive tools, AI-driven experience, and real-time data.
+            </p>
+            <div className="mt-4 flex items-center gap-2">
+              <input
+                type="email"
+                placeholder="Enter your email"
+                className="w-full max-w-[220px] rounded-xl border border-black/10 bg-white px-3 py-2 text-sm"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-            </div>
-            <div className="p-5">
-              <div className="flex items-center justify-between">
-                <h3 className="font-bold text-lg">Soil Test</h3>
-                <span className="text-[10px] uppercase text-muted-foreground">Camera</span>
-              </div>
-              <p className="text-sm text-muted-foreground mt-1">
-                Upload or capture soil photos for instant insights.
-              </p>
-              <div className="mt-4 flex items-center gap-2">
-                <Button
-                  className="rounded-xl shadow-md shadow-primary/20"
-                  onClick={() => navigate("/soil-test")}
-                >
-                  Try Soil Test <Camera className="ml-2 h-4 w-4" />
-                </Button>
-                <Button
-                  variant="secondary"
-                  className="rounded-xl shadow-md shadow-primary/10"
-                  onClick={() => navigate("/learn")}
-                >
-                  Learn More
-                </Button>
-              </div>
-            </div>
-          </div>
-
-          {/* My Farm */}
-          <div className="panel-glass rounded-3xl p-0 overflow-hidden hover:-translate-y-1 hover:scale-[1.01] hover:shadow-[0_24px_80px_-24px_rgba(0,0,0,0.45)] transition-all">
-            <div className="h-40 relative">
-              <img
-                src="/assets/Fild.jpeg"
-                alt="Farm"
-                className="absolute inset-0 h-full w-full object-cover"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-            </div>
-            <div className="p-5">
-              <div className="flex items-center justify-between">
-                <h3 className="font-bold text-lg">My Farm</h3>
-                <span className="text-[10px] uppercase text-muted-foreground">Simulate</span>
-              </div>
-              <p className="text-sm text-muted-foreground mt-1">
-                Manage farms and run simulations with real weather.
-              </p>
-              <div className="mt-4 flex items-center gap-2">
-                <Button
-                  className="rounded-xl shadow-md shadow-primary/20"
-                  onClick={() => navigate("/my-farm")}
-                >
-                  Go to My Farm <Sprout className="ml-2 h-4 w-4" />
-                </Button>
-                <Button
-                  variant="secondary"
-                  className="rounded-xl shadow-md shadow-primary/10"
-                  onClick={() => navigate("/dashboard")}
-                >
-                  Open App
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Why Root AI */}
-        <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="panel-glass rounded-2xl p-5 shadow-[0_8px_30px_rgba(0,0,0,0.15)] hover:-translate-y-1 hover:shadow-[0_20px_80px_-24px_rgba(0,0,0,0.45)] transition-all">
-            <div className="text-xs uppercase tracking-widest text-muted-foreground">Irrigation</div>
-            <div className="mt-2 font-bold text-lg">Real Weather Advisor</div>
-            <p className="text-sm text-muted-foreground mt-1">
-              Uses ET0 and rain to guide watering for your chosen crop.
-            </p>
-          </div>
-          <div className="panel-glass rounded-2xl p-5 shadow-[0_8px_30px_rgba(0,0,0,0.15)] hover:-translate-y-1 hover:shadow-[0_20px_80px_-24px_rgba(0,0,0,0.45)] transition-all">
-            <div className="text-xs uppercase tracking-widest text-muted-foreground">Multilingual</div>
-            <div className="mt-2 font-bold text-lg">20+ Languages</div>
-            <p className="text-sm text-muted-foreground mt-1">
-              A native experience with dynamic language switching.
-            </p>
-          </div>
-          <div className="panel-glass rounded-2xl p-5 shadow-[0_8px_30px_rgba(0,0,0,0.15)] hover:-translate-y-1 hover:shadow-[0_20px_80px_-24px_rgba(0,0,0,0.45)] transition-all">
-            <div className="text-xs uppercase tracking-widest text-muted-foreground">Privacy</div>
-            <div className="mt-2 font-bold text-lg">Your Data, Yours</div>
-            <p className="text-sm text-muted-foreground mt-1">
-              No hype. Clear sources and transparent outcomes.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Tech Stack Section */}
-      <section id="stack" className="mx-auto w-full max-w-6xl px-4 pb-8">
-        <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight">Under the Hood</h2>
-          <div className="text-xs uppercase tracking-widest text-muted-foreground">Our Stack</div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="panel-glass rounded-2xl p-5">
-            <div className="font-bold text-lg">Frontend</div>
-            <ul className="mt-2 text-sm text-muted-foreground space-y-1">
-              <li>• TypeScript + React</li>
-              <li>• Vite + React Router</li>
-              <li>• Tailwind CSS + shadcn/ui</li>
-              <li>• Framer Motion (animations)</li>
-              <li>• Recharts (visualizations)</li>
-              <li>• Sonner (toasts)</li>
-            </ul>
-          </div>
-          <div className="panel-glass rounded-2xl p-5">
-            <div className="font-bold text-lg">Backend & Integrations</div>
-            <ul className="mt-2 text-sm text-muted-foreground space-y-1">
-              <li>• Convex (database, functions, realtime)</li>
-              <li>• Convex Auth OTP (testing: temporarily bypassed)</li>
-              <li>• Convex Storage (file uploads)</li>
-              <li>• Meshy API (AI Image → 3D models)</li>
-              <li>• OpenRouter (multi‑model LLM access)</li>
-              <li>• Open‑Meteo (weather & ET0 for irrigation)</li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      {/* Enhanced CTA */}
-      <section className="mx-auto w-full max-w-6xl px-4 pb-16">
-        <motion.div 
-          className="rounded-3xl gradient-border p-8 text-center bg-white/10 backdrop-blur-xl border border-transparent ring-1 ring-white/20 shadow-[0_12px_60px_-10px_rgba(0,0,0,0.25)] hover:-translate-y-1 hover:shadow-[0_28px_120px_-28px_rgba(0,0,0,0.5)] transition-all"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          whileHover={{ scale: 1.02 }}
-        >
-          <motion.h2 
-            className="text-3xl md:text-4xl font-extrabold text-gradient-animated"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-          >
-            {ui(activeLang, "Start with your voice")}
-          </motion.h2>
-          <motion.p 
-            className="text-muted-foreground mt-2 text-lg"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.4 }}
-          >
-            {ui(activeLang, "Voice CTA")}
-          </motion.p>
-          {!postGate && (
-            <motion.div 
-              className="mt-6 flex items-center justify-center gap-3"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.6 }}
-            >
-              <Button 
-                className="magnetic-hover rounded-xl px-6 py-6 text-lg animate-shimmer shadow-lg shadow-primary/30" 
-                onClick={() => navigate("/dashboard")}
-              >
-                <Zap className="mr-2 h-5 w-5" />
-                {ui(activeLang, "Get Started")}
+              <Button className="rounded-xl bg-[oklch(0.69_0.17_145)] text-white hover:bg-[oklch(0.64_0.17_145)]">
+                Subscribe
               </Button>
-              <Button 
-                variant="secondary" 
-                className="magnetic-hover rounded-xl px-6 py-6 text-lg glow-sweep shadow-md shadow-primary/15" 
-                onClick={() => navigate("/soil-test")}
-              >
-                <Camera className="mr-2 h-5 w-5" />
-                {ui(activeLang, "Try Soil Test")}
-              </Button>
-            </motion.div>
-          )}
-        </motion.div>
-      </section>
-
-      {/* Enhanced Official Footer */}
-      <section className="border-t bg-card/60 relative">
-        {/* Animated gradient top border */}
-        <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary via-accent to-primary animate-gradient-shift" />
-        
-        <div className="mx-auto w-full max-w-6xl px-4 py-12 grid grid-cols-1 md:grid-cols-4 gap-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-          >
-            <div className="flex items-center gap-2 relative">
-              {/* Soft glow behind logo */}
-              <div className="absolute -inset-2 bg-primary/10 rounded-lg blur-lg animate-glow-pulse" />
-              <img
-                src="/logo.svg"
-                alt="Root AI"
-                className="relative h-10 w-10 rounded-xl border border-transparent ring-1 ring-white/20 object-cover animate-float-slow"
-                onError={(e) => {
-                  const t = e.currentTarget as HTMLImageElement;
-                  if (t.src !== '/logo.png') t.src = '/logo.png';
-                  t.onerror = null;
-                }}
-              />
-              <span className="relative font-extrabold tracking-wide text-gradient-animated">Root AI</span>
             </div>
-            <p className="text-sm text-muted-foreground mt-3">
-              Helping farms grow smarter with AI-driven insights, localized experience, and real-time tools.
-            </p>
-            <div className="mt-4 inline-flex items-center gap-2 rounded-xl border border-transparent bg-white/10 backdrop-blur-md ring-1 ring-white/15 px-3 py-2 text-xs">
-              <span className="inline-block h-3 w-3 rounded-[4px] bg-primary animate-pulse" />
-              Private & secure. You control your data.
-            </div>
-          </motion.div>
+          </div>
 
+          {/* Columns */}
           {[
             {
               title: "Product",
@@ -1097,65 +289,53 @@ export default function Landing() {
                 { label: "Dashboard", href: "/dashboard" },
                 { label: "My Farm", href: "/my-farm" },
                 { label: "Soil Test", href: "/soil-test" },
-                { label: "Market", href: "/market" }
-              ]
+                { label: "Market Prices", href: "/market" },
+              ],
             },
             {
               title: "Company",
               links: [
                 { label: "Our Mission", href: "/our-mission" },
                 { label: "Our Team", href: "/our-team" },
-                { label: "Future Plan", href: "/future-plan" }
-              ]
+                { label: "Careers", href: "/future-plan" },
+                { label: "Contact Us", href: "/settings" },
+              ],
             },
             {
               title: "Resources",
               links: [
-                { label: "Frequently Asked Questions", href: "/#faq" },
-                { label: "Learn", href: "/learn" },
+                { label: "Blog", href: "/learn" },
+                { label: "FAQs", href: "/#faq" },
                 { label: "Community", href: "/community" },
-                { label: "Settings", href: "/settings" }
-              ]
-            }
-          ].map((section, index) => (
-            <motion.div
-              key={section.title}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: (index + 1) * 0.1 }}
-            >
-              <div className="text-sm font-semibold mb-3">{section.title}</div>
+                { label: "Support", href: "/settings" },
+              ],
+            },
+          ].map((col) => (
+            <div key={col.title}>
+              <div className="font-semibold mb-3">{col.title}</div>
               <ul className="space-y-2 text-sm">
-                {section.links.map((link) => (
-                  <li key={link.label}>
-                    <a href={link.href} className="hover:underline hover:text-primary transition-colors">
-                      {link.label}
+                {col.links.map((l) => (
+                  <li key={l.label}>
+                    <a href={l.href} className="text-[oklch(0.45_0.03_120)] hover:text-[oklch(0.35_0.03_120)] hover:underline">
+                      {l.label}
                     </a>
                   </li>
                 ))}
               </ul>
-            </motion.div>
+            </div>
           ))}
         </div>
 
-        <div className="border-t">
-          <motion.div 
-            className="mx-auto w-full max-w-6xl px-4 py-4 text-xs flex flex-col md:flex-row items-center justify-between gap-2"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-          >
-            <div className="text-muted-foreground">© {new Date().getFullYear()} Root AI. All rights reserved.</div>
+        <div className="border-t border-black/10">
+          <div className="mx-auto w-full max-w-6xl px-4 py-4 text-xs flex flex-col md:flex-row items-center justify-between gap-2 text-[oklch(0.45_0.03_120)]">
+            <div>© {new Date().getFullYear()} Root AI. All rights reserved.</div>
             <div className="flex items-center gap-4">
-              <a href="/#faq" className="hover:underline hover:text-primary transition-colors">FAQs</a>
-              <a href="#" className="hover:underline hover:text-primary transition-colors">Privacy</a>
-              <a href="#" className="hover:underline hover:text-primary transition-colors">Terms</a>
+              <a href="#" className="hover:underline">Privacy Policy</a>
+              <a href="#" className="hover:underline">Terms of Service</a>
             </div>
-          </motion.div>
+          </div>
         </div>
-      </section>
+      </footer>
     </div>
   );
 }
