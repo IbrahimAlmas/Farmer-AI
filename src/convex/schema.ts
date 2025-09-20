@@ -99,8 +99,12 @@ const schema = defineSchema(
       notes: v.optional(v.string()),
       // Add: optional priority for dashboard surfacing ("high" | "medium" | "low")
       priority: v.optional(v.string()),
+      // Add: optional association to a specific farm for per-farm views
+      farmId: v.optional(v.id("farms")),
     }).index("by_userId", ["userId"])
-     .index("by_userId_and_status", ["userId", "status"]),
+     .index("by_userId_and_status", ["userId", "status"])
+     // New index to efficiently query tasks by user + farm
+     .index("by_userId_and_farmId", ["userId", "farmId"]),
 
     // Market listings
     market_listings: defineTable({

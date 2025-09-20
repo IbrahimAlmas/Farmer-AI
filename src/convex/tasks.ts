@@ -17,6 +17,19 @@ export const list = query({
   },
 });
 
+export const listByFarm = query({
+  args: { farmId: v.id("farms") },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return [];
+    return await ctx.db
+      .query("tasks")
+      .withIndex("by_userId_and_farmId", (q) => q.eq("userId", userId).eq("farmId", args.farmId))
+      .order("desc")
+      .collect();
+  },
+});
+
 export const listPending = query({
   args: {},
   handler: async (ctx) => {
@@ -36,6 +49,7 @@ export const create = mutation({
     title: v.string(),
     dueDate: v.optional(v.number()),
     notes: v.optional(v.string()),
+    farmId: v.optional(v.id("farms")),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -47,6 +61,7 @@ export const create = mutation({
       dueDate: args.dueDate,
       status: "pending",
       notes: args.notes,
+      farmId: args.farmId,
     });
   },
 });
@@ -392,6 +407,7 @@ export const createFromSuggestion = mutation({
     reason: v.string(),
     priority: v.optional(v.string()),
     dueInDays: v.optional(v.number()),
+    farmId: v.optional(v.id("farms")),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -407,6 +423,7 @@ export const createFromSuggestion = mutation({
       status: "pending",
       notes: args.reason,
       priority: args.priority ?? undefined,
+      farmId: args.farmId,
     });
   },
 });

@@ -25,16 +25,34 @@ export default function Tasks() {
     | Array<{ at: number; item: string; details: string; technique?: string }>
     | undefined;
 
-  const [title, setTitle] = useState("");
-  const [open, setOpen] = useState(false);
-
-  // NEW: selected form filter
+  const tasksAll = useQuery(api.tasks.list);
+  // Selected farm filter (moved earlier to avoid init error)
+  const [selectedForm, setSelectedForm] = useState<string>("All");
   const demoForms = useMemo(() => ["Farm A", "Farm B", "Farm C"], []);
   const formNames = useMemo(() => {
     const names = (farms ?? []).map((f: any) => (f?.name as string) || "Farm");
     return names.length ? names : demoForms;
   }, [farms, demoForms]);
-  const [selectedForm, setSelectedForm] = useState<string>("All");
+  // Determine selected farmId from farms + selectedForm
+  const selectedFarmId = useMemo(() => {
+    if (!farms || selectedForm === "All") return null;
+    const match = (farms as any[]).find((f) => (f?.name as string)?.toLowerCase() === selectedForm.toLowerCase());
+    return match?._id ?? null;
+  }, [farms, selectedForm]);
+
+  // Load per-farm tasks when a farm is selected
+  const tasksByFarm = useQuery(
+    (api as any).tasks.listByFarm as any,
+    selectedFarmId ? ({ farmId: selectedFarmId } as any) : "skip"
+  ) as any[] | undefined;
+
+  // Choose dataset based on selection
+  const visibleTasks = (selectedFarmId ? tasksByFarm : tasksAll) ?? [];
+
+  const [title, setTitle] = useState("");
+  const [open, setOpen] = useState(false);
+
+  // (moved) selected form filter declarations are defined above to prevent initialization errors
 
   // Helpers to extract farm name from strings like "Task — Farm Name"
   const extractFarmName = (text: string): string | null => {
@@ -66,7 +84,7 @@ export default function Tasks() {
   const addTask = async () => {
     if (!title.trim()) return;
     try {
-      await create({ title, notes: undefined, dueDate: undefined });
+      await create({ title, notes: undefined, dueDate: undefined, farmId: selectedFarmId as any });
       setTitle("");
       toast.success("Task added");
     } catch {
@@ -86,6 +104,7 @@ export default function Tasks() {
         reason: s.reason,
         priority: s.priority,
         dueInDays: s.dueInDays,
+        farmId: selectedFarmId as any,
       } as any);
       toast.success("Added to your tasks");
     } catch (e: any) {
@@ -233,8 +252,8 @@ export default function Tasks() {
                 <CardTitle>Your Tasks</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                {tasks?.length ? (
-                  tasks.map((t) => (
+                {visibleTasks?.length ? (
+                  visibleTasks.map((t: any) => (
                     <div
                       key={t._id}
                       className="flex items-center justify-between border rounded-md p-2"
@@ -260,7 +279,7 @@ export default function Tasks() {
                   ))
                 ) : (
                   <div className="text-sm text-muted-foreground">
-                    No tasks yet. Add tasks from AI suggestions or create your own.
+                    No tasks yet for {selectedForm === "All" ? "all farms" : selectedForm}. Add tasks from AI suggestions or create your own.
                   </div>
                 )}
               </CardContent>
