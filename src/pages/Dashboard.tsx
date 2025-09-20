@@ -1,7 +1,7 @@
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Droplets, Thermometer, Home as HomeIcon, AlertTriangle } from "lucide-react";
 import { useNavigate } from "react-router";
 import {
   ChartContainer,
@@ -19,11 +19,7 @@ import {
   PieChart,
   Pie,
   Cell,
-  RadarChart as RChart,
-  Radar,
-  PolarGrid,
-  PolarAngleAxis,
-  PolarRadiusAxis,
+  ComposedChart,
 } from "recharts";
 import { toast } from "sonner";
 import { useState } from "react";
@@ -32,10 +28,10 @@ export default function Dashboard() {
   const navigate = useNavigate();
 
   // Add: urgent tasks local state
-  const [urgentTasks, setUrgentTasks] = useState<Array<{ id: number; title: string; due: string; done: boolean }>>([
-    { id: 1, title: "Irrigate wheat plot (Block A)", due: "Today", done: false },
-    { id: 2, title: "Scout pest in maize strip", due: "Today", done: false },
-    { id: 3, title: "Update market prices", due: "Tomorrow", done: false },
+  const [urgentTasks, setUrgentTasks] = useState<Array<{ id: number; title: string; due: string; done: boolean; risk?: "low" | "high" | "critical"; icon?: "water" | "pest" | "price" }>>([
+    { id: 1, title: "Irrigate wheat plot (Block A)", due: "Today — Critically Low Moisture", done: false, risk: "critical", icon: "water" },
+    { id: 2, title: "Scout for aphids in maize strip", due: "Today — High Risk", done: false, risk: "high", icon: "pest" },
+    { id: 3, title: "Update market prices for soybeans", due: "Tomorrow", done: false, risk: "low", icon: "price" },
   ]);
   const toggleTask = (id: number) => {
     setUrgentTasks((prev) =>
@@ -156,160 +152,135 @@ export default function Dashboard() {
           </p>
         </motion.div>
 
-        {/* Urgent Tasks (new): critical, compact and actionable */}
-        <motion.div
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="panel-glass rounded-2xl p-4"
-        >
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-semibold">Urgent Tasks</h3>
-            <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
-              Today
-            </span>
-          </div>
-          <ul className="space-y-2">
-            {urgentTasks.map((t) => (
-              <li
-                key={t.id}
-                className="flex items-center justify-between rounded-xl border px-3 py-2"
-              >
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={() => toggleTask(t.id)}
-                    aria-label={t.done ? "Mark as not done" : "Mark as done"}
-                    className={`size-5 rounded-md border flex items-center justify-center transition-colors ${
-                      t.done
-                        ? "bg-primary/90 text-primary-foreground border-transparent"
-                        : "hover:bg-muted/60"
-                    }`}
-                  >
-                    {t.done ? "✓" : ""}
-                  </button>
-                  <div>
-                    <div
-                      className={`text-sm font-medium ${
-                        t.done ? "line-through text-muted-foreground" : ""
-                      }`}
-                    >
-                      {t.title}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      Due: {t.due}
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  {!t.done && (
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      className="rounded-lg"
-                      onClick={() => {
-                        toggleTask(t.id);
-                      }}
-                    >
-                      Quick Complete
-                    </Button>
-                  )}
-                  <Button
-                    size="sm"
-                    className="rounded-lg"
-                    onClick={() => navigate("/tasks")}
-                  >
-                    View All
-                  </Button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </motion.div>
-
-        {/* Add: KPI strip */}
+        {/* KPI strip - refined to match screenshot with icons and deltas */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           className="grid grid-cols-2 md:grid-cols-4 gap-3"
         >
           <div className="panel-glass rounded-xl p-4">
-            <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Today's ET0</div>
-            <div className="mt-1 text-xl font-bold">4.2 mm</div>
-            <div className="text-xs text-muted-foreground">Clear skies</div>
+            <div className="flex items-center justify-between">
+              <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Today's ET0</div>
+              <Droplets className="h-4 w-4 text-primary/80" />
+            </div>
+            <div className="mt-1 text-2xl font-extrabold">4.2 mm</div>
+            <div className="text-xs text-emerald-400">+0.2 mm vs avg</div>
           </div>
           <div className="panel-glass rounded-xl p-4">
-            <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Avg Moisture</div>
-            <div className="mt-1 text-xl font-bold">46%</div>
+            <div className="flex items-center justify-between">
+              <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Avg. Moisture</div>
+              <Thermometer className="h-4 w-4 text-primary/80" />
+            </div>
+            <div className="mt-1 text-2xl font-extrabold">46%</div>
             <div className="text-xs text-muted-foreground">Last 7 days</div>
           </div>
           <div className="panel-glass rounded-xl p-4">
             <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Active Farms</div>
-            <div className="mt-1 text-xl font-bold">3</div>
+            <div className="mt-1 text-2xl font-extrabold">3</div>
             <div className="text-xs text-muted-foreground">Managed</div>
           </div>
           <div className="panel-glass rounded-xl p-4">
-            <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Alerts</div>
-            <div className="mt-1 text-xl font-bold text-amber-400">2</div>
+            <div className="flex items-center justify-between">
+              <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Alerts</div>
+              <AlertTriangle className="h-4 w-4 text-amber-400" />
+            </div>
+            <div className="mt-1 text-2xl font-extrabold text-amber-400">2</div>
             <div className="text-xs text-muted-foreground">Irrigation pending</div>
           </div>
         </motion.div>
 
-        {/* Add: Simple analytics (row 1: keep only Estimated Yield by Crop) */}
+        {/* Urgent Tasks — inline cards with icons + View Details */}
         <motion.div
-          initial={{ opacity: 0, y: 18 }}
+          initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
-          className="grid grid-cols-1 gap-4"
+          className="panel-glass rounded-2xl p-4"
         >
-          {/* Estimated Yield by Crop */}
-          <div className="panel-glass rounded-2xl p-4">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-semibold">Estimated Yield by Crop</h3>
-              <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Demo</span>
-            </div>
-            <ChartContainer
-              className="h-72"
-              config={{
-                yield: { label: "Yield (t/ha)", color: "oklch(0.70 0.14 90)" },
-              }}
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-semibold">Urgent Tasks</h3>
+            <button
+              onClick={() => navigate("/tasks")}
+              className="text-xs font-medium text-emerald-400 hover:underline"
             >
-              <BarChart data={yieldData} barCategoryGap={18}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border)/0.35)" />
-                <XAxis dataKey="crop" tickLine={false} axisLine={false} />
-                <YAxis unit=" t/ha" tickLine={false} axisLine={false} />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar
-                  dataKey="yield"
-                  fill="var(--color-yield)"
-                  radius={[8, 8, 0, 0]}
-                />
-              </BarChart>
-            </ChartContainer>
+              View All
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            {urgentTasks.map((t) => (
+              <div
+                key={t.id}
+                className="rounded-xl border px-3 py-3 bg-card/70 flex items-start justify-between gap-3"
+              >
+                <div className="flex items-start gap-3">
+                  <div className="grid place-items-center size-8 rounded-lg bg-primary/15 text-primary">
+                    {t.icon === "water" ? (
+                      <Droplets className="h-4 w-4" />
+                    ) : t.icon === "pest" ? (
+                      <AlertTriangle className="h-4 w-4" />
+                    ) : (
+                      <HomeIcon className="h-4 w-4" />
+                    )}
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium">{t.title}</div>
+                    <div className={`text-xs ${t.risk === "critical" ? "text-red-400" : t.risk === "high" ? "text-amber-400" : "text-muted-foreground"}`}>
+                      Due: {t.due}
+                    </div>
+                    <button
+                      onClick={() => navigate("/tasks")}
+                      className="mt-1 text-xs font-semibold text-emerald-400 hover:underline"
+                    >
+                      View Details
+                    </button>
+                  </div>
+                </div>
+                <button
+                  onClick={() => toggleTask(t.id)}
+                  className={`size-6 grid place-items-center rounded-md border ${t.done ? "bg-primary/90 text-primary-foreground border-transparent" : "hover:bg-muted/60"}`}
+                  aria-label={t.done ? "Mark as not done" : "Mark as done"}
+                  title={t.done ? "Mark as not done" : "Mark as done"}
+                >
+                  {t.done ? "✓" : ""}
+                </button>
+              </div>
+            ))}
           </div>
         </motion.div>
 
-        {/* Add: More analytics (row 2: temperature + rainfall) */}
+        {/* Replace analytics with Environmental Factors + Crop Share */}
         <motion.div
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           className="grid grid-cols-1 md:grid-cols-2 gap-4"
         >
-          {/* Temperature Trend */}
+          {/* Environmental Factors (7 days) — temp line + rainfall bars */}
           <div className="panel-glass rounded-2xl p-4">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-semibold">Temperature (7 days)</h3>
-              <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Realtime</span>
+              <h3 className="text-sm font-semibold">Environmental Factors (7 days)</h3>
+              <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Temp • Rain</span>
             </div>
             <ChartContainer
               className="h-72"
               config={{
                 temp: { label: "Temperature (°C)", color: "oklch(0.72 0.10 50)" },
+                rain: { label: "Rainfall (mm)", color: "oklch(0.70 0.14 145)" },
               }}
             >
-              <LineChart data={tempData}>
+              <ComposedChart data={tempData.map((d, i) => ({ day: d.day, temp: d.temp, rain: rainData[i]?.rain ?? 0 }))}>
+                <defs>
+                  <linearGradient id="rainGradAll" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="var(--color-rain)" stopOpacity="0.95" />
+                    <stop offset="100%" stopColor="var(--color-rain)" stopOpacity="0.2" />
+                  </linearGradient>
+                </defs>
                 <CartesianGrid strokeDasharray="2 4" stroke="hsl(var(--border)/0.3)" />
                 <XAxis dataKey="day" tickLine={false} axisLine={false} />
-                <YAxis unit="°C" tickLine={false} axisLine={false} />
+                <YAxis yAxisId="left" unit="°C" tickLine={false} axisLine={false} />
+                <YAxis yAxisId="right" orientation="right" unit=" mm" tickLine={false} axisLine={false} />
                 <ChartTooltip content={<ChartTooltipContent />} />
+                <Bar yAxisId="right" dataKey="rain" fill="url(#rainGradAll)" radius={[6, 6, 6, 6]} barSize={18} />
                 <Line
+                  yAxisId="left"
                   type="monotone"
                   dataKey="temp"
                   stroke="var(--color-temp)"
@@ -317,52 +288,15 @@ export default function Dashboard() {
                   dot={{ r: 3, strokeWidth: 0 }}
                   activeDot={{ r: 5 }}
                 />
-              </LineChart>
+              </ComposedChart>
             </ChartContainer>
           </div>
 
-          {/* Rainfall */}
-          <div className="panel-glass rounded-2xl p-4">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-semibold">Rainfall (7 days)</h3>
-              <span className="text-[10px] uppercase tracking-widest text-muted-foreground">mm</span>
-            </div>
-            <ChartContainer
-              className="h-72"
-              config={{
-                rain: { label: "Rain (mm)", color: "oklch(0.70 0.14 145)" },
-              }}
-            >
-              <BarChart data={rainData} barCategoryGap={28}>
-                <defs>
-                  <linearGradient id="rainGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="var(--color-rain)" stopOpacity="0.95" />
-                    <stop offset="100%" stopColor="var(--color-rain)" stopOpacity="0.2" />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="1 6" stroke="hsl(var(--border)/0.25)" />
-                <XAxis dataKey="day" tickLine={false} axisLine={false} />
-                <YAxis unit=" mm" tickLine={false} axisLine={false} />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="rain" fill="url(#rainGrad)" radius={[10, 10, 10, 10]} />
-              </BarChart>
-            </ChartContainer>
-          </div>
-        </motion.div>
-
-        {/* Row 3: Distinct styles — Pie + Radar */}
-        <motion.div
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="grid grid-cols-1 md:grid-cols-2 gap-4"
-        >
-          {/* Crop Share — Pie with custom colors and labels */}
+          {/* Crop Share — doughnut */}
           <div className="panel-glass rounded-2xl p-4">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-sm font-semibold">Crop Share</h3>
-              <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
-                % Area
-              </span>
+              <span className="text-[10px] uppercase tracking-widest text-muted-foreground">% Area</span>
             </div>
             <ChartContainer
               className="h-72"
@@ -373,7 +307,6 @@ export default function Dashboard() {
                 pulses: { label: "Pulses", color: cropShare[3].color },
               }}
             >
-              {/* Using Recharts PieChart directly for distinct look */}
               <PieChart>
                 <Pie
                   data={cropShare}
@@ -381,9 +314,9 @@ export default function Dashboard() {
                   nameKey="name"
                   cx="50%"
                   cy="50%"
-                  innerRadius={55}
-                  outerRadius={90}
-                  paddingAngle={2}
+                  innerRadius={65}
+                  outerRadius={95}
+                  paddingAngle={3}
                   cornerRadius={6}
                   stroke="hsl(var(--background))"
                   strokeWidth={3}
@@ -395,37 +328,6 @@ export default function Dashboard() {
                 </Pie>
                 <ChartTooltip content={<ChartTooltipContent />} />
               </PieChart>
-            </ChartContainer>
-          </div>
-
-          {/* Farm Health — Radar for varied presentation */}
-          <div className="panel-glass rounded-2xl p-4">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-semibold">Farm Health</h3>
-              <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
-                Composite
-              </span>
-            </div>
-            <ChartContainer
-              className="h-72"
-              config={{
-                score: { label: "Score", color: "oklch(0.72 0.15 145)" },
-              }}
-            >
-              <RChart data={healthRadar}>
-                <PolarGrid stroke="hsl(var(--border)/0.35)" />
-                <PolarAngleAxis dataKey="metric" tick={{ fontSize: 12 }} />
-                <PolarRadiusAxis angle={30} domain={[0, 100]} />
-                <Radar
-                  name="Score"
-                  dataKey="score"
-                  stroke="var(--color-score)"
-                  fill="var(--color-score)"
-                  fillOpacity={0.25}
-                  strokeWidth={2}
-                />
-                <ChartTooltip content={<ChartTooltipContent />} />
-              </RChart>
             </ChartContainer>
           </div>
         </motion.div>
