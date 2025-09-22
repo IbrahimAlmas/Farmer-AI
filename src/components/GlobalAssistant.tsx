@@ -32,42 +32,67 @@ export function GlobalAssistant() {
   });
   const draggingRef = useRef(false);
   const offsetRef = useRef<{ dx: number; dy: number }>({ dx: 0, dy: 0 });
+  // Add: drag threshold + start and moved refs to distinguish click vs drag
+  const startRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const movedRef = useRef(false);
+
+  // Add: Clamp helper to keep the widget on-screen and a resize handler
+  const clampPos = (x: number, y: number) => {
+    const maxX = Math.max(8, window.innerWidth - 64);
+    const maxY = Math.max(8, window.innerHeight - 64);
+    return { x: Math.max(8, Math.min(x, maxX)), y: Math.max(8, Math.min(y, maxY)) };
+  };
 
   useEffect(() => {
-    const onMove = (e: MouseEvent) => {
-      if (!draggingRef.current) return;
-      const x = e.clientX - offsetRef.current.dx;
-      const y = e.clientY - offsetRef.current.dy;
-      const maxX = window.innerWidth - 64;
-      const maxY = window.innerHeight - 64;
-      const nx = Math.max(8, Math.min(x, maxX));
-      const ny = Math.max(8, Math.min(y, maxY));
-      setPos({ x: nx, y: ny });
+    // Clamp position on mount and when window resizes (prevents being stuck off-screen)
+    const handleResize = () => {
+      setPos((p) => clampPos(p.x, p.y));
     };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const startDrag: React.MouseEventHandler<HTMLDivElement> = (e) => {
+    // Start pointer tracking; only treat as drag if movement exceeds a small threshold
+    const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
+    offsetRef.current = { dx: e.clientX - rect.left, dy: e.clientY - rect.top };
+    startRef.current = { x: e.clientX, y: e.clientY };
+    movedRef.current = false;
+    draggingRef.current = false;
+
+    const onMove = (me: MouseEvent) => {
+      const dist = Math.hypot(me.clientX - startRef.current.x, me.clientY - startRef.current.y);
+      if (dist > 4 && !draggingRef.current) {
+        draggingRef.current = true;
+      }
+      if (draggingRef.current) {
+        movedRef.current = true;
+        const x = me.clientX - offsetRef.current.dx;
+        const y = me.clientY - offsetRef.current.dy;
+        setPos(clampPos(x, y));
+      }
+    };
+
     const onUp = () => {
-      if (!draggingRef.current) return;
-      draggingRef.current = false;
+      // Persist position
       try {
-        localStorage.setItem("ga_pos", JSON.stringify(pos));
+        const p = clampPos(pos.x, pos.y);
+        localStorage.setItem("ga_pos", JSON.stringify(p));
       } catch {}
       window.removeEventListener("mousemove", onMove);
       window.removeEventListener("mouseup", onUp);
-    };
-    if (draggingRef.current) {
-      window.addEventListener("mousemove", onMove);
-      window.addEventListener("mouseup", onUp);
-    }
-    return () => {
-      window.removeEventListener("mousemove", onMove);
-      window.removeEventListener("mouseup", onUp);
-    };
-  }, [pos]);
 
-  const startDrag: React.MouseEventHandler<HTMLDivElement> = (e) => {
-    // Start dragging only when clicking the floating button area
-    const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
-    offsetRef.current = { dx: e.clientX - rect.left, dy: e.clientY - rect.top };
-    draggingRef.current = true;
+      // If not moved significantly, treat as a click: open chat
+      if (!movedRef.current) {
+        setOpen(true);
+      }
+      draggingRef.current = false;
+      movedRef.current = false;
+    };
+
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
   };
 
   const push = (m: ChatMessage) => setMessages((prev) => [...prev, m]);
@@ -159,7 +184,7 @@ export function GlobalAssistant() {
 
   return (
     <div
-      className="fixed z-[60]"
+      className="fixed z-[100]"
       style={{ left: pos.x, top: pos.y }}
     >
       {!open && (
@@ -170,13 +195,11 @@ export function GlobalAssistant() {
           title="Drag me"
         >
           <Button
-            className="rounded-full size-16 p-0 shadow-lg bg-emerald-600 hover:bg-emerald-500 text-white"
-            onClick={(e) => {
-              if (!draggingRef.current) setOpen(true);
-            }}
+            className="rounded-full size-18 p-0 shadow-lg bg-emerald-600 hover:bg-emerald-500 text-white"
+            onClick={() => setOpen(true)}
             aria-label="Open Assistant"
           >
-            <MessageSquare className="h-7 w-7" />
+            <MessageSquare className="h-8 w-8" />
           </Button>
         </div>
       )}
