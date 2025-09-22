@@ -47,12 +47,13 @@ export function GlobalAssistant() {
   };
 
   // Add: ensure the chat panel is fully visible when opening
-  const PANEL_W = 360; // matches sm width
-  const PANEL_H = 420; // approximate height; enough to keep it in view
   const clampPosForPanel = (x: number, y: number) => {
-    const maxX = Math.max(8, window.innerWidth - PANEL_W - 8);
-    const maxY = Math.max(8, window.innerHeight - PANEL_H - 8);
-    return { x: Math.max(8, Math.min(x, maxX)), y: Math.max(8, Math.min(y, maxY)) };
+    const margin = 8;
+    const panelW = window.innerWidth >= 640 ? 360 : 320; // matches sm width behavior
+    const panelH = Math.max(320, Math.floor(window.innerHeight * 0.8)); // up to 80vh
+    const maxX = Math.max(margin, window.innerWidth - panelW - margin);
+    const maxY = Math.max(margin, window.innerHeight - panelH - margin);
+    return { x: Math.max(margin, Math.min(x, maxX)), y: Math.max(margin, Math.min(y, maxY)) };
   };
 
   // Button clamp (small footprint)
@@ -266,7 +267,7 @@ export function GlobalAssistant() {
       )}
 
       {open && (
-        <div className="w-[320px] sm:w-[360px] rounded-2xl bg-white shadow-xl ring-1 ring-black/10 overflow-hidden">
+        <div className="w-[320px] sm:w-[360px] max-h-[80vh] rounded-2xl bg-white shadow-xl ring-1 ring-black/10 overflow-hidden">
           <div
             className="flex items-center justify-between px-3 py-2 bg-[oklch(0.98_0.01_120)] select-none cursor-move"
             onMouseDown={startDragPanel}
@@ -312,7 +313,8 @@ export function GlobalAssistant() {
             </div>
           </div>
 
-          <div className="h-56 overflow-y-auto px-3 py-2 space-y-2">
+          {/* Make messages area responsive to viewport to avoid off-screen overflow */}
+          <div className="max-h-[45vh] overflow-y-auto px-3 py-2 space-y-2">
             {messages.map((m, i) => (
               <div
                 key={i}
