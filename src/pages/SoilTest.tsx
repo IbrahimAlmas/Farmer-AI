@@ -377,98 +377,154 @@ export default function SoilTest() {
               className="hidden"
             />
 
-            {/* NEW: Intro step with information and single CTA */}
+            {/* NEW: Intro step redesigned to match reference (hero + two cards + why section) */}
             {step === "intro" && (
               <motion.div
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 className=""
               >
-                {/* Reworked layout with tighter gaps and fixed right rail width */}
-                <div className="grid items-start gap-4 lg:gap-6 lg:grid-cols-[1fr_300px]">
-                  {/* LEFT: Main Soil Health Check */}
-                  <div>
-                    <Card className="overflow-hidden backdrop-blur supports-[backdrop-filter]:bg-card/70">
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-lg">Soil Health Check</CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-3">
-                        <div className="rounded-xl border overflow-hidden bg-muted">
-                          <img
-                            src="/assets/Soil.webp"
-                            alt="Wide farmland with clearly visible soil rows"
-                            className="w-full h-72 sm:h-80 object-cover"
-                            onError={(e) => {
-                              const t = e.currentTarget as HTMLImageElement;
-                              if (t.src !== '/logo_bg.png') t.src = '/logo_bg.png';
-                              t.onerror = null;
-                            }}
-                          />
-                        </div>
-                        <div className="text-sm text-muted-foreground space-y-1.5">
-                          <p>
-                            Quickly estimate pH, moisture, and key nutrients from a soil photo. Use daylight and frame a small patch of bare soil.
-                          </p>
-                          <ul className="list-disc pl-5 space-y-1">
-                            <li>Use natural light and focus on bare soil surface</li>
-                            <li>Avoid leaves, tools, or people in the frame</li>
-                            <li>Fill most of the frame with soil; keep angle roughly top‑down</li>
-                          </ul>
-                        </div>
-                        <div className="flex justify-start">
-                          <Button
-                            className="gap-2 px-6 py-6 text-base sm:text-lg rounded-xl w-full sm:w-auto min-w-[200px] bg-amber-600 hover:bg-amber-500 text-white shadow-md"
-                            onClick={() => {
-                              setErrorMsg(null);
-                              setResult(null);
-                              setStep("capture");
-                              // do not auto-start camera
-                            }}
-                          >
-                            Start Soil Test
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
+                {/* Hero heading */}
+                <div className="text-center max-w-4xl mx-auto mb-6 sm:mb-8">
+                  <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight">
+                    Revolutionize Your Farming with AI‑Powered Soil Analysis
+                  </h1>
+                  <p className="mt-3 text-sm sm:text-base text-muted-foreground">
+                    Get instant, accurate soil health insights from a single photo. No expensive lab tests, no waiting. Just smarter farming decisions.
+                  </p>
+                </div>
 
-                  {/* RIGHT: Sticky rail with Why test soil (top) and Sample insights (bottom) */}
-                  <div className="hidden lg:flex lg:flex-col lg:gap-4 lg:sticky lg:top-24 self-start w-[360px]">
-                    {/* Why test soil? */}
-                    <Card className="overflow-hidden backdrop-blur supports-[backdrop-filter]:bg-card/70">
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-sm">Why test soil?</CardTitle>
-                      </CardHeader>
-                      <CardContent className="text-xs text-muted-foreground space-y-2">
-                        <p>Soil health drives yield, quality, and sustainability.</p>
-                        <ul className="list-disc pl-5 space-y-1">
-                          <li>Detect pH problems early</li>
-                          <li>Optimize nutrient application</li>
-                          <li>Improve water retention</li>
-                        </ul>
-                      </CardContent>
-                    </Card>
+                {/* Main two-column cards */}
+                <div className="grid items-stretch gap-4 lg:gap-6 lg:grid-cols-2">
+                  {/* LEFT: Steps + CTA */}
+                  <Card className="overflow-hidden backdrop-blur supports-[backdrop-filter]:bg-card/70">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-lg sm:text-xl font-semibold">
+                        Ready to Grow Smarter?
+                      </CardTitle>
+                      <p className="text-sm text-muted-foreground">
+                        Join thousands of farmers boosting yields and sustainability. Start your first soil analysis now.
+                      </p>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid sm:grid-cols-3 gap-4">
+                        <div className="rounded-xl border p-4 bg-muted/30 text-center">
+                          <div className="mx-auto mb-2 grid place-items-center size-10 rounded-full bg-emerald-100 text-emerald-700">
+                            <CameraIcon className="h-5 w-5" />
+                          </div>
+                          <div className="font-medium text-sm">1. Snap a Photo</div>
+                          <div className="text-xs text-muted-foreground">Take a clear picture of your soil.</div>
+                        </div>
+                        <div className="rounded-xl border p-4 bg-muted/30 text-center">
+                          <div className="mx-auto mb-2 grid place-items-center size-10 rounded-full bg-emerald-100 text-emerald-700">
+                            <Upload className="h-5 w-5" />
+                          </div>
+                          <div className="font-medium text-sm">2. Upload & Analyze</div>
+                          <div className="text-xs text-muted-foreground">Our AI will analyze it in seconds.</div>
+                        </div>
+                        <div className="rounded-xl border p-4 bg-muted/30 text-center">
+                          <div className="mx-auto mb-2 grid place-items-center size-10 rounded-full bg-emerald-100 text-emerald-700">
+                            <Wand2 className="h-5 w-5" />
+                          </div>
+                          <div className="font-medium text-sm">3. Get Insights</div>
+                          <div className="text-xs text-muted-foreground">Receive a detailed report.</div>
+                        </div>
+                      </div>
 
-                    {/* Sample insights */}
-                    <Card className="overflow-hidden backdrop-blur supports-[backdrop-filter]:bg-card/70">
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-sm">Sample insights</CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-3">
-                        <div className="rounded-lg border p-3 bg-muted/30">
-                          <div className="text-[11px] text-muted-foreground mb-1">Typical pH (ideal 6.0–7.5)</div>
-                          <Progress value={70} className="h-3" />
+                      <div className="flex justify-start">
+                        <Button
+                          className="gap-2 px-6 py-6 text-base sm:text-lg rounded-xl w-full sm:w-auto min-w-[200px] bg-emerald-600 hover:bg-emerald-500 text-white shadow-md"
+                          onClick={() => {
+                            setErrorMsg(null);
+                            setResult(null);
+                            setStep("capture");
+                            // keep camera opt-in; user can press Enable Camera next
+                          }}
+                        >
+                          Start Soil Test
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* RIGHT: Image + Sample Insights */}
+                  <Card className="overflow-hidden backdrop-blur supports-[backdrop-filter]:bg-card/70">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-lg sm:text-xl">Sample Insights</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="rounded-xl border overflow-hidden bg-muted">
+                        <img
+                          src="/assets/Soil.webp"
+                          alt="Soil sample"
+                          className="w-full h-44 sm:h-56 object-cover"
+                          onError={(e) => {
+                            const t = e.currentTarget as HTMLImageElement;
+                            if (t.src !== '/logo_bg.png') t.src = '/logo_bg.png';
+                            t.onerror = null;
+                          }}
+                        />
+                      </div>
+                      <div className="rounded-lg border p-3 bg-muted/30">
+                        <div className="flex items-center justify-between text-[11px] text-muted-foreground mb-1">
+                          <span>Typical pH (ideal 6.0–7.5)</span>
+                          <span>6.8</span>
                         </div>
-                        <div className="rounded-lg border p-3 bg-muted/30">
-                          <div className="text-[11px] text-muted-foreground mb-1">Moisture target (20–40%)</div>
-                          <Progress value={28} className="h-3" />
+                        <Progress value={70} className="h-3" />
+                      </div>
+                      <div className="rounded-lg border p-3 bg-muted/30">
+                        <div className="flex items-center justify-between text-[11px] text-muted-foreground mb-1">
+                          <span>Moisture target (20–40%)</span>
+                          <span>32%</span>
                         </div>
-                        <div className="text-[11px] text-muted-foreground">
-                          Results are estimates from photo analysis; confirm with lab tests if needed.
+                        <Progress value={32} className="h-3" />
+                      </div>
+                      <div className="text-[11px] text-muted-foreground">
+                        *Estimates from photo analysis. Confirm with lab tests if needed.
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Why Test Soil section */}
+                <div className="mt-6">
+                  <Card className="overflow-hidden backdrop-blur supports-[backdrop-filter]:bg-card/70">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-base sm:text-lg">Why Test Soil?</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 text-sm">
+                        <div className="flex items-start gap-2">
+                          <span className="mt-1 size-2 rounded-full bg-emerald-600" />
+                          <div>
+                            <div className="font-semibold">Boost Yields</div>
+                            <div className="text-muted-foreground">Optimize conditions for maximum crop production.</div>
+                          </div>
                         </div>
-                      </CardContent>
-                    </Card>
-                  </div>
+                        <div className="flex items-start gap-2">
+                          <span className="mt-1 size-2 rounded-full bg-emerald-600" />
+                          <div>
+                            <div className="font-semibold">Save Money</div>
+                            <div className="text-muted-foreground">Apply only the necessary nutrients and fertilizers.</div>
+                          </div>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <span className="mt-1 size-2 rounded-full bg-emerald-600" />
+                          <div>
+                            <div className="font-semibold">Enhance Sustainability</div>
+                            <div className="text-muted-foreground">Prevent nutrient runoff and improve water retention.</div>
+                          </div>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <span className="mt-1 size-2 rounded-full bg-emerald-600" />
+                          <div>
+                            <div className="font-semibold">Detect Problems Early</div>
+                            <div className="text-muted-foreground">Identify pH imbalances and other issues.</div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
               </motion.div>
             )}
