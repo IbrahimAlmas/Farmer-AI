@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { MessageSquare, Send, Compass, Camera as CameraIcon, Upload, Wand2, Image as ImageIcon, Home, ListChecks } from "lucide-react";
 import { useLocation, useNavigate } from "react-router";
@@ -18,6 +18,56 @@ export function GlobalAssistant() {
     },
   ]);
   const [input, setInput] = useState("");
+
+  // Add: draggable floating position state (persisted)
+  const [pos, setPos] = useState<{ x: number; y: number }>(() => {
+    if (typeof window === "undefined") return { x: 0, y: 0 };
+    try {
+      const saved = localStorage.getItem("ga_pos");
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    // Default: bottom-right offset
+    return { x: window.innerWidth - 88, y: window.innerHeight - 88 };
+  });
+  const draggingRef = useRef(false);
+  const offsetRef = useRef<{ dx: number; dy: number }>({ dx: 0, dy: 0 });
+
+  useEffect(() => {
+    const onMove = (e: MouseEvent) => {
+      if (!draggingRef.current) return;
+      const x = e.clientX - offsetRef.current.dx;
+      const y = e.clientY - offsetRef.current.dy;
+      const maxX = window.innerWidth - 64;
+      const maxY = window.innerHeight - 64;
+      const nx = Math.max(8, Math.min(x, maxX));
+      const ny = Math.max(8, Math.min(y, maxY));
+      setPos({ x: nx, y: ny });
+    };
+    const onUp = () => {
+      if (!draggingRef.current) return;
+      draggingRef.current = false;
+      try {
+        localStorage.setItem("ga_pos", JSON.stringify(pos));
+      } catch {}
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+    };
+    if (draggingRef.current) {
+      window.addEventListener("mousemove", onMove);
+      window.addEventListener("mouseup", onUp);
+    }
+    return () => {
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+    };
+  }, [pos]);
+
+  const startDrag: React.MouseEventHandler<HTMLDivElement> = (e) => {
+    // Start dragging only when clicking the floating button area
+    const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
+    offsetRef.current = { dx: e.clientX - rect.left, dy: e.clientY - rect.top };
+    draggingRef.current = true;
+  };
 
   const push = (m: ChatMessage) => setMessages((prev) => [...prev, m]);
 
@@ -107,21 +157,34 @@ export function GlobalAssistant() {
   );
 
   return (
-    <div className="fixed bottom-4 right-4 z-50">
+    <div
+      className="fixed z-50"
+      style={{ left: pos.x, top: pos.y }}
+    >
       {!open && (
-        <Button
-          className="rounded-full size-12 p-0 shadow-lg bg-emerald-600 hover:bg-emerald-500 text-white"
-          onClick={() => setOpen(true)}
-          aria-label="Open Assistant"
+        <div
+          onMouseDown={startDrag}
+          className="cursor-grab active:cursor-grabbing"
+          aria-label="Drag chat button"
+          title="Drag me"
         >
-          <MessageSquare className="h-5 w-5" />
-        </Button>
+          <Button
+            className="rounded-full size-14 p-0 shadow-lg bg-emerald-600 hover:bg-emerald-500 text-white"
+            onClick={(e) => {
+              // Prevent drag from immediately opening on small move
+              if (!draggingRef.current) setOpen(true);
+            }}
+            aria-label="Open Assistant"
+          >
+            <MessageSquare className="h-6 w-6" />
+          </Button>
+        </div>
       )}
 
       {open && (
         <div className="w-[320px] sm:w-[360px] rounded-2xl bg-white shadow-xl ring-1 ring-black/10 overflow-hidden">
           <div className="flex items-center justify-between px-3 py-2 bg-[oklch(0.98_0.01_120)]">
-            <div className="text-sm font-semibold">Assistant</div>
+            <div className="text-sm font-semibold text-[oklch(0.22_0.02_120)]">Assistant</div>
             <div className="flex items-center gap-2">
               <Button
                 variant="ghost"
@@ -131,7 +194,7 @@ export function GlobalAssistant() {
                 title="Go Home"
               >
                 <Compass className="h-4 w-4" />
-                Home
+                <span className="text-[oklch(0.22_0.02_120)]">Home</span>
               </Button>
               <Button variant="ghost" size="sm" onClick={() => setOpen(false)}>
                 Close
@@ -168,7 +231,7 @@ export function GlobalAssistant() {
                 key={i}
                 className={`max-w-[85%] rounded-lg px-3 py-2 text-sm ${
                   m.role === "assistant"
-                    ? "bg-[oklch(0.98_0.01_120)] text-foreground"
+                    ? "bg-[oklch(0.98_0.01_120)] text-[oklch(0.22_0.02_120)]"
                     : "bg-emerald-600 text-white ml-auto"
                 }`}
               >
@@ -179,7 +242,7 @@ export function GlobalAssistant() {
 
           <div className="flex items-center gap-2 p-2 border-t bg-white">
             <input
-              className="flex-1 h-9 px-3 rounded-md border ring-0 outline-none text-sm"
+              className="flex-1 h-9 px-3 rounded-md border ring-0 outline-none text-sm text-[oklch(0.22_0.02_120)] placeholder:text-[oklch(0.5_0.02_120)]"
               placeholder="Type a command…"
               value={input}
               onChange={(e) => setInput(e.target.value)}

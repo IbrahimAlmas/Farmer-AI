@@ -9,6 +9,7 @@ import LanguageSelect from "@/components/LanguageSelect";
 import { useAction, useMutation, useQuery } from "convex/react";
 import { toast } from "sonner";
 import { ui, type LangKey } from "@/lib/i18n";
+import GlobalAssistant from "@/components/GlobalAssistant";
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -336,6 +337,8 @@ export default function Landing() {
           </div>
         </div>
       </footer>
+
+      <GlobalAssistant />
     </div>
   );
 }

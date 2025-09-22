@@ -919,7 +919,7 @@ export default function SoilTest() {
                     key={i}
                     className={`max-w-[85%] rounded-lg px-3 py-2 text-sm ${
                       m.role === "assistant"
-                        ? "bg-[oklch(0.98_0.01_120)] text-foreground"
+                        ? "bg-[oklch(0.98_0.01_120)] text-[oklch(0.22_0.02_120)]"
                         : "bg-emerald-600 text-white ml-auto"
                     }`}
                   >
