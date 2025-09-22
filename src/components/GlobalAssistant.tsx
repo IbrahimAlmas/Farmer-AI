@@ -9,8 +9,8 @@ export function GlobalAssistant() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  // Open chat by default on the home page
-  const [open, setOpen] = useState(pathname === "/");
+  // Start closed by default on all pages (show only the floating logo)
+  const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: "assistant",
