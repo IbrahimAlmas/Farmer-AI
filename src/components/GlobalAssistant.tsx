@@ -196,8 +196,6 @@ export function GlobalAssistant() {
         >
           <Button
             className="rounded-full size-18 p-0 shadow-lg bg-emerald-600 hover:bg-emerald-500 text-white"
-            onClick={() => setOpen(true)}
-            aria-label="Open Assistant"
           >
             <MessageSquare className="h-8 w-8" />
           </Button>
