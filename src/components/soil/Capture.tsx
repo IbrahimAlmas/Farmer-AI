@@ -1,4 +1,4 @@
-import { RefObject } from "react";
+import type React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -21,12 +21,12 @@ export function SoilCapture({
   cameraReady: boolean;
   cameraError: string | null;
   loading: boolean;
-  videoRef: RefObject<HTMLVideoElement>;
-  canvasRef: RefObject<HTMLCanvasElement>;
+  videoRef: React.MutableRefObject<HTMLVideoElement | null>;
+  canvasRef: React.MutableRefObject<HTMLCanvasElement | null>;
   startCamera: () => Promise<void>;
   stopCamera: () => void;
   capturePhoto: () => Promise<void>;
-  fileInputRef: RefObject<HTMLInputElement>;
+  fileInputRef: React.MutableRefObject<HTMLInputElement | null>;
 }) {
   return (
     <div className="">

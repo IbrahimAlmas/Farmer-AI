@@ -1,3 +1,4 @@
+import type React from "react";
 import { RefObject } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -24,7 +25,7 @@ export function SoilResults({
   errorMsg: string | null;
   runCameraAnalysis: () => Promise<void>;
   onRetake: () => void;
-  fileInputRef: RefObject<HTMLInputElement>;
+  fileInputRef: React.MutableRefObject<HTMLInputElement | null>;
 }) {
   return (
     <div className="max-w-5xl mx-auto space-y-6">

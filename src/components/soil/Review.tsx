@@ -1,4 +1,4 @@
-import { RefObject } from "react";
+import type React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -18,7 +18,7 @@ export function SoilReview({
   file: File | null;
   runCameraAnalysis: () => Promise<void>;
   onRetake: () => void;
-  fileInputRef: RefObject<HTMLInputElement>;
+  fileInputRef: React.MutableRefObject<HTMLInputElement | null>;
   errorMsg: string | null;
 }) {
   return (
@@ -34,7 +34,7 @@ export function SoilReview({
           <div className="relative group rounded-xl border overflow-hidden bg-background">
             {preview ? (
               <>
-                <img src={preview} alt="Soil preview" className="w-full object-cover max-h[520px] max-h-[520px]" />
+                <img src={preview} alt="Soil preview" className="w-full object-cover max-h-[520px]" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-black/0 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 <div className="absolute bottom-3 left-3 right-3 flex flex-wrap gap-2 justify-center">
                   <Button onClick={runCameraAnalysis} disabled={loading || !file} className="gap-2">
