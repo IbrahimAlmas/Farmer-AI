@@ -43,6 +43,15 @@ export function GlobalAssistant() {
     return { x: Math.max(8, Math.min(x, maxX)), y: Math.max(8, Math.min(y, maxY)) };
   };
 
+  // Add: ensure the chat panel is fully visible when opening
+  const PANEL_W = 360; // matches sm width
+  const PANEL_H = 420; // approximate height; enough to keep it in view
+  const clampPosForPanel = (x: number, y: number) => {
+    const maxX = Math.max(8, window.innerWidth - PANEL_W - 8);
+    const maxY = Math.max(8, window.innerHeight - PANEL_H - 8);
+    return { x: Math.max(8, Math.min(x, maxX)), y: Math.max(8, Math.min(y, maxY)) };
+  };
+
   useEffect(() => {
     // Clamp position on mount and when window resizes (prevents being stuck off-screen)
     const handleResize = () => {
@@ -52,6 +61,13 @@ export function GlobalAssistant() {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  // Ensure visibility when opening by default (e.g., on "/")
+  useEffect(() => {
+    if (open) {
+      setPos((p) => clampPosForPanel(p.x, p.y));
+    }
+  }, [open]);
 
   const startDrag: React.MouseEventHandler<HTMLDivElement> = (e) => {
     // Start pointer tracking; only treat as drag if movement exceeds a small threshold
@@ -83,8 +99,10 @@ export function GlobalAssistant() {
       window.removeEventListener("mousemove", onMove);
       window.removeEventListener("mouseup", onUp);
 
-      // If not moved significantly, treat as a click: open chat
+      // If not moved significantly, treat as a click: open chat,
+      // and first ensure the panel won't be cut off
       if (!movedRef.current) {
+        setPos((p) => clampPosForPanel(p.x, p.y));
         setOpen(true);
       }
       draggingRef.current = false;
@@ -196,6 +214,7 @@ export function GlobalAssistant() {
         >
           <Button
             className="rounded-full size-18 p-0 shadow-lg bg-emerald-600 hover:bg-emerald-500 text-white"
+            aria-label="Open Assistant"
           >
             <MessageSquare className="h-8 w-8" />
           </Button>
