@@ -5,7 +5,7 @@ import { api } from "@/convex/_generated/api";
 import { useAction, useMutation } from "convex/react";
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { Camera as CameraIcon, Image as ImageIcon, RefreshCw, Play, Upload, Wand2 } from "lucide-react";
+import { Camera as CameraIcon, Image as ImageIcon, RefreshCw, Play, Upload, Wand2, MessageSquare, Send } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -40,6 +40,111 @@ export default function SoilTest() {
   const [step, setStep] = useState<"intro" | "capture" | "review" | "results">("intro");
   const startedRef = useRef(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Chatbot state
+  type ChatMessage = { role: "user" | "assistant"; text: string };
+  const [chatOpen, setChatOpen] = useState(false);
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    {
+      role: "assistant",
+      text: `Hi! I can control this page for you. Try: "Enable Camera", "Upload Photo", "Click Photo", "Analyze Photo", "Retake", or "Stop Camera".`,
+    },
+  ]);
+  const [chatInput, setChatInput] = useState("");
+
+  // Helper to push a message
+  const pushMessage = (m: ChatMessage) => setMessages((prev) => [...prev, m]);
+
+  // Execute a known action id
+  const doAction = async (actionId: string): Promise<string> => {
+    try {
+      switch (actionId) {
+        case "enable_camera":
+          await startCamera();
+          return "Camera enabled.";
+        case "upload_photo":
+          fileInputRef.current?.click();
+          return "Opening file picker…";
+        case "click_photo":
+          await capturePhoto();
+          return "Photo captured. You can now review it.";
+        case "analyze_photo":
+          if (!file) return "No photo selected yet. Please capture or upload a photo first.";
+          await runCameraAnalysis();
+          return "Analyzing your photo now…";
+        case "retake":
+          setFile(null);
+          setPreview(null);
+          setResult(null);
+          setStep("capture");
+          await startCamera().catch(() => {});
+          return "Ready to retake. Camera re-enabled.";
+        case "stop_camera":
+          stopCamera();
+          return "Camera stopped.";
+        case "go_intro":
+          stopCamera();
+          setStep("intro");
+          return "Back to the intro.";
+        case "help":
+          return "Available actions: Enable Camera, Upload Photo, Click Photo, Analyze Photo, Retake, Stop Camera, Go to Intro.";
+        case "status":
+          return `Status — Step: ${step}. Camera: ${cameraOn ? "on" : "off"}. ${file ? "Photo selected." : "No photo selected."} ${result ? "Analysis available." : "No analysis yet."}`;
+        default:
+          // Fix: use backticks to safely include "help"
+          return `I didn't recognize that action. Say "help" to see available actions.`;
+      }
+    } catch (e: any) {
+      return e?.message ?? "Something went wrong performing that action.";
+    }
+  };
+
+  // Very simple intent parser for NL commands
+  const parseIntent = (text: string): string => {
+    const t = text.toLowerCase().trim();
+    if (/^(help|\?)$/.test(t) || t.includes("help")) return "help";
+    if (t.includes("status")) return "status";
+    if (t.includes("go to intro") || t.includes("back to intro")) return "go_intro";
+    if (t.includes("enable") && t.includes("camera")) return "enable_camera";
+    if (t.includes("start") && t.includes("camera")) return "enable_camera";
+    if ((t.includes("upload") && t.includes("photo")) || t.includes("choose file")) return "upload_photo";
+    if (t.includes("click") && t.includes("photo")) return "click_photo";
+    if (t.includes("take") && (t.includes("photo") || t.includes("picture") || t.includes("shot"))) return "click_photo";
+    if (t.includes("analyze")) return "analyze_photo";
+    if (t.includes("retake")) return "retake";
+    if (t.includes("stop") && t.includes("camera")) return "stop_camera";
+    return "";
+  };
+
+  const handleChatSubmit = async () => {
+    const text = chatInput.trim();
+    if (!text) return;
+    setChatInput("");
+    pushMessage({ role: "user", text });
+
+    const actionId = parseIntent(text);
+    if (actionId) {
+      const reply = await doAction(actionId);
+      pushMessage({ role: "assistant", text: reply });
+      return;
+    }
+
+    // Fallback generic response
+    pushMessage({
+      role: "assistant",
+      // Fix: use backticks so inner quotes don't break parsing
+      text: `I can help with camera and analysis actions. Try: "Enable Camera", "Upload Photo", "Click Photo", "Analyze Photo", "Retake", or "Stop Camera".`,
+    });
+  };
+
+  const suggestionActions: Array<{ id: string; label: string }> = [
+    { id: "enable_camera", label: "Enable Camera" },
+    { id: "upload_photo", label: "Upload Photo" },
+    { id: "click_photo", label: "Click Photo" },
+    { id: "analyze_photo", label: "Analyze Photo" },
+    { id: "retake", label: "Retake" },
+    { id: "stop_camera", label: "Stop Camera" },
+  ];
 
   useEffect(() => {
     let didCancel = false;
@@ -444,14 +549,14 @@ export default function SoilTest() {
                                   <Play className="h-5 w-5" />
                                   Enable Camera
                                 </Button>
-<Button
-  variant="default"
-  className="gap-2 px-6 py-6 text-base sm:text-lg rounded-xl w-full sm:w-auto min-w-[200px] bg-amber-600 hover:bg-amber-500 text-white shadow-md"
-  onClick={() => fileInputRef.current?.click()}
->
-  <Upload className="h-5 w-5" />
-  Upload Photo
-</Button>
+                                <Button
+                                  variant="default"
+                                  className="gap-2 px-6 py-6 text-base sm:text-lg rounded-xl w-full sm:w-auto min-w-[200px] bg-amber-600 hover:bg-amber-500 text-white shadow-md"
+                                  onClick={() => fileInputRef.current?.click()}
+                                >
+                                  <Upload className="h-5 w-5" />
+                                  Upload Photo
+                                </Button>
                               </div>
 
                               {/* Troubleshooter */}
@@ -575,10 +680,10 @@ export default function SoilTest() {
                             >
                               Retake
                             </Button>
-<Button variant="outline" className="gap-2" onClick={() => fileInputRef.current?.click()}>
-  <Upload className="h-4 w-4" />
-  Add More
-</Button>
+                            <Button variant="outline" className="gap-2" onClick={() => fileInputRef.current?.click()}>
+                              <Upload className="h-4 w-4" />
+                              Add More
+                            </Button>
                           </div>
                         </>
                       ) : (
@@ -645,10 +750,10 @@ export default function SoilTest() {
                           >
                             Retake
                           </Button>
-<Button variant="outline" className="gap-2" onClick={() => fileInputRef.current?.click()}>
-  <Upload className="h-4 w-4" />
-  Add More
-</Button>
+                          <Button variant="outline" className="gap-2" onClick={() => fileInputRef.current?.click()}>
+                            <Upload className="h-4 w-4" />
+                            Add More
+                          </Button>
                         </div>
                       </div>
                     </CardContent>
@@ -747,6 +852,79 @@ export default function SoilTest() {
               </div>
             )}
           </div>
+        </div>
+
+        {/* Floating Chatbot */}
+        <div className="fixed bottom-4 right-4 z-50">
+          {!chatOpen && (
+            <Button
+              className="rounded-full size-12 p-0 shadow-lg bg-emerald-600 hover:bg-emerald-500 text-white"
+              onClick={() => setChatOpen(true)}
+              aria-label="Open Assistant"
+            >
+              <MessageSquare className="h-5 w-5" />
+            </Button>
+          )}
+
+          {chatOpen && (
+            <div className="w-[320px] sm:w-[360px] rounded-2xl bg-white shadow-xl ring-1 ring-black/10 overflow-hidden">
+              <div className="flex items-center justify-between px-3 py-2 bg-[oklch(0.98_0.01_120)]">
+                <div className="text-sm font-semibold">Soil Test Assistant</div>
+                <Button variant="ghost" size="sm" onClick={() => setChatOpen(false)}>
+                  Close
+                </Button>
+              </div>
+
+              <div className="px-3 pt-2 pb-1 border-b">
+                <div className="flex flex-wrap gap-2">
+                  {suggestionActions.map((s) => (
+                    <Button
+                      key={s.id}
+                      size="sm"
+                      variant="outline"
+                      className="rounded-full"
+                      onClick={async () => {
+                        const reply = await doAction(s.id);
+                        pushMessage({ role: "assistant", text: reply });
+                      }}
+                    >
+                      {s.label}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="h-56 overflow-y-auto px-3 py-2 space-y-2">
+                {messages.map((m, i) => (
+                  <div
+                    key={i}
+                    className={`max-w-[85%] rounded-lg px-3 py-2 text-sm ${
+                      m.role === "assistant"
+                        ? "bg-[oklch(0.98_0.01_120)] text-foreground"
+                        : "bg-emerald-600 text-white ml-auto"
+                    }`}
+                  >
+                    {m.text}
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex items-center gap-2 p-2 border-t bg-white">
+                <input
+                  className="flex-1 h-9 px-3 rounded-md border ring-0 outline-none text-sm"
+                  placeholder="Type a command…"
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleChatSubmit();
+                  }}
+                />
+                <Button onClick={handleChatSubmit} className="h-9">
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </AppShell>
