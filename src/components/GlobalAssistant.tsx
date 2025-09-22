@@ -36,6 +36,9 @@ export function GlobalAssistant() {
   const startRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const movedRef = useRef(false);
 
+  // Add: track drag mode (button vs panel)
+  const dragModeRef = useRef<"button" | "panel">("button");
+
   // Add: Clamp helper to keep the widget on-screen and a resize handler
   const clampPos = (x: number, y: number) => {
     const maxX = Math.max(8, window.innerWidth - 64);
@@ -52,15 +55,24 @@ export function GlobalAssistant() {
     return { x: Math.max(8, Math.min(x, maxX)), y: Math.max(8, Math.min(y, maxY)) };
   };
 
+  // Button clamp (small footprint)
+  const clampPosButton = (x: number, y: number) => {
+    const btnSize = 64; // ~size-16 container
+    const margin = 8;
+    const maxX = Math.max(margin, window.innerWidth - btnSize - margin);
+    const maxY = Math.max(margin, window.innerHeight - btnSize - margin);
+    return { x: Math.max(margin, Math.min(x, maxX)), y: Math.max(margin, Math.min(y, maxY)) };
+  };
+
+  // Update: resize handling to use proper clamp based on open state
   useEffect(() => {
-    // Clamp position on mount and when window resizes (prevents being stuck off-screen)
     const handleResize = () => {
-      setPos((p) => clampPos(p.x, p.y));
+      setPos((p) => (open ? clampPosForPanel(p.x, p.y) : clampPosButton(p.x, p.y)));
     };
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  }, [open]);
 
   // Ensure visibility when opening by default (e.g., on "/")
   useEffect(() => {
@@ -69,8 +81,8 @@ export function GlobalAssistant() {
     }
   }, [open]);
 
-  const startDrag: React.MouseEventHandler<HTMLDivElement> = (e) => {
-    // Start pointer tracking; only treat as drag if movement exceeds a small threshold
+  const startDragButton: React.MouseEventHandler<HTMLDivElement> = (e) => {
+    dragModeRef.current = "button";
     const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
     offsetRef.current = { dx: e.clientX - rect.left, dy: e.clientY - rect.top };
     startRef.current = { x: e.clientX, y: e.clientY };
@@ -79,32 +91,64 @@ export function GlobalAssistant() {
 
     const onMove = (me: MouseEvent) => {
       const dist = Math.hypot(me.clientX - startRef.current.x, me.clientY - startRef.current.y);
-      if (dist > 4 && !draggingRef.current) {
-        draggingRef.current = true;
-      }
+      if (dist > 4 && !draggingRef.current) draggingRef.current = true;
       if (draggingRef.current) {
         movedRef.current = true;
         const x = me.clientX - offsetRef.current.dx;
         const y = me.clientY - offsetRef.current.dy;
-        setPos(clampPos(x, y));
+        setPos(clampPosButton(x, y));
       }
     };
 
     const onUp = () => {
-      // Persist position
       try {
-        const p = clampPos(pos.x, pos.y);
+        const p = clampPosButton(pos.x, pos.y);
         localStorage.setItem("ga_pos", JSON.stringify(p));
       } catch {}
       window.removeEventListener("mousemove", onMove);
       window.removeEventListener("mouseup", onUp);
 
-      // If not moved significantly, treat as a click: open chat,
-      // and first ensure the panel won't be cut off
+      // Click (not drag): open and ensure panel is fully visible
       if (!movedRef.current) {
         setPos((p) => clampPosForPanel(p.x, p.y));
         setOpen(true);
       }
+      draggingRef.current = false;
+      movedRef.current = false;
+    };
+
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+  };
+
+  const startDragPanel: React.MouseEventHandler<HTMLDivElement> = (e) => {
+    dragModeRef.current = "panel";
+    const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
+    offsetRef.current = { dx: e.clientX - rect.left, dy: e.clientY - rect.top };
+    startRef.current = { x: e.clientX, y: e.clientY };
+    movedRef.current = false;
+    draggingRef.current = false;
+
+    const onMove = (me: MouseEvent) => {
+      const dist = Math.hypot(me.clientX - startRef.current.x, me.clientY - startRef.current.y);
+      if (dist > 4 && !draggingRef.current) draggingRef.current = true;
+      if (draggingRef.current) {
+        movedRef.current = true;
+        const x = me.clientX - offsetRef.current.dx;
+        const y = me.clientY - offsetRef.current.dy;
+        setPos(clampPosForPanel(x, y));
+      }
+    };
+
+    const onUp = () => {
+      try {
+        const p = clampPosForPanel(pos.x, pos.y);
+        localStorage.setItem("ga_pos", JSON.stringify(p));
+      } catch {}
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+
+      // Releasing after panel drag: do nothing else (keep open)
       draggingRef.current = false;
       movedRef.current = false;
     };
@@ -207,7 +251,7 @@ export function GlobalAssistant() {
     >
       {!open && (
         <div
-          onMouseDown={startDrag}
+          onMouseDown={startDragButton}
           className="cursor-grab active:cursor-grabbing"
           aria-label="Drag chat button"
           title="Drag me"
@@ -223,7 +267,10 @@ export function GlobalAssistant() {
 
       {open && (
         <div className="w-[320px] sm:w-[360px] rounded-2xl bg-white shadow-xl ring-1 ring-black/10 overflow-hidden">
-          <div className="flex items-center justify-between px-3 py-2 bg-[oklch(0.98_0.01_120)]">
+          <div
+            className="flex items-center justify-between px-3 py-2 bg-[oklch(0.98_0.01_120)] select-none cursor-move"
+            onMouseDown={startDragPanel}
+          >
             <div className="text-sm font-semibold text-[oklch(0.22_0.02_120)]">Assistant</div>
             <div className="flex items-center gap-2">
               <Button
