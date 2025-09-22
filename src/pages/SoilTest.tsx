@@ -1,27 +1,15 @@
+import type React from "react";
 import { AppShell } from "@/components/AppShell";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { api } from "@/convex/_generated/api";
 import { useAction, useMutation } from "convex/react";
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { Camera as CameraIcon, Image as ImageIcon, RefreshCw, Play, Upload, Wand2, MessageSquare, Send, CheckCircle2 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { toast } from "sonner";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { SoilIntro } from "@/components/soil/Intro";
+import { SoilCapture } from "@/components/soil/Capture";
+import { SoilReview } from "@/components/soil/Review";
+import { SoilResults } from "@/components/soil/Results";
+import type { Analysis } from "@/types/soil";
 import { SoilTestAssistant, type SoilAssistantSuggestion } from "@/components/SoilTestAssistant";
-
-type Analysis = {
-  ph: number;
-  nitrogen: number;
-  phosphorus: number;
-  potassium: number;
-  moisture: number;
-  organicMatter: number;
-  recommendations: string[];
-};
 
 export default function SoilTest() {
   const getUploadUrl = useMutation(api.soil_upload.getUploadUrl);
@@ -42,19 +30,7 @@ export default function SoilTest() {
   const startedRef = useRef(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // Chatbot state
-  type ChatMessage = { role: "user" | "assistant"; text: string };
-  const [chatOpen, setChatOpen] = useState(false);
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      role: "assistant",
-      text: `Hi! I can control this page for you. Try: "Enable Camera", "Upload Photo", "Click Photo", "Analyze Photo", "Retake", or "Stop Camera".`,
-    },
-  ]);
-  const [chatInput, setChatInput] = useState("");
-
-  // Helper to push a message
-  const pushMessage = (m: ChatMessage) => setMessages((prev) => [...prev, m]);
+  // Inline chat removed (using SoilTestAssistant)
 
   // Execute a known action id
   const doAction = async (actionId: string): Promise<string> => {
@@ -100,43 +76,9 @@ export default function SoilTest() {
     }
   };
 
-  // Very simple intent parser for NL commands
-  const parseIntent = (text: string): string => {
-    const t = text.toLowerCase().trim();
-    if (/^(help|\?)$/.test(t) || t.includes("help")) return "help";
-    if (t.includes("status")) return "status";
-    if (t.includes("go to intro") || t.includes("back to intro")) return "go_intro";
-    if (t.includes("enable") && t.includes("camera")) return "enable_camera";
-    if (t.includes("start") && t.includes("camera")) return "enable_camera";
-    if ((t.includes("upload") && t.includes("photo")) || t.includes("choose file")) return "upload_photo";
-    if (t.includes("click") && t.includes("photo")) return "click_photo";
-    if (t.includes("take") && (t.includes("photo") || t.includes("picture") || t.includes("shot"))) return "click_photo";
-    if (t.includes("analyze")) return "analyze_photo";
-    if (t.includes("retake")) return "retake";
-    if (t.includes("stop") && t.includes("camera")) return "stop_camera";
-    return "";
-  };
+  // (removed legacy parseIntent; handled by assistant UI)
 
-  const handleChatSubmit = async () => {
-    const text = chatInput.trim();
-    if (!text) return;
-    setChatInput("");
-    pushMessage({ role: "user", text });
-
-    const actionId = parseIntent(text);
-    if (actionId) {
-      const reply = await doAction(actionId);
-      pushMessage({ role: "assistant", text: reply });
-      return;
-    }
-
-    // Fallback generic response
-    pushMessage({
-      role: "assistant",
-      // Fix: use backticks so inner quotes don't break parsing
-      text: `I can help with camera and analysis actions. Try: "Enable Camera", "Upload Photo", "Click Photo", "Analyze Photo", "Retake", or "Stop Camera".`,
-    });
-  };
+  // (removed inline chat submit handler)
 
   const suggestionActions: Array<{ id: string; label: string }> = [
     { id: "enable_camera", label: "Enable Camera" },
@@ -167,9 +109,7 @@ export default function SoilTest() {
   }, [doAction]);
 
   useEffect(() => {
-    let didCancel = false;
     return () => {
-      didCancel = true;
       if (streamRef.current) {
         streamRef.current.getTracks().forEach((t) => t.stop());
         streamRef.current = null;
@@ -380,557 +320,74 @@ export default function SoilTest() {
 
             {/* NEW: Intro step redesigned to match reference (hero + two cards + why section) */}
             {step === "intro" && (
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                className=""
-              >
-                {/* Top mini header to match reference: left logo + title, right language */}
-                <div className="hidden mb-4 sm:mb-6 items-center justify-between">
-                  {/* (hidden to match provided reference header-less hero) */}
-                </div>
-
-                {/* Hero heading */}
-                <div className="text-center max-w-4xl mx-auto mb-6 sm:mb-8">
-                  <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight">
-                    Revolutionize Your Farming with AI‑Powered Soil Analysis
-                  </h1>
-                  <p className="mt-3 text-sm sm:text-base text-muted-foreground">
-                    Get instant, accurate soil health insights from a single photo. No expensive lab tests, no waiting. Just smarter farming decisions.
-                  </p>
-                </div>
-
-                {/* Main two-column cards */}
-                <div className="grid items-stretch gap-4 lg:gap-6 lg:grid-cols-2">
-                  {/* LEFT: Steps + CTA */}
-                  <Card className="overflow-hidden bg-white shadow-sm ring-1 ring-black/5">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-lg sm:text-xl font-semibold">
-                        Ready to Grow Smarter?
-                      </CardTitle>
-                      <p className="text-sm text-muted-foreground">
-                        Join thousands of farmers who are boosting yields and sustainability. Start your first soil analysis now.
-                      </p>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="grid sm:grid-cols-3 gap-4">
-                        <div className="rounded-xl border p-4 bg-muted/30 text-center">
-                          <div className="mx-auto mb-2 grid place-items-center size-10 rounded-full bg-emerald-100 text-emerald-700">
-                            <CameraIcon className="h-5 w-5" />
-                          </div>
-                          <div className="font-medium text-sm">1. Snap a Photo</div>
-                          <div className="text-xs text-muted-foreground">Take a clear picture of your soil.</div>
-                        </div>
-                        <div className="rounded-xl border p-4 bg-muted/30 text-center">
-                          <div className="mx-auto mb-2 grid place-items-center size-10 rounded-full bg-emerald-100 text-emerald-700">
-                            <Upload className="h-5 w-5" />
-                          </div>
-                          <div className="font-medium text-sm">2. Upload & Analyze</div>
-                          <div className="text-xs text-muted-foreground">Our AI will analyze it in seconds.</div>
-                        </div>
-                        <div className="rounded-xl border p-4 bg-muted/30 text-center">
-                          <div className="mx-auto mb-2 grid place-items-center size-10 rounded-full bg-emerald-100 text-emerald-700">
-                            <Wand2 className="h-5 w-5" />
-                          </div>
-                          <div className="font-medium text-sm">3. Get Insights</div>
-                          <div className="text-xs text-muted-foreground">Receive a detailed report.</div>
-                        </div>
-                      </div>
-
-                      <div className="flex justify-start">
-                        <Button
-                          className="gap-2 px-6 py-6 text-base sm:text-lg rounded-full w-full sm:w-auto min-w-[220px] bg-emerald-600 hover:bg-emerald-500 text-white shadow-md"
-                          onClick={() => {
-                            setErrorMsg(null);
-                            setResult(null);
-                            setStep("capture");
-                          }}
-                        >
-                          <Upload className="h-5 w-5" />
-                          Start Soil Test
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* RIGHT: Image + Sample Insights */}
-                  <Card className="overflow-hidden bg-white shadow-sm ring-1 ring-black/5">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-lg sm:text-xl">Sample Insights</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="rounded-xl border overflow-hidden bg-muted">
-                        <img
-                          src="/assets/Soil.webp"
-                          alt="Soil sample"
-                          className="w-full h-44 sm:h-56 object-cover"
-                          onError={(e) => {
-                            const t = e.currentTarget as HTMLImageElement;
-                            if (t.src !== '/logo_bg.png') t.src = '/logo_bg.png';
-                            t.onerror = null;
-                          }}
-                        />
-                      </div>
-                      <div className="rounded-lg border p-3 bg-muted/30">
-                        <div className="flex items-center justify-between text-[11px] text-muted-foreground mb-1">
-                          <span>Typical pH (ideal 6.0–7.5)</span>
-                          <span>6.8</span>
-                        </div>
-                        <Progress value={70} className="h-3 rounded-full bg-emerald-100 [&>div]:bg-emerald-500 [&>div]:rounded-full" />
-                      </div>
-                      <div className="rounded-lg border p-3 bg-muted/30">
-                        <div className="flex items-center justify-between text-[11px] text-muted-foreground mb-1">
-                          <span>Moisture target (20–40%)</span>
-                          <span>32%</span>
-                        </div>
-                        <Progress value={32} className="h-3 rounded-full bg-blue-100 [&>div]:bg-blue-500 [&>div]:rounded-full" />
-                      </div>
-                      <div className="text-[11px] text-muted-foreground">
-                        *Estimates from photo analysis. Confirm with lab tests if needed.
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-
-                {/* Why Test Soil section */}
-                <div className="mt-6">
-                  <Card className="overflow-hidden bg-white shadow-sm ring-1 ring-black/5">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-base sm:text-lg">Why Test Soil?</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 text-sm">
-                        <div className="flex items-start gap-2">
-                          <CheckCircle2 className="mt-0.5 h-4 w-4 text-emerald-600" />
-                          <div>
-                            <div className="font-semibold">Boost Yields</div>
-                            <div className="text-muted-foreground">Optimize conditions for maximum crop production.</div>
-                          </div>
-                        </div>
-                        <div className="flex items-start gap-2">
-                          <CheckCircle2 className="mt-0.5 h-4 w-4 text-emerald-600" />
-                          <div>
-                            <div className="font-semibold">Save Money</div>
-                            <div className="text-muted-foreground">Apply only the necessary nutrients and fertilizers.</div>
-                          </div>
-                        </div>
-                        <div className="flex items-start gap-2">
-                          <CheckCircle2 className="mt-0.5 h-4 w-4 text-emerald-600" />
-                          <div>
-                            <div className="font-semibold">Enhance Sustainability</div>
-                            <div className="text-muted-foreground">Prevent nutrient runoff and improve water retention.</div>
-                          </div>
-                        </div>
-                        <div className="flex items-start gap-2">
-                          <CheckCircle2 className="mt-0.5 h-4 w-4 text-emerald-600" />
-                          <div>
-                            <div className="font-semibold">Detect Problems Early</div>
-                            <div className="text-muted-foreground">Identify pH imbalances and other issues.</div>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
+              <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+                <SoilIntro
+                  onStart={() => {
+                    setErrorMsg(null);
+                    setResult(null);
+                    setStep("capture");
+                  }}
+                />
               </motion.div>
             )}
 
             {/* Centered capture step with side panels */}
             {step === "capture" && (
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                className=""
-              >
-                {/* UPDATED LAYOUT: Left = Soil Test capture, Right = Pro tips (top) + Sample preview (bottom) */}
-                <div className="grid gap-4 lg:gap-6 lg:grid-cols-[1fr_380px]">
-                  {/* LEFT: Main capture card */}
-                  <div className="">
-                    <Card className="overflow-hidden backdrop-blur supports-[backdrop-filter]:bg-card/70">
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-xl sm:text-2xl font-semibold">Soil Test</CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        {cameraOn ? (
-                          <div className="relative rounded-xl border overflow-hidden bg-muted">
-                            <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/10 via-transparent to-transparent" />
-                            <div className="aspect-[4/3] w-full">
-                              <video
-                                ref={videoRef}
-                                className="h-full w-full object-cover"
-                                playsInline
-                                muted
-                                autoPlay
-                              />
-                            </div>
-
-                            {/* Camera overlay guides */}
-                            <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                              <div className="h-[55%] w-[70%] max-w-[520px] rounded-2xl border border-white/30 shadow-[0_0_0_9999px_rgba(0,0,0,0.08)]" />
-                            </div>
-                            <div className="pointer-events-none absolute top-3 left-3 text-[11px] font-medium px-2 py-0.5 rounded-full bg-black/40 text-white">
-                              Aim at bare soil, avoid leaves/tools
-                            </div>
-
-                            {/* Overlay controls when camera is ON */}
-                            <div className="absolute bottom-3 left-3 right-3 flex items-center justify-center">
-                              <div className="flex flex-wrap gap-2">
-                                <Button
-                                  onClick={capturePhoto}
-                                  disabled={!cameraReady || loading}
-                                  className="gap-2"
-                                >
-                                  {loading ? (
-                                    <>
-                                      <RefreshCw className="h-4 w-4 animate-spin" />
-                                      Processing…
-                                    </>
-                                  ) : (
-                                    <>
-                                      <CameraIcon className="h-4 w-4" />
-                                      Click Photo
-                                    </>
-                                  )}
-                                </Button>
-                                <Button variant="outline" onClick={stopCamera} className="gap-2">
-                                  <RefreshCw className="h-4 w-4" />
-                                  Stop
-                                </Button>
-                              </div>
-                            </div>
-                          </div>
-                        ) : (
-                          // Enhanced placeholder BEFORE enabling camera
-                          <div className="relative rounded-xl border overflow-hidden bg-muted">
-                            <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/5 via-transparent to-transparent" />
-                            <div className="flex flex-col items-center justify-center gap-4 p-6 text-center">
-                              <img
-                                src="https://images.unsplash.com/photo-1525824236856-8b420b9bb75b?q=80&w=1600&auto=format&fit=crop"
-                                alt="Soil guide"
-                                className="w-full max-w-2xl h-44 object-cover rounded-lg border"
-                                onError={(e) => {
-                                  const t = e.currentTarget as HTMLImageElement;
-                                  if (t.src !== '/logo_bg.png') t.src = '/logo_bg.png';
-                                  t.onerror = null;
-                                }}
-                              />
-                              <div className="grid gap-2 text-sm text-muted-foreground">
-                                <div className="flex items-center justify-center gap-2">
-                                  <Badge variant="outline">Tip</Badge>
-                                  Use natural light • Focus on bare soil • Keep phone steady
-                                </div>
-                                <div>Or upload a clear close-up if your camera isn't available.</div>
-                              </div>
-                              <div className="flex flex-wrap items-center justify-center gap-3">
-                                <Button
-                                  variant="default"
-                                  onClick={startCamera}
-                                  className="gap-2 px-6 py-6 text-base sm:text-lg rounded-xl w-full sm:w-auto min-w-[200px] bg-amber-600 hover:bg-amber-500 text-white shadow-md"
-                                >
-                                  <Play className="h-5 w-5" />
-                                  Enable Camera
-                                </Button>
-                                <Button
-                                  variant="default"
-                                  className="gap-2 px-6 py-6 text-base sm:text-lg rounded-xl w-full sm:w-auto min-w-[200px] bg-amber-600 hover:bg-amber-500 text-white shadow-md"
-                                  onClick={() => fileInputRef.current?.click()}
-                                >
-                                  <Upload className="h-5 w-5" />
-                                  Upload Photo
-                                </Button>
-                              </div>
-
-                              {/* Troubleshooter */}
-                              <details className="w-full max-w-xl mx-auto text-left mt-1">
-                                <summary className="text-xs text-muted-foreground cursor-pointer">
-                                  Having trouble enabling camera?
-                                </summary>
-                                <div className="text-xs text-muted-foreground mt-2 space-y-1">
-                                  <p>1) Allow camera permission in your browser settings.</p>
-                                  <p>2) Switch to a browser like Chrome, Safari, or Edge.</p>
-                                  <p>3) If still blocked, use Upload Photo.</p>
-                                </div>
-                              </details>
-                            </div>
-                          </div>
-                        )}
-
-                        {cameraError && !cameraReady && (
-                          <div className="text-xs text-red-600 text-center">
-                            {cameraError} — You can still upload a photo.
-                          </div>
-                        )}
-
-                        {/* Hidden canvas for capture */}
-                        <canvas ref={canvasRef} className="hidden" />
-                      </CardContent>
-                    </Card>
-                  </div>
-
-                  {/* RIGHT: Pro tips (top) + Sample result preview (bottom) */}
-                  <div className="flex flex-col gap-4">
-                    {/* Pro tips */}
-                    <Card className="overflow-hidden backdrop-blur supports-[backdrop-filter]:bg-card/70">
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-base">Pro tips</CardTitle>
-                      </CardHeader>
-                      <CardContent className="text-xs text-muted-foreground space-y-2">
-                        <ul className="list-disc pl-5 space-y-1">
-                          <li>Frame only the soil surface</li>
-                          <li>Avoid shadows; use daylight</li>
-                          <li>Hold steady for sharp focus</li>
-                        </ul>
-                      </CardContent>
-                    </Card>
-
-                    {/* Sample result preview */}
-                    <Card className="overflow-hidden backdrop-blur supports-[backdrop-filter]:bg-card/70">
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-base">Sample result preview</CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-3">
-                        <div className="rounded-lg border p-3 bg-muted/30">
-                          <div className="text-[11px] text-muted-foreground mb-1">pH</div>
-                          <Progress value={68} className="h-3" />
-                        </div>
-                        <div className="rounded-lg border p-3 bg-muted/30">
-                          <div className="text-[11px] text-muted-foreground mb-1">Moisture</div>
-                          <Progress value={35} className="h-3" />
-                        </div>
-                        <div className="rounded-lg border p-3">
-                          <div className="text-[11px] text-muted-foreground mb-1">Organic Matter</div>
-                          <Progress value={50} className="h-3" />
-                        </div>
-                        <div className="text-[11px] text-muted-foreground">
-                          Upload a photo of soil to get your actual analysis.
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-                </div>
+              <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+                <SoilCapture
+                  cameraOn={cameraOn}
+                  cameraReady={cameraReady}
+                  cameraError={cameraError}
+                  loading={loading}
+                  videoRef={videoRef}
+                  canvasRef={canvasRef}
+                  startCamera={startCamera}
+                  stopCamera={stopCamera}
+                  capturePhoto={capturePhoto}
+                  fileInputRef={fileInputRef}
+                />
               </motion.div>
             )}
 
             {/* Review step */}
             {step === "review" && (
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="max-w-2xl mx-auto"
-              >
-                <Card className="overflow-hidden">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="flex items-center gap-2 text-base">
-                      <ImageIcon className="h-4 w-4" />
-                      Review Photo
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="relative group rounded-xl border overflow-hidden bg-background">
-                      {preview ? (
-                        <>
-                          <img
-                            src={preview}
-                            alt="Soil preview"
-                            className="w-full object-cover max-h-[520px]"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-black/0 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                          <div className="absolute bottom-3 left-3 right-3 flex flex-wrap gap-2 justify-center">
-                            <Button onClick={runCameraAnalysis} disabled={loading || !file} className="gap-2">
-                              {loading ? (
-                                <>
-                                  <RefreshCw className="h-4 w-4 animate-spin" />
-                                  Analyzing…
-                                </>
-                              ) : (
-                                <>
-                                  <Wand2 className="h-4 w-4" />
-                                  Analyze Photo
-                                </>
-                              )}
-                            </Button>
-                            <Button
-                              variant="secondary"
-                              onClick={() => {
-                                setFile(null);
-                                setPreview(null);
-                                setResult(null);
-                                setStep("capture");
-                                startCamera().catch(() => {});
-                              }}
-                            >
-                              Retake
-                            </Button>
-                            <Button variant="outline" className="gap-2" onClick={() => fileInputRef.current?.click()}>
-                              <Upload className="h-4 w-4" />
-                              Add More
-                            </Button>
-                          </div>
-                        </>
-                      ) : (
-                        <div className="flex items-center justify-center h-48">
-                          <div className="text-sm text-muted-foreground">No image selected</div>
-                        </div>
-                      )}
-                    </div>
-                    {errorMsg && (
-                      <Alert variant="destructive" className="rounded-lg">
-                        <AlertTitle>Error</AlertTitle>
-                        <AlertDescription>{errorMsg}</AlertDescription>
-                      </Alert>
-                    )}
-                  </CardContent>
-                </Card>
+              <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+                <SoilReview
+                  preview={preview}
+                  loading={loading}
+                  file={file}
+                  runCameraAnalysis={runCameraAnalysis}
+                  onRetake={() => {
+                    setFile(null);
+                    setPreview(null);
+                    setResult(null);
+                    setStep("capture");
+                    startCamera().catch(() => {});
+                  }}
+                  fileInputRef={fileInputRef}
+                  errorMsg={errorMsg}
+                />
               </motion.div>
             )}
 
             {/* Results step */}
             {step === "results" && (
-              <div className="max-w-5xl mx-auto space-y-6">
-                {/* Photo + actions */}
-                <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
-                  <Card className="overflow-hidden">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="flex items-center gap-2 text-base">
-                        <ImageIcon className="h-4 w-4" />
-                        Photo
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="relative rounded-xl border overflow-hidden bg-background">
-                        {preview && (
-                          <img
-                            src={preview}
-                            alt="Soil preview"
-                            className="w-full object-cover max-h-[480px]"
-                          />
-                        )}
-                        <div className="absolute bottom-3 left-3 right-3 flex flex-wrap gap-2 justify-center">
-                          <Button onClick={runCameraAnalysis} disabled={loading || !file} className="gap-2">
-                            {loading ? (
-                              <>
-                                <RefreshCw className="h-4 w-4 animate-spin" />
-                                Re-Analyzing…
-                              </>
-                            ) : (
-                              <>
-                                <Wand2 className="h-4 w-4" />
-                                Analyze Again
-                              </>
-                            )}
-                          </Button>
-                          <Button
-                            variant="secondary"
-                            onClick={() => {
-                              setFile(null);
-                              setPreview(null);
-                              setResult(null);
-                              setStep("capture");
-                              startCamera().catch(() => {});
-                            }}
-                          >
-                            Retake
-                          </Button>
-                          <Button variant="outline" className="gap-2" onClick={() => fileInputRef.current?.click()}>
-                            <Upload className="h-4 w-4" />
-                            Add More
-                          </Button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-
-                {/* Results */}
-                <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
-                  <Card className="overflow-hidden border-emerald-200 bg-emerald-50/70 dark:bg-emerald-900/10">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-base text-emerald-900 dark:text-emerald-200">Analysis Results</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      {errorMsg && (
-                        <Alert variant="destructive" className="rounded-lg">
-                          <AlertTitle>Error</AlertTitle>
-                          <AlertDescription>{errorMsg}</AlertDescription>
-                        </Alert>
-                      )}
-
-                      {!result && (
-                        <div className="text-sm text-muted-foreground">
-                          No results available. Analyze the photo to see results here.
-                        </div>
-                      )}
-
-                      {result && (
-                        <div className="space-y-6">
-                          {/* Primary metrics */}
-                          <div className="grid gap-3 sm:grid-cols-2">
-                            <div className="rounded-lg border border-emerald-200 p-4 bg-emerald-50/60 dark:bg-emerald-900/20">
-                              <div className="text-xs text-muted-foreground mb-1">pH</div>
-                              <div className="flex items-baseline justify-between">
-                                <div className="text-2xl font-semibold">{result.ph}</div>
-                                <Badge variant="outline" className="border-emerald-400 text-emerald-700 dark:text-emerald-300">Ideal: 6.0–7.5</Badge>
-                              </div>
-                              <div className="mt-3">
-                                <Progress value={((result.ph - 4) / (9 - 4)) * 100} className="h-3 bg-emerald-100 [&>div]:bg-emerald-500" />
-                              </div>
-                            </div>
-
-                            <div className="rounded-lg border border-emerald-200 p-4 bg-emerald-50/60 dark:bg-emerald-900/20">
-                              <div className="text-xs text-muted-foreground mb-1">Moisture</div>
-                              <div className="flex items-baseline justify-between">
-                                <div className="text-2xl font-semibold">{result.moisture}%</div>
-                                <Badge variant="outline" className="border-emerald-400 text-emerald-700 dark:text-emerald-300">Target: 20–40%</Badge>
-                              </div>
-                              <div className="mt-3">
-                                <Progress value={Math.min(100, Math.max(0, result.moisture))} className="h-3 bg-emerald-100 [&>div]:bg-emerald-500" />
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Nutrients */}
-                          <div className="grid gap-3 sm:grid-cols-3">
-                            <div className="rounded-lg border border-emerald-200 p-4">
-                              <div className="text-xs text-muted-foreground mb-1">Nitrogen</div>
-                              <div className="text-xl font-semibold">{result.nitrogen} mg/kg</div>
-                            </div>
-                            <div className="rounded-lg border border-emerald-200 p-4">
-                              <div className="text-xs text-muted-foreground mb-1">Phosphorus</div>
-                              <div className="text-xl font-semibold">{result.phosphorus} mg/kg</div>
-                            </div>
-                            <div className="rounded-lg border border-emerald-200 p-4">
-                              <div className="text-xs text-muted-foreground mb-1">Potassium</div>
-                              <div className="text-xl font-semibold">{result.potassium} mg/kg</div>
-                            </div>
-                          </div>
-
-                          {/* Organic matter */}
-                          <div className="rounded-lg border border-emerald-200 p-4 bg-emerald-50/60 dark:bg-emerald-900/20">
-                            <div className="text-xs text-muted-foreground mb-2">Organic Matter</div>
-                            <div className="flex items-baseline justify-between">
-                              <div className="text-2xl font-semibold">{result.organicMatter}%</div>
-                              <Badge variant="outline" className="border-emerald-400 text-emerald-700 dark:text-emerald-300">Healthy: 3–6%</Badge>
-                            </div>
-                            <div className="mt-3">
-                              <Progress value={Math.min(100, (result.organicMatter / 6) * 100)} className="h-3 bg-emerald-100 [&>div]:bg-emerald-500" />
-                            </div>
-                          </div>
-
-                          {/* Recommendations */}
-                          <div>
-                            <div className="text-xs text-muted-foreground mb-2">Recommendations</div>
-                            <ul className="list-disc pl-5 space-y-1 text-sm">
-                              {result.recommendations.map((r, i) => (
-                                <li key={i}>{r}</li>
-                              ))}
-                            </ul>
-                          </div>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              </div>
+              <SoilResults
+                preview={preview}
+                loading={loading}
+                file={file}
+                result={result}
+                errorMsg={errorMsg}
+                runCameraAnalysis={runCameraAnalysis}
+                onRetake={() => {
+                  setFile(null);
+                  setPreview(null);
+                  setResult(null);
+                  setStep("capture");
+                  startCamera().catch(() => {});
+                }}
+                fileInputRef={fileInputRef}
+              />
             )}
           </div>
         </div>

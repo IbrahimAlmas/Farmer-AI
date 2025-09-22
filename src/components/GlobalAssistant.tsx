@@ -1,3 +1,4 @@
+import type React from "react";
 import { useEffect, useMemo, useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { MessageSquare, Send, Compass, Camera as CameraIcon, Upload, Wand2, Image as ImageIcon, Home, ListChecks } from "lucide-react";
