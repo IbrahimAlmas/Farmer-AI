@@ -9,7 +9,8 @@ export function GlobalAssistant() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  const [open, setOpen] = useState(false);
+  // Open chat by default on the home page
+  const [open, setOpen] = useState(pathname === "/");
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: "assistant",
@@ -158,7 +159,7 @@ export function GlobalAssistant() {
 
   return (
     <div
-      className="fixed z-50"
+      className="fixed z-[60]"
       style={{ left: pos.x, top: pos.y }}
     >
       {!open && (
@@ -169,14 +170,13 @@ export function GlobalAssistant() {
           title="Drag me"
         >
           <Button
-            className="rounded-full size-14 p-0 shadow-lg bg-emerald-600 hover:bg-emerald-500 text-white"
+            className="rounded-full size-16 p-0 shadow-lg bg-emerald-600 hover:bg-emerald-500 text-white"
             onClick={(e) => {
-              // Prevent drag from immediately opening on small move
               if (!draggingRef.current) setOpen(true);
             }}
             aria-label="Open Assistant"
           >
-            <MessageSquare className="h-6 w-6" />
+            <MessageSquare className="h-7 w-7" />
           </Button>
         </div>
       )}
