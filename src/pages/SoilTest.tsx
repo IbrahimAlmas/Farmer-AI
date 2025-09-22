@@ -384,6 +384,41 @@ export default function SoilTest() {
                 animate={{ opacity: 1, y: 0 }}
                 className=""
               >
+                {/* Top mini header to match reference: left logo + title, right language */}
+                <div className="mb-4 sm:mb-6 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="grid place-items-center size-7 rounded-md bg-emerald-700">
+                      <img
+                        src="/assets/Logo_.png"
+                        alt="Logo"
+                        className="h-5 w-5 object-contain rounded-sm"
+                        onError={(e) => {
+                          const t = e.currentTarget as HTMLImageElement;
+                          if (t.src !== '/logo.png') t.src = '/logo.png';
+                          t.onerror = null;
+                        }}
+                      />
+                    </div>
+                    <span className="text-sm font-semibold">Soil Health Check</span>
+                  </div>
+                  <button
+                    className="inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-sm bg-white hover:bg-muted transition-colors"
+                    onClick={() => (window.location.href = "/settings")}
+                    aria-label="Change language"
+                  >
+                    English
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-3.5 w-3.5"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      aria-hidden
+                    >
+                      <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.173l3.71-3.94a.75.75 0 111.08 1.04l-4.24 4.5a.75.75 0 01-1.08 0l-4.24-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
+                    </svg>
+                  </button>
+                </div>
+
                 {/* Hero heading */}
                 <div className="text-center max-w-4xl mx-auto mb-6 sm:mb-8">
                   <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight">
@@ -470,14 +505,14 @@ export default function SoilTest() {
                           <span>Typical pH (ideal 6.0–7.5)</span>
                           <span>6.8</span>
                         </div>
-                        <Progress value={70} className="h-3" />
+                        <Progress value={70} className="h-3 rounded-full bg-emerald-100 [&>div]:bg-emerald-500 [&>div]:rounded-full" />
                       </div>
                       <div className="rounded-lg border p-3 bg-muted/30">
                         <div className="flex items-center justify-between text-[11px] text-muted-foreground mb-1">
                           <span>Moisture target (20–40%)</span>
                           <span>32%</span>
                         </div>
-                        <Progress value={32} className="h-3" />
+                        <Progress value={32} className="h-3 rounded-full bg-blue-100 [&>div]:bg-blue-500 [&>div]:rounded-full" />
                       </div>
                       <div className="text-[11px] text-muted-foreground">
                         *Estimates from photo analysis. Confirm with lab tests if needed.
