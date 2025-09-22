@@ -20,6 +20,7 @@ import { toast } from "sonner";
 import { MoreHorizontal } from "lucide-react";
 import LanguageSelect from "@/components/LanguageSelect";
 import { useEffect, useState } from "react";
+import GlobalAssistant from "@/components/GlobalAssistant";
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -432,6 +433,9 @@ export function AppShell({ children, title }: AppShellProps) {
           </AnimatePresence>
         </>
       )}
+
+      {/* Global Assistant */}
+      <GlobalAssistant />
     </div>
   );
 }

@@ -146,6 +146,25 @@ export default function SoilTest() {
     { id: "stop_camera", label: "Stop Camera" },
   ];
 
+  // Listen for global assistant actions
+  useEffect(() => {
+    const handler = async (e: Event) => {
+      const ce = e as CustomEvent<{ actionId?: string }>;
+      const actionId = ce.detail?.actionId;
+      if (!actionId) return;
+      try {
+        // Reuse the same local action executor
+        await doAction(actionId);
+      } catch {
+        // no-op: errors are already handled in doAction
+      }
+    };
+    window.addEventListener("assistant:action", handler as EventListener);
+    return () => {
+      window.removeEventListener("assistant:action", handler as EventListener);
+    };
+  }, [doAction]);
+
   useEffect(() => {
     let didCancel = false;
     return () => {

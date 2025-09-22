@@ -1,0 +1,200 @@
+import { useEffect, useMemo, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { MessageSquare, Send, Compass, Camera as CameraIcon, Upload, Wand2, Image as ImageIcon, Home, ListChecks } from "lucide-react";
+import { useLocation, useNavigate } from "react-router";
+
+type ChatMessage = { role: "user" | "assistant"; text: string };
+
+export function GlobalAssistant() {
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+
+  const [open, setOpen] = useState(false);
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    {
+      role: "assistant",
+      text:
+        'Hi! I can control the app. Try: "Open Soil Test", "Open Tasks", "Enable Camera", "Upload Photo", "Click Photo", or "Analyze Photo".',
+    },
+  ]);
+  const [input, setInput] = useState("");
+
+  const push = (m: ChatMessage) => setMessages((prev) => [...prev, m]);
+
+  // Map natural language to action ids
+  const parseIntent = (text: string): string => {
+    const t = text.toLowerCase().trim();
+
+    // Navigation
+    if (t.includes("open") && (t.includes("soil") || t.includes("soil test"))) return "go:soil-test";
+    if (t.includes("open") && t.includes("tasks")) return "go:tasks";
+    if (t.includes("open") && (t.includes("home") || t.includes("landing"))) return "go:/";
+    if (t.includes("open") && t.includes("dashboard")) return "go:/dashboard";
+
+    // SoilTest actions
+    if ((t.includes("enable") || t.includes("start")) && t.includes("camera")) return "soil:enable_camera";
+    if (t.includes("upload") && (t.includes("photo") || t.includes("image"))) return "soil:upload_photo";
+    if ((t.includes("click") || t.includes("take") || t.includes("capture")) && (t.includes("photo") || t.includes("picture"))) return "soil:click_photo";
+    if (t.includes("analyze")) return "soil:analyze_photo";
+    if (t.includes("retake")) return "soil:retake";
+    if (t.includes("stop") && t.includes("camera")) return "soil:stop_camera";
+
+    if (t === "help" || t.includes("?")) return "help";
+    if (t.includes("status")) return "status";
+    return "";
+  };
+
+  const doIntent = async (intent: string) => {
+    // Navigation
+    if (intent.startsWith("go:")) {
+      const target = intent.slice(3);
+      if (target.startsWith("/")) {
+        navigate(target);
+      } else if (target === "soil-test") navigate("/soil-test");
+      else if (target === "tasks") navigate("/tasks");
+      else navigate("/");
+      return "Navigating…";
+    }
+
+    // Soil page actions: dispatch global event
+    if (intent.startsWith("soil:")) {
+      const actionId = intent.replace("soil:", "");
+      window.dispatchEvent(new CustomEvent("assistant:action", { detail: { actionId } }));
+      // Replace replaceAll to support older TS lib targets
+      return `Executing soil action: ${actionId.split("_").join(" ")}`;
+    }
+
+    if (intent === "help") {
+      return 'Try: "Open Soil Test", "Open Tasks", "Enable Camera", "Upload Photo", "Click Photo", "Analyze Photo", "Retake", "Stop Camera".';
+    }
+
+    if (intent === "status") {
+      return `You are on ${pathname}. I can navigate or trigger actions on supported pages.`;
+    }
+
+    return `I didn't recognize that. Type "help" to see options.`;
+  };
+
+  const handleSend = async () => {
+    const text = input.trim();
+    if (!text) return;
+    setInput("");
+    push({ role: "user", text });
+    const intent = parseIntent(text);
+    if (intent) {
+      const reply = await doIntent(intent);
+      push({ role: "assistant", text: reply });
+    } else {
+      push({
+        role: "assistant",
+        text:
+          'I can help with navigation and soil actions. Try: "Open Soil Test", "Open Tasks", "Enable Camera", "Upload Photo", "Click Photo", "Analyze Photo".',
+      });
+    }
+  };
+
+  const suggestionActions: Array<{ id: string; label: string; icon?: React.ComponentType<any> }> = useMemo(
+    () => [
+      { id: "go:/", label: "Home", icon: Home },
+      { id: "go:soil-test", label: "Open Soil Test", icon: ImageIcon },
+      { id: "go:tasks", label: "Open Tasks", icon: ListChecks },
+      { id: "soil:enable_camera", label: "Enable Camera", icon: CameraIcon },
+      { id: "soil:upload_photo", label: "Upload Photo", icon: Upload },
+      { id: "soil:click_photo", label: "Click Photo", icon: CameraIcon },
+      { id: "soil:analyze_photo", label: "Analyze Photo", icon: Wand2 },
+    ],
+    []
+  );
+
+  return (
+    <div className="fixed bottom-4 right-4 z-50">
+      {!open && (
+        <Button
+          className="rounded-full size-12 p-0 shadow-lg bg-emerald-600 hover:bg-emerald-500 text-white"
+          onClick={() => setOpen(true)}
+          aria-label="Open Assistant"
+        >
+          <MessageSquare className="h-5 w-5" />
+        </Button>
+      )}
+
+      {open && (
+        <div className="w-[320px] sm:w-[360px] rounded-2xl bg-white shadow-xl ring-1 ring-black/10 overflow-hidden">
+          <div className="flex items-center justify-between px-3 py-2 bg-[oklch(0.98_0.01_120)]">
+            <div className="text-sm font-semibold">Assistant</div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="gap-1"
+                onClick={() => navigate("/")}
+                title="Go Home"
+              >
+                <Compass className="h-4 w-4" />
+                Home
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => setOpen(false)}>
+                Close
+              </Button>
+            </div>
+          </div>
+
+          <div className="px-3 pt-2 pb-1 border-b">
+            <div className="flex flex-wrap gap-2">
+              {suggestionActions.map((s) => {
+                const Icon = s.icon;
+                return (
+                  <Button
+                    key={s.id}
+                    size="sm"
+                    variant="outline"
+                    className="rounded-full"
+                    onClick={async () => {
+                      const reply = await doIntent(s.id);
+                      push({ role: "assistant", text: reply });
+                    }}
+                  >
+                    {Icon ? <Icon className="h-3.5 w-3.5 mr-1.5" /> : null}
+                    {s.label}
+                  </Button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="h-56 overflow-y-auto px-3 py-2 space-y-2">
+            {messages.map((m, i) => (
+              <div
+                key={i}
+                className={`max-w-[85%] rounded-lg px-3 py-2 text-sm ${
+                  m.role === "assistant"
+                    ? "bg-[oklch(0.98_0.01_120)] text-foreground"
+                    : "bg-emerald-600 text-white ml-auto"
+                }`}
+              >
+                {m.text}
+              </div>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-2 p-2 border-t bg-white">
+            <input
+              className="flex-1 h-9 px-3 rounded-md border ring-0 outline-none text-sm"
+              placeholder="Type a command…"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleSend();
+              }}
+            />
+            <Button onClick={handleSend} className="h-9">
+              <Send className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default GlobalAssistant;
