@@ -11,6 +11,7 @@ import { Progress } from "@/components/ui/progress";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { SoilTestAssistant, type SoilAssistantSuggestion } from "@/components/SoilTestAssistant";
 
 type Analysis = {
   ph: number;
@@ -934,78 +935,11 @@ export default function SoilTest() {
           </div>
         </div>
 
-        {/* Floating Chatbot */}
-        <div className="fixed bottom-4 right-4 z-50">
-          {!chatOpen && (
-            <Button
-              className="rounded-full size-12 p-0 shadow-lg bg-emerald-600 hover:bg-emerald-500 text-white"
-              onClick={() => setChatOpen(true)}
-              aria-label="Open Assistant"
-            >
-              <MessageSquare className="h-5 w-5" />
-            </Button>
-          )}
-
-          {chatOpen && (
-            <div className="w-[320px] sm:w-[360px] rounded-2xl bg-white shadow-xl ring-1 ring-black/10 overflow-hidden">
-              <div className="flex items-center justify-between px-3 py-2 bg-[oklch(0.98_0.01_120)]">
-                <div className="text-sm font-semibold">Soil Test Assistant</div>
-                <Button variant="ghost" size="sm" onClick={() => setChatOpen(false)}>
-                  Close
-                </Button>
-              </div>
-
-              <div className="px-3 pt-2 pb-1 border-b">
-                <div className="flex flex-wrap gap-2">
-                  {suggestionActions.map((s) => (
-                    <Button
-                      key={s.id}
-                      size="sm"
-                      variant="outline"
-                      className="rounded-full"
-                      onClick={async () => {
-                        const reply = await doAction(s.id);
-                        pushMessage({ role: "assistant", text: reply });
-                      }}
-                    >
-                      {s.label}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="h-56 overflow-y-auto px-3 py-2 space-y-2">
-                {messages.map((m, i) => (
-                  <div
-                    key={i}
-                    className={`max-w-[85%] rounded-lg px-3 py-2 text-sm ${
-                      m.role === "assistant"
-                        ? "bg-[oklch(0.98_0.01_120)] text-[oklch(0.22_0.02_120)]"
-                        : "bg-emerald-600 text-white ml-auto"
-                    }`}
-                  >
-                    {m.text}
-                  </div>
-                ))}
-              </div>
-
-              <div className="flex items-center gap-2 p-2 border-t bg-white">
-                <input
-                  className="flex-1 h-9 px-3 rounded-md border ring-0 outline-none text-sm"
-                  placeholder="Type a command…"
-                  value={chatInput}
-                  onChange={(e) => setChatInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") handleChatSubmit();
-                  }}
-                />
-                <Button onClick={handleChatSubmit} className="h-9">
-                  <Send className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          )}
-        </div>
+        {/* Floating Assistant (extracted component) */}
+        <SoilTestAssistant
+          suggestions={suggestionActions as SoilAssistantSuggestion[]}
+          onAction={doAction}
+        />
       </div>
     </AppShell>
   );
