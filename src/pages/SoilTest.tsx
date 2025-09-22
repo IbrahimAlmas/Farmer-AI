@@ -5,7 +5,7 @@ import { api } from "@/convex/_generated/api";
 import { useAction, useMutation } from "convex/react";
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { Camera as CameraIcon, Image as ImageIcon, RefreshCw, Play, Upload, Wand2, MessageSquare, Send } from "lucide-react";
+import { Camera as CameraIcon, Image as ImageIcon, RefreshCw, Play, Upload, Wand2, MessageSquare, Send, CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -360,7 +360,7 @@ export default function SoilTest() {
     <AppShell title="Soil Test">
       <div className="relative">
         {/* Decorative background */}
-        <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+        <div className="hidden pointer-events-none absolute inset-0 -z-10 overflow-hidden">
           <div className="absolute -top-24 -left-24 h-72 w-72 rounded-full bg-gradient-to-br from-emerald-400/20 to-teal-400/10 blur-3xl" />
           <div className="absolute -bottom-24 -right-16 h-72 w-72 rounded-full bg-gradient-to-br from-sky-400/20 to-indigo-400/10 blur-3xl" />
         </div>
@@ -385,38 +385,8 @@ export default function SoilTest() {
                 className=""
               >
                 {/* Top mini header to match reference: left logo + title, right language */}
-                <div className="mb-4 sm:mb-6 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="grid place-items-center size-7 rounded-md bg-emerald-700">
-                      <img
-                        src="/assets/Logo_.png"
-                        alt="Logo"
-                        className="h-5 w-5 object-contain rounded-sm"
-                        onError={(e) => {
-                          const t = e.currentTarget as HTMLImageElement;
-                          if (t.src !== '/logo.png') t.src = '/logo.png';
-                          t.onerror = null;
-                        }}
-                      />
-                    </div>
-                    <span className="text-sm font-semibold">Soil Health Check</span>
-                  </div>
-                  <button
-                    className="inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-sm bg-white hover:bg-muted transition-colors"
-                    onClick={() => (window.location.href = "/settings")}
-                    aria-label="Change language"
-                  >
-                    English
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-3.5 w-3.5"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                      aria-hidden
-                    >
-                      <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.173l3.71-3.94a.75.75 0 111.08 1.04l-4.24 4.5a.75.75 0 01-1.08 0l-4.24-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
-                    </svg>
-                  </button>
+                <div className="hidden mb-4 sm:mb-6 items-center justify-between">
+                  {/* (hidden to match provided reference header-less hero) */}
                 </div>
 
                 {/* Hero heading */}
@@ -432,13 +402,13 @@ export default function SoilTest() {
                 {/* Main two-column cards */}
                 <div className="grid items-stretch gap-4 lg:gap-6 lg:grid-cols-2">
                   {/* LEFT: Steps + CTA */}
-                  <Card className="overflow-hidden backdrop-blur supports-[backdrop-filter]:bg-card/70">
+                  <Card className="overflow-hidden bg-white shadow-sm ring-1 ring-black/5">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-lg sm:text-xl font-semibold">
                         Ready to Grow Smarter?
                       </CardTitle>
                       <p className="text-sm text-muted-foreground">
-                        Join thousands of farmers boosting yields and sustainability. Start your first soil analysis now.
+                        Join thousands of farmers who are boosting yields and sustainability. Start your first soil analysis now.
                       </p>
                     </CardHeader>
                     <CardContent className="space-y-4">
@@ -468,14 +438,14 @@ export default function SoilTest() {
 
                       <div className="flex justify-start">
                         <Button
-                          className="gap-2 px-6 py-6 text-base sm:text-lg rounded-xl w-full sm:w-auto min-w-[200px] bg-emerald-600 hover:bg-emerald-500 text-white shadow-md"
+                          className="gap-2 px-6 py-6 text-base sm:text-lg rounded-full w-full sm:w-auto min-w-[220px] bg-emerald-600 hover:bg-emerald-500 text-white shadow-md"
                           onClick={() => {
                             setErrorMsg(null);
                             setResult(null);
                             setStep("capture");
-                            // keep camera opt-in; user can press Enable Camera next
                           }}
                         >
+                          <Upload className="h-5 w-5" />
                           Start Soil Test
                         </Button>
                       </div>
@@ -483,7 +453,7 @@ export default function SoilTest() {
                   </Card>
 
                   {/* RIGHT: Image + Sample Insights */}
-                  <Card className="overflow-hidden backdrop-blur supports-[backdrop-filter]:bg-card/70">
+                  <Card className="overflow-hidden bg-white shadow-sm ring-1 ring-black/5">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-lg sm:text-xl">Sample Insights</CardTitle>
                     </CardHeader>
@@ -523,35 +493,35 @@ export default function SoilTest() {
 
                 {/* Why Test Soil section */}
                 <div className="mt-6">
-                  <Card className="overflow-hidden backdrop-blur supports-[backdrop-filter]:bg-card/70">
+                  <Card className="overflow-hidden bg-white shadow-sm ring-1 ring-black/5">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-base sm:text-lg">Why Test Soil?</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 text-sm">
                         <div className="flex items-start gap-2">
-                          <span className="mt-1 size-2 rounded-full bg-emerald-600" />
+                          <CheckCircle2 className="mt-0.5 h-4 w-4 text-emerald-600" />
                           <div>
                             <div className="font-semibold">Boost Yields</div>
                             <div className="text-muted-foreground">Optimize conditions for maximum crop production.</div>
                           </div>
                         </div>
                         <div className="flex items-start gap-2">
-                          <span className="mt-1 size-2 rounded-full bg-emerald-600" />
+                          <CheckCircle2 className="mt-0.5 h-4 w-4 text-emerald-600" />
                           <div>
                             <div className="font-semibold">Save Money</div>
                             <div className="text-muted-foreground">Apply only the necessary nutrients and fertilizers.</div>
                           </div>
                         </div>
                         <div className="flex items-start gap-2">
-                          <span className="mt-1 size-2 rounded-full bg-emerald-600" />
+                          <CheckCircle2 className="mt-0.5 h-4 w-4 text-emerald-600" />
                           <div>
                             <div className="font-semibold">Enhance Sustainability</div>
                             <div className="text-muted-foreground">Prevent nutrient runoff and improve water retention.</div>
                           </div>
                         </div>
                         <div className="flex items-start gap-2">
-                          <span className="mt-1 size-2 rounded-full bg-emerald-600" />
+                          <CheckCircle2 className="mt-0.5 h-4 w-4 text-emerald-600" />
                           <div>
                             <div className="font-semibold">Detect Problems Early</div>
                             <div className="text-muted-foreground">Identify pH imbalances and other issues.</div>
