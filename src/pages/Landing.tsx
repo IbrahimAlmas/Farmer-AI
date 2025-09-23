@@ -60,9 +60,9 @@ export default function Landing() {
 
       {/* Hero */}
       <section className="relative mt-6">
-        <div className="relative h-screen min-h-[640px] w-full">
+            <div className="relative h-screen min-h-[640px] w-full">
           <img
-            src="/assets/Fild.jpeg"
+            src="/assets/Farm_2.webp"
             alt="Farm field"
             className="absolute inset-0 h-full w-full object-cover"
           />
