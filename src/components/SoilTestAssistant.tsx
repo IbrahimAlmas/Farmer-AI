@@ -18,7 +18,7 @@ export function SoilTestAssistant({
     {
       role: "assistant",
       text:
-        'Hi! I can control this page for you. Try: "Enable Camera", "Upload Photo", "Click Photo", "Analyze Photo", "Retake", or "Stop Camera".',
+        'Hi! I can control this page for you. Try: "Enable Camera", "Upload Photo", "Click Photo", "Analyze Photo", "Retake", "Stop Camera", "Go to Intro", or "Status".',
     },
   ]);
   const [chatInput, setChatInput] = useState("");
@@ -40,6 +40,9 @@ export function SoilTestAssistant({
     else if (t.includes("analyze")) actionId = "analyze_photo";
     else if (t.includes("retake")) actionId = "retake";
     else if (t.includes("stop") && t.includes("camera")) actionId = "stop_camera";
+    // Add: go to intro and status intents
+    else if (t.includes("intro") || (t.includes("go") && t.includes("back"))) actionId = "go_intro";
+    else if (t.includes("status")) actionId = "status";
 
     if (actionId) {
       const reply = await onAction(actionId);
@@ -50,7 +53,7 @@ export function SoilTestAssistant({
     pushMessage({
       role: "assistant",
       text:
-        'I can help with camera and analysis actions. Try: "Enable Camera", "Upload Photo", "Click Photo", "Analyze Photo", "Retake", or "Stop Camera".',
+        'I can help with camera and analysis actions. Try: "Enable Camera", "Upload Photo", "Click Photo", "Analyze Photo", "Retake", "Stop Camera", "Go to Intro", or "Status".',
     });
   };
 

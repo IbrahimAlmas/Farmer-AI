@@ -87,6 +87,8 @@ export default function SoilTest() {
     { id: "analyze_photo", label: "Analyze Photo" },
     { id: "retake", label: "Retake" },
     { id: "stop_camera", label: "Stop Camera" },
+    { id: "go_intro", label: "Back to Intro" },
+    { id: "status", label: "Status" },
   ];
 
   // Listen for global assistant actions
