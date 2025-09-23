@@ -210,82 +210,58 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Technical Approach — Flow (Centralized Vertical Flowchart) */}
-      <section id="flow" className="py-20 bg-white">
+      {/* Technical Approach — Flow (Mini Flowchart) */}
+      <section id="flow" className="py-16 bg-white">
         <div className="mx-auto w-full max-w-6xl px-4">
-          <div className="text-center mb-10">
-            <h3 className="text-3xl md:text-4xl font-extrabold text-[oklch(0.22_0.02_120)]">Technical Approach — Flow</h3>
-            <p className="mt-2 text-[oklch(0.35_0.03_120)]">
-              High-level system flow for Root AI. Clean, simple, and easy to follow.
+          <div className="text-center mb-8">
+            <h3 className="text-2xl md:text-3xl font-extrabold text-[oklch(0.22_0.02_120)]">Technical Flow</h3>
+            <p className="mt-1 text-[oklch(0.35_0.03_120)] text-sm">
+              A quick, compact overview of how Root AI works.
             </p>
           </div>
 
-          {/* Proper vertical flowchart with a center spine and nodes */}
-          <div className="relative mx-auto max-w-3xl">
-            {/* Center line */}
-            <div className="pointer-events-none absolute inset-y-0 left-1/2 -translate-x-1/2 w-px bg-neutral-200" />
-
-            {[
-              {
-                title: "Voice/Text Input",
-                desc: "User speaks or types commands in any supported language.",
-              },
-              {
-                title: "AI Processing",
-                desc: "Natural language understanding, intent detection, and routing.",
-              },
-              {
-                title: "Convex Backend",
-                desc: "Secure server functions, real-time data, and storage.",
-              },
-              {
-                title: "Farm & Weather Data",
-                desc: "Farms, soil tests, simulations, market prices, and weather.",
-              },
-              {
-                title: "Actions & Insights",
-                desc: "Execute tasks, run simulations, get irrigation advice.",
-              },
-              {
-                title: "Results & Feedback",
-                desc: "Clear UI updates, toast feedback, and optional voice reply.",
-              },
-            ].map((step, i, arr) => (
-              <div key={step.title} className="relative flex flex-col items-center">
-                {/* Node dot */}
-                <div className="z-10 mb-3 grid size-7 place-items-center rounded-full bg-white shadow-sm ring-1 ring-black/5">
-                  <span className="block size-2.5 rounded-full bg-[oklch(0.69_0.17_145)]" />
-                </div>
-
-                {/* Step card */}
-                <div className="w-full rounded-xl border border-neutral-200 bg-white p-4 shadow-sm">
-                  <div className="text-sm font-semibold text-[oklch(0.22_0.02_120)]">{step.title}</div>
-                  <div className="mt-1 text-xs text-[oklch(0.45_0.03_120)]">{step.desc}</div>
-                </div>
-
-                {/* Connector arrow to next step */}
-                {i < arr.length - 1 && (
-                  <div className="my-3 text-[oklch(0.35_0.03_120)]">
-                    <ArrowDown className="h-6 w-6" />
+          {/* Mini flowchart: compact, horizontal, scrollable on mobile */}
+          <div className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm">
+            <ul className="flex items-center gap-3 overflow-x-auto no-scrollbar">
+              {[
+                { key: "input", label: "Input" },
+                { key: "ai", label: "AI" },
+                { key: "backend", label: "Backend" },
+                { key: "data", label: "Data" },
+                { key: "actions", label: "Actions" },
+                { key: "results", label: "Results" },
+              ].map((step, i, arr) => (
+                <li key={step.key} className="flex items-center gap-3 shrink-0">
+                  <div className="flex flex-col items-center">
+                    <div className="grid size-7 place-items-center rounded-full bg-[oklch(0.97_0.01_120)] ring-1 ring-black/5">
+                      <span className="block size-2.5 rounded-full bg-[oklch(0.69_0.17_145)]" />
+                    </div>
+                    <span className="mt-1 text-[11px] font-medium text-[oklch(0.22_0.02_120)]">
+                      {step.label}
+                    </span>
                   </div>
-                )}
-              </div>
-            ))}
-          </div>
 
-          {/* Legend */}
-          <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-3 text-xs text-[oklch(0.35_0.03_120)]">
-            <div className="rounded-xl border border-neutral-200 bg-white p-3">
-              <div className="font-semibold text-[oklch(0.22_0.02_120)]">Simple & Clear</div>
-              <div className="mt-1">Clean white background with a central connector line and nodes.</div>
-            </div>
-            <div className="rounded-xl border border-neutral-200 bg-white p-3">
-              <div className="font-semibold text-[oklch(0.22_0.02_120)]">Readable Text</div>
-              <div className="mt-1">Dark labels and small descriptive text for clarity.</div>
-            </div>
-            <div className="rounded-xl border border-neutral-200 bg-white p-3">
-              <div className="font-semibold text-[oklch(0.22_0.02_120)]">Responsive Layout</div>
-              <div className="mt-1">Centered flow that scales well on mobile and desktop.</div>
+                  {i < arr.length - 1 && (
+                    <ArrowRight className="h-4 w-4 text-[oklch(0.35_0.03_120)] shrink-0" />
+                  )}
+                </li>
+              ))}
+            </ul>
+
+            {/* Tiny legend row */}
+            <div className="mt-4 grid grid-cols-2 md:grid-cols-3 gap-2 text-[11px] text-[oklch(0.35_0.03_120)]">
+              <div className="rounded-lg border border-neutral-200 bg-white px-2.5 py-2">
+                <div className="font-semibold text-[oklch(0.22_0.02_120)]">Compact</div>
+                <div className="opacity-80">Small nodes with arrows</div>
+              </div>
+              <div className="rounded-lg border border-neutral-200 bg-white px-2.5 py-2">
+                <div className="font-semibold text-[oklch(0.22_0.02_120)]">Scrollable</div>
+                <div className="opacity-80">Swipe on mobile</div>
+              </div>
+              <div className="rounded-lg border border-neutral-200 bg-white px-2.5 py-2">
+                <div className="font-semibold text-[oklch(0.22_0.02_120)]">Clear</div>
+                <div className="opacity-80">Just the essentials</div>
+              </div>
             </div>
           </div>
         </div>
