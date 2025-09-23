@@ -16,6 +16,13 @@ export const getVegetablePrices = query({
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
 
+    // Compute a single stable timestamp for the whole response (midnight local)
+    const dayStart = (() => {
+      const d = new Date();
+      d.setHours(0, 0, 0, 0);
+      return d.getTime();
+    })();
+
     let stateLower = "delhi";
     let stateLabel = "Delhi";
 
@@ -26,8 +33,9 @@ export const getVegetablePrices = query({
         .unique()
         .catch(() => null);
 
-      stateLower = profile?.location?.state?.toLowerCase() ?? stateLower;
-      stateLabel = profile?.location?.state ?? stateLabel;
+      const raw = profile?.location?.state ?? stateLabel;
+      stateLabel = raw;
+      stateLower = String(raw).trim().toLowerCase();
     }
 
     // Baseline indicative retail prices (₹/kg), conservative and stable
@@ -85,7 +93,16 @@ export const getVegetablePrices = query({
       "goa": 1.1,
     };
 
-    const factor = regionFactors[stateLower] ?? 1.0;
+    // Resolve factor with exact match first, then substring fallback
+    const resolveRegionFactor = (norm: string): number => {
+      if (regionFactors[norm] != null) return regionFactors[norm];
+      for (const key of Object.keys(regionFactors)) {
+        if (norm.includes(key)) return regionFactors[key];
+      }
+      return 1.0;
+    };
+
+    const factor = resolveRegionFactor(stateLower);
 
     // Round to nearest rupee and clamp to sensible bounds
     const round = (n: number) => Math.max(5, Math.round(n));
@@ -112,15 +129,15 @@ export const getVegetablePrices = query({
       "garlic",
     ];
 
-    const items: Array<Item> = order.slice(0, 18).map((key) => {
+    const items = order.slice(0, 18).map((key) => {
       const p = round(base[key] * factor);
       return {
-        name: key.replace(/_/g, " "),
+        name: String(key).split("_").join(" "),
         price: p,
-        unit: "kg",
+        unit: "kg" as const,
         source: "Indicative local retail estimates",
         region: stateLabel,
-        updatedAt: Date.now(),
+        updatedAt: dayStart, // stable per-day timestamp to avoid reactive churn
       };
     });
 
