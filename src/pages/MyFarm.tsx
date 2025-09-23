@@ -266,13 +266,25 @@ export default function MyFarm() {
     }
   };
 
-  function FarmCard({ farm, onEnterSim }: { farm: any; onEnterSim: (id: string) => void }) {
+  function FarmCard({ farm, onEnterSim, idx }: { farm: any; onEnterSim: (id: string) => void; idx: number }) {
     // Resolve a preview image for the farm (first corner photo if present)
     const photoId = (farm?.cornerPhotos?.[0] as any) ?? null;
     const photoUrl = useQuery(
       api.soil_upload.getFileUrl,
       photoId ? ({ fileId: photoId as any } as any) : "skip"
     ) as string | null;
+
+    // Choose a unique default image per card index
+    const defaults = [
+      "/assets/Farm_3.jpg",
+      "/assets/Farm_4.webp",
+      "/assets/Farm_5.webp",
+      "/assets/Farm_6.webp",
+      "/assets/Wheat_Farm.webp",
+      "/assets/Barily.jpg",
+      "/assets/FEILD_1.jpeg",
+    ] as const;
+    const defaultImage = defaults[idx % defaults.length];
 
     // Local hooks used by card actions
     const { _id: farmId, name, modelStatus, modelPreviewUrl } = farm;
@@ -354,12 +366,12 @@ export default function MyFarm() {
       <div className="rounded-2xl bg-white ring-1 ring-black/5 shadow-md overflow-hidden flex flex-col">
         <div className="h-44 w-full overflow-hidden rounded-t-2xl">
           <img
-            src={photoUrl || "/assets/Farm_3.jpg"}
+            src={photoUrl || defaultImage}
             alt={name}
             className="h-full w-full object-cover"
             onError={(e) => {
               const t = e.currentTarget as HTMLImageElement;
-              if (t.src !== "/assets/Farm_3.jpg") t.src = "/assets/Farm_3.jpg";
+              if (t.src !== defaultImage) t.src = defaultImage;
               t.onerror = null;
             }}
           />
@@ -406,8 +418,8 @@ export default function MyFarm() {
 
         {/* New grid displaying farms in card style */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {(farms ?? []).map((f: any) => (
-            <FarmCard key={(f as any)._id} farm={f} onEnterSim={(id) => openSim(id)} />
+          {(farms ?? []).map((f: any, i: number) => (
+            <FarmCard key={(f as any)._id} farm={f} onEnterSim={(id) => openSim(id)} idx={i} />
           ))}
         </div>
 
