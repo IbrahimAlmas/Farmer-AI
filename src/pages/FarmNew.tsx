@@ -117,7 +117,7 @@ export default function FarmNew() {
             {/* Hero image */}
             <div className="rounded-2xl overflow-hidden shadow-sm ring-1 ring-black/5">
               <img
-                src="/assets/Fild.jpeg"
+                src="/assets/Farm_7.jpg"
                 alt="Farm preview"
                 className="w-full h-[280px] md:h-[420px] object-cover"
                 onError={(e) => {

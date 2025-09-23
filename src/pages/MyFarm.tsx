@@ -354,12 +354,12 @@ export default function MyFarm() {
       <div className="rounded-2xl bg-white ring-1 ring-black/5 shadow-md overflow-hidden flex flex-col">
         <div className="h-44 w-full overflow-hidden rounded-t-2xl">
           <img
-            src={photoUrl || "/assets/Fild.jpeg"}
+            src={photoUrl || "/assets/Farm_3.jpg"}
             alt={name}
             className="h-full w-full object-cover"
             onError={(e) => {
               const t = e.currentTarget as HTMLImageElement;
-              if (t.src !== "/assets/Fild.jpeg") t.src = "/assets/Fild.jpeg";
+              if (t.src !== "/assets/Farm_3.jpg") t.src = "/assets/Farm_3.jpg";
               t.onerror = null;
             }}
           />
