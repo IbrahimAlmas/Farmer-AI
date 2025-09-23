@@ -30,6 +30,23 @@ const vegImages: Record<string, string> = {
   pumpkin: "https://images.unsplash.com/photo-1475855581690-80accde3ae2b?q=80&w=1200&auto=format&fit=crop",
 };
 
+const localImages: string[] = [
+  "/assets/Farm_3.jpg",
+  "/assets/Farm_4.webp",
+  "/assets/Farm_5.webp",
+  "/assets/Farm_6.webp",
+  "/assets/Wheat_Farm.webp",
+  "/assets/Barily.jpg",
+  "/assets/FEILD_1.jpeg",
+  "/assets/Farm_7.jpg",
+];
+
+const nameHash = (s: string) => {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+  return h;
+};
+
 export default function Market() {
   const profile = useQuery(api.profiles.get);
   const items = useQuery(api.market_prices.getVegetablePrices);
@@ -127,9 +144,9 @@ export default function Market() {
                   className="grid grid-cols-2 sm:grid-cols-3 gap-3"
                 >
                   {items.map((it) => {
-                    const key = it.name.toLowerCase();
-                    const img =
-                      vegImages[key] || vegImages[key.replace(/_/g, " ")] || "https://images.unsplash.com/photo-1556912998-6a321d926c83?q=80&w=1200&auto=format&fit=crop";
+                    // Use local assets deterministically so images always load and vary by item
+                    const idx = nameHash(it.name) % localImages.length;
+                    const img = localImages[idx];
                     return (
                       <div
                         key={it.name}
