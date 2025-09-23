@@ -221,7 +221,7 @@ export default function Market() {
                         </div>
                         <div className="p-3 flex items-start justify-between gap-2">
                           <div>
-                            <div className="font-medium capitalize leading-tight">{it.name}</div>
+                            <div className="font-medium capitalize leading-tight text-emerald-700">{it.name}</div>
                             <div className="mt-1">
                               <Badge variant="secondary" className="text-[10px]">
                                 {tr("per")} {it.unit}
@@ -229,7 +229,7 @@ export default function Market() {
                             </div>
                           </div>
                           <div className="text-right">
-                            <div className="text-lg font-semibold tracking-tight">₹{it.price}</div>
+                            <div className="text-lg font-semibold tracking-tight text-emerald-700">₹{it.price}</div>
                             <div className="text-[10px] text-muted-foreground">
                               {tr("Updated")}: {new Date(it.updatedAt).toLocaleDateString()}
                             </div>
