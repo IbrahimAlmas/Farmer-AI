@@ -210,63 +210,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Technical Approach — Flow (Mini Flowchart) */}
-      <section id="flow" className="py-16 bg-white">
-        <div className="mx-auto w-full max-w-6xl px-4">
-          <div className="text-center mb-8">
-            <h3 className="text-2xl md:text-3xl font-extrabold text-[oklch(0.22_0.02_120)]">Technical Flow</h3>
-            <p className="mt-1 text-[oklch(0.35_0.03_120)] text-sm">
-              A quick, compact overview of how Root AI works.
-            </p>
-          </div>
-
-          {/* Mini flowchart: compact, horizontal, scrollable on mobile */}
-          <div className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm">
-            <ul className="flex items-center gap-3 overflow-x-auto no-scrollbar">
-              {[
-                { key: "input", label: "Input" },
-                { key: "ai", label: "AI" },
-                { key: "backend", label: "Backend" },
-                { key: "data", label: "Data" },
-                { key: "actions", label: "Actions" },
-                { key: "results", label: "Results" },
-              ].map((step, i, arr) => (
-                <li key={step.key} className="flex items-center gap-3 shrink-0">
-                  <div className="flex flex-col items-center">
-                    <div className="grid size-7 place-items-center rounded-full bg-[oklch(0.97_0.01_120)] ring-1 ring-black/5">
-                      <span className="block size-2.5 rounded-full bg-[oklch(0.69_0.17_145)]" />
-                    </div>
-                    <span className="mt-1 text-[11px] font-medium text-[oklch(0.22_0.02_120)]">
-                      {step.label}
-                    </span>
-                  </div>
-
-                  {i < arr.length - 1 && (
-                    <ArrowRight className="h-4 w-4 text-[oklch(0.35_0.03_120)] shrink-0" />
-                  )}
-                </li>
-              ))}
-            </ul>
-
-            {/* Tiny legend row */}
-            <div className="mt-4 grid grid-cols-2 md:grid-cols-3 gap-2 text-[11px] text-[oklch(0.35_0.03_120)]">
-              <div className="rounded-lg border border-neutral-200 bg-white px-2.5 py-2">
-                <div className="font-semibold text-[oklch(0.22_0.02_120)]">Compact</div>
-                <div className="opacity-80">Small nodes with arrows</div>
-              </div>
-              <div className="rounded-lg border border-neutral-200 bg-white px-2.5 py-2">
-                <div className="font-semibold text-[oklch(0.22_0.02_120)]">Scrollable</div>
-                <div className="opacity-80">Swipe on mobile</div>
-              </div>
-              <div className="rounded-lg border border-neutral-200 bg-white px-2.5 py-2">
-                <div className="font-semibold text-[oklch(0.22_0.02_120)]">Clear</div>
-                <div className="opacity-80">Just the essentials</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Testimonials */}
       <section className="mx-auto w-full max-w-6xl px-4 py-20">
         <div className="text-center">
