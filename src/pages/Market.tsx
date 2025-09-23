@@ -116,7 +116,7 @@ export default function Market() {
 
   return (
     <AppShell title={tr("Market")}>
-      <div className="p-0">
+      <div className="p-0 bg-white min-h-screen">
         {/* Hero */}
         <div className="relative">
           <div className="h-36 sm:h-44 w-full overflow-hidden rounded-b-3xl">
@@ -140,7 +140,7 @@ export default function Market() {
         </div>
 
         <div className="p-4 space-y-4">
-          <Card className="border-emerald-200/50 shadow-sm overflow-hidden">
+          <Card className="bg-white ring-1 ring-black/5 border-emerald-200/50 shadow-sm overflow-hidden">
             <CardHeader className="pb-2">
               <CardTitle className="flex items-center justify-between">
                 <span className="flex items-center gap-2">
@@ -194,7 +194,7 @@ export default function Market() {
                     return (
                       <div
                         key={it.name}
-                        className="group rounded-xl border overflow-hidden bg-muted/20 hover:shadow-md transition-all"
+                        className="group rounded-xl overflow-hidden bg-white ring-1 ring-black/5 hover:shadow-md transition-all"
                       >
                         <div className="h-24 w-full overflow-hidden">
                           <img
