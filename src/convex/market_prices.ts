@@ -23,8 +23,9 @@ export const getVegetablePrices = query({
       return d.getTime();
     })();
 
-    let stateLower = "delhi";
-    let stateLabel = "Delhi";
+    // Set default region to Hyderabad
+    let stateLower = "hyderabad";
+    let stateLabel = "Hyderabad";
 
     if (userId) {
       const profile = await ctx.db

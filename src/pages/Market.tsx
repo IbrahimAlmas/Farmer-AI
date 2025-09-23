@@ -93,7 +93,7 @@ export default function Market() {
   const items = useQuery(api.market_prices.getVegetablePrices);
   const loading = items === undefined;
 
-  const regionLabel = useMemo(() => profile?.location?.state ?? "Delhi", [profile]);
+  const regionLabel = useMemo(() => profile?.location?.state ?? "Hyderabad", [profile]);
 
   const lang = profile?.preferredLang ?? "en";
   const tr = (s: string) => {
@@ -127,11 +127,11 @@ export default function Market() {
               loading="eager"
             />
           </div>
-          <div className="absolute inset-x-0 top-0 h-36 sm:h-44 bg-gradient-to-b from-black/30 to-transparent rounded-b-3xl" />
+          <div className="absolute inset-x-0 top-0 h-36 sm:h-44 bg-gradient-to-b from-white/60 to-transparent rounded-b-3xl" />
           <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between">
-            <div className="text-white drop-shadow">
+            <div className="text-black">
               <div className="text-lg font-semibold">{tr("Nearby Vegetable Prices")}</div>
-              <div className="text-xs opacity-90">{tr("Indicative local retail estimates (₹/kg)")}</div>
+              <div className="text-xs opacity-80">{tr("Indicative local retail estimates (₹/kg)")}</div>
             </div>
             <Badge variant="secondary" className="text-xs shadow">
               {tr("Region")}: {regionLabel}
