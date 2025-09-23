@@ -58,7 +58,7 @@ export function AppDock({
             transition={{ duration: 0.3, ease: "easeOut" }}
           >
             <div className="absolute inset-0 bg-primary/5 rounded-[22px] blur-2xl scale-110 animate-glow-pulse" />
-            <div className="relative flex items-end gap-5 rounded-[22px] border bg-white text-[oklch(0.35_0.03_120)] shadow-[0_28px_80px_-20px_rgba(0,0,0,0.25)] ring-1 ring-black/5 px-6 py-3">
+            <div className="relative flex items-end gap-5 rounded-[22px] border bg-white/60 backdrop-blur-md text-[oklch(0.35_0.03_120)] shadow-[0_28px_80px_-20px_rgba(0,0,0,0.25)] ring-1 ring-black/5 px-6 py-3">
               {leftItems.map((item) => {
                 const isActive = currentPath === item.path;
                 const Icon = item.icon;
