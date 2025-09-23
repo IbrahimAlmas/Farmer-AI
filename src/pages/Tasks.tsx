@@ -9,14 +9,13 @@ import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 export default function Tasks() {
-  const tasks = useQuery(api.tasks.list);
   const create = useMutation(api.tasks.create);
   const markDone = useMutation(api.tasks.markDone);
 
-  // New: load forms (farms) to build dynamic buttons, fallback to demo list if none
-  const farms = useQuery((api as any).farms?.list as any) as Array<{ name: string }> | undefined;
+  // Farms list (real if available)
+  const farms = useQuery((api as any).farms?.list as any) as Array<{ _id?: string; name: string }> | undefined;
 
-  // New: AI hooks
+  // AI hooks
   const suggestions = useQuery((api as any).tasks.aiSuggestions as any) as
     | Array<{ title: string; priority: "high" | "medium" | "low"; reason: string; dueInDays: number }>
     | undefined;
@@ -25,36 +24,55 @@ export default function Tasks() {
     | Array<{ at: number; item: string; details: string; technique?: string }>
     | undefined;
 
-  // Selected farm filter (must be declared before useMemo below)
-  // selectedForm state declared above to avoid initialization order issues
-  const [selectedForm, setSelectedForm] = useState<string>("All");
+  // Selected farm (no "All" anymore) — default to first available
+  const [selectedForm, setSelectedForm] = useState<string>("");
+
+  // Load all tasks (for fallback filtering when no farmId exists)
   const tasksAll = useQuery(api.tasks.list);
+
   // Determine selected farmId from farms + selectedForm
   const selectedFarmId = useMemo(() => {
-    if (!farms || selectedForm === "All") return null;
+    if (!farms || !selectedForm) return null;
     const match = (farms as any[]).find((f) => (f?.name as string)?.toLowerCase() === selectedForm.toLowerCase());
     return match?._id ?? null;
   }, [farms, selectedForm]);
 
-  // Load per-farm tasks when a farm is selected
+  // Load per-farm tasks when a farm is selected (uses farmId if available)
   const tasksByFarm = useQuery(
     (api as any).tasks.listByFarm as any,
     selectedFarmId ? ({ farmId: selectedFarmId } as any) : "skip"
   ) as any[] | undefined;
 
-  // Choose dataset based on selection
-  const visibleTasks = (selectedFarmId ? tasksByFarm : tasksAll) ?? [];
+  // Visible tasks: prefer farmId query; otherwise fallback-filter by title against selected farm name
+  const visibleTasks = useMemo(() => {
+    if (selectedFarmId) return tasksByFarm ?? [];
+    const all = tasksAll ?? [];
+    const target = (selectedForm || "").trim().toLowerCase();
+    if (!target) return [];
+    return all.filter((t: any) => {
+      const fromTitle = extractFarmName(t.title);
+      if (fromTitle) return fromTitle.toLowerCase() === target;
+      return (t.title as string)?.toLowerCase().includes(target);
+    });
+  }, [tasksByFarm, tasksAll, selectedFarmId, selectedForm]);
 
   const [title, setTitle] = useState("");
   const [open, setOpen] = useState(false);
 
-  // NEW: selected form filter
-  const demoForms = useMemo(() => ["Farm A", "Farm B", "Farm C"], []);
+  // Demo farm names as requested
+  const demoForms = useMemo(() => ["Wheat farm", "Barely", "Rice"], []);
   const formNames = useMemo(() => {
     const names = (farms ?? []).map((f: any) => (f?.name as string) || "Farm");
     return names.length ? names : demoForms;
   }, [farms, demoForms]);
-  // selectedForm state declared above to avoid initialization order issues
+
+  // Initialize selectedForm to first available farm if not set
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useMemo(() => {
+    if (!selectedForm && formNames.length) {
+      setSelectedForm(formNames[0]);
+    }
+  }, [formNames, selectedForm]);
 
   // Helpers to extract farm name from strings like "Task — Farm Name"
   const extractFarmName = (text: string): string | null => {
@@ -64,9 +82,9 @@ export default function Tasks() {
     return name || null;
   };
 
-  // Filtered datasets based on selected form
+  // Filtered datasets based on selected farm (no "All")
   const filteredSuggestions = useMemo(() => {
-    if (selectedForm === "All") return suggestions ?? [];
+    if (!selectedForm) return [];
     const target = selectedForm.toLowerCase();
     return (suggestions ?? []).filter((s) => {
       const fromTitle = extractFarmName(s.title);
@@ -75,7 +93,7 @@ export default function Tasks() {
   }, [suggestions, selectedForm]);
 
   const filteredSchedule = useMemo(() => {
-    if (selectedForm === "All") return schedule ?? [];
+    if (!selectedForm) return [];
     const target = selectedForm.toLowerCase();
     return (schedule ?? []).filter((it) => {
       const fromItem = extractFarmName(it.item);
@@ -84,9 +102,12 @@ export default function Tasks() {
   }, [schedule, selectedForm]);
 
   const addTask = async () => {
-    if (!title.trim()) return;
+    if (!title.trim() || !selectedForm) return;
     try {
-      await create({ title, notes: undefined, dueDate: undefined, farmId: selectedFarmId as any });
+      const suffix = ` — ${selectedForm}`;
+      const needsTag = !title.toLowerCase().includes(selectedForm.toLowerCase());
+      const finalTitle = needsTag ? `${title}${suffix}` : title;
+      await create({ title: finalTitle, notes: undefined, dueDate: undefined, farmId: selectedFarmId as any });
       setTitle("");
       toast.success("Task added");
     } catch {
@@ -101,8 +122,10 @@ export default function Tasks() {
     dueInDays: number;
   }) => {
     try {
+      const needsTag = !s.title.toLowerCase().includes((selectedForm || "").toLowerCase());
+      const finalTitle = needsTag && selectedForm ? `${s.title} — ${selectedForm}` : s.title;
       await createFromSuggestion({
-        title: s.title,
+        title: finalTitle,
         reason: s.reason,
         priority: s.priority,
         dueInDays: s.dueInDays,
@@ -126,15 +149,8 @@ export default function Tasks() {
           </p>
         </div>
 
-        {/* NEW: Form selector buttons */}
+        {/* Farm selector buttons (no "All") */}
         <div className="flex flex-wrap items-center gap-2 justify-center">
-          <Button
-            variant={selectedForm === "All" ? "default" : "outline"}
-            className="rounded-xl"
-            onClick={() => setSelectedForm("All")}
-          >
-            All
-          </Button>
           {formNames.map((name, idx) => (
             <Button
               key={`${name}-${idx}`}
@@ -152,7 +168,7 @@ export default function Tasks() {
           <Card className="lg:col-span-2 rounded-2xl bg-white ring-1 ring-black/5">
             <CardHeader className="flex-row items-center justify-between">
               <CardTitle>
-                AI Task Suggestions{selectedForm !== "All" ? ` — ${selectedForm}` : ""}
+                AI Task Suggestions{selectedForm ? ` — ${selectedForm}` : ""}
               </CardTitle>
               <div className="text-xs font-medium text-emerald-500">Analysis Complete ✨</div>
             </CardHeader>
@@ -165,7 +181,7 @@ export default function Tasks() {
                   <div>
                     <div className="font-semibold">{s.title}</div>
                     <div className="text-xs text-muted-foreground">
-                      Priority:{" "}
+                      Priority{" "}
                       <span
                         className={
                           s.priority === "high"
@@ -197,7 +213,7 @@ export default function Tasks() {
                   <DialogContent className="max-w-2xl">
                     <DialogHeader>
                       <DialogTitle>
-                        Full Schedule Plan{selectedForm !== "All" ? ` — ${selectedForm}` : ""}
+                        Full Schedule Plan{selectedForm ? ` — ${selectedForm}` : ""}
                       </DialogTitle>
                     </DialogHeader>
                     <div className="space-y-3 max-h-[60vh] overflow-auto">
@@ -251,7 +267,7 @@ export default function Tasks() {
 
             <Card className="rounded-2xl bg-white ring-1 ring-black/5">
               <CardHeader>
-                <CardTitle>Your Tasks</CardTitle>
+                <CardTitle>Your Tasks{selectedForm ? ` — ${selectedForm}` : ""}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 {visibleTasks?.length ? (
@@ -281,7 +297,7 @@ export default function Tasks() {
                   ))
                 ) : (
                   <div className="text-sm text-muted-foreground">
-                    No tasks yet for {selectedForm === "All" ? "all farms" : selectedForm}. Add tasks from AI suggestions or create your own.
+                    No tasks yet for {selectedForm || "this farm"}. Add tasks from AI suggestions or create your own.
                   </div>
                 )}
               </CardContent>
