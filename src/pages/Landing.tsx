@@ -210,7 +210,7 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Technical Approach — Flow (Plain White) */}
+      {/* Technical Approach — Flow (Centralized Vertical Flowchart) */}
       <section id="flow" className="py-20 bg-white">
         <div className="mx-auto w-full max-w-6xl px-4">
           <div className="text-center mb-10">
@@ -220,107 +220,72 @@ export default function Landing() {
             </p>
           </div>
 
-          {/* Horizontal flow on desktop, vertical on mobile */}
-          <div className="flex flex-col items-stretch justify-center gap-3">
-            {/* Step 1 */}
-            <div className="flex-1">
-              <div className="h-full rounded-xl border border-neutral-200 bg-white p-4">
-                <div className="text-sm font-semibold text-[oklch(0.22_0.02_120)]">Voice/Text Input</div>
-                <div className="mt-1 text-xs text-[oklch(0.45_0.03_120)]">
-                  User speaks or types commands in any supported language.
+          {/* Proper vertical flowchart with a center spine and nodes */}
+          <div className="relative mx-auto max-w-3xl">
+            {/* Center line */}
+            <div className="pointer-events-none absolute inset-y-0 left-1/2 -translate-x-1/2 w-px bg-neutral-200" />
+
+            {[
+              {
+                title: "Voice/Text Input",
+                desc: "User speaks or types commands in any supported language.",
+              },
+              {
+                title: "AI Processing",
+                desc: "Natural language understanding, intent detection, and routing.",
+              },
+              {
+                title: "Convex Backend",
+                desc: "Secure server functions, real-time data, and storage.",
+              },
+              {
+                title: "Farm & Weather Data",
+                desc: "Farms, soil tests, simulations, market prices, and weather.",
+              },
+              {
+                title: "Actions & Insights",
+                desc: "Execute tasks, run simulations, get irrigation advice.",
+              },
+              {
+                title: "Results & Feedback",
+                desc: "Clear UI updates, toast feedback, and optional voice reply.",
+              },
+            ].map((step, i, arr) => (
+              <div key={step.title} className="relative flex flex-col items-center">
+                {/* Node dot */}
+                <div className="z-10 mb-3 grid size-7 place-items-center rounded-full bg-white shadow-sm ring-1 ring-black/5">
+                  <span className="block size-2.5 rounded-full bg-[oklch(0.69_0.17_145)]" />
                 </div>
-              </div>
-            </div>
 
-            {/* Arrow down */}
-            <div className="flex items-center justify-center text-[oklch(0.35_0.03_120)]">
-              <ArrowDown className="h-6 w-6" />
-            </div>
-
-            {/* Step 2 */}
-            <div className="flex-1">
-              <div className="h-full rounded-xl border border-neutral-200 bg-white p-4">
-                <div className="text-sm font-semibold text-[oklch(0.22_0.02_120)]">AI Processing</div>
-                <div className="mt-1 text-xs text-[oklch(0.45_0.03_120)]">
-                  Natural language understanding, intent detection, and routing.
+                {/* Step card */}
+                <div className="w-full rounded-xl border border-neutral-200 bg-white p-4 shadow-sm">
+                  <div className="text-sm font-semibold text-[oklch(0.22_0.02_120)]">{step.title}</div>
+                  <div className="mt-1 text-xs text-[oklch(0.45_0.03_120)]">{step.desc}</div>
                 </div>
+
+                {/* Connector arrow to next step */}
+                {i < arr.length - 1 && (
+                  <div className="my-3 text-[oklch(0.35_0.03_120)]">
+                    <ArrowDown className="h-6 w-6" />
+                  </div>
+                )}
               </div>
-            </div>
-
-            {/* Arrow down */}
-            <div className="flex items-center justify-center text-[oklch(0.35_0.03_120)]">
-              <ArrowDown className="h-6 w-6" />
-            </div>
-
-            {/* Step 3 */}
-            <div className="flex-1">
-              <div className="h-full rounded-xl border border-neutral-200 bg-white p-4">
-                <div className="text-sm font-semibold text-[oklch(0.22_0.02_120)]">Convex Backend</div>
-                <div className="mt-1 text-xs text-[oklch(0.45_0.03_120)]">
-                  Secure server functions, real-time data, and storage.
-                </div>
-              </div>
-            </div>
-
-            {/* Arrow down */}
-            <div className="flex items-center justify-center text-[oklch(0.35_0.03_120)]">
-              <ArrowDown className="h-6 w-6" />
-            </div>
-
-            {/* Step 4 */}
-            <div className="flex-1">
-              <div className="h-full rounded-xl border border-neutral-200 bg-white p-4">
-                <div className="text-sm font-semibold text-[oklch(0.22_0.02_120)]">Farm & Weather Data</div>
-                <div className="mt-1 text-xs text-[oklch(0.45_0.03_120)]">
-                  Farms, soil tests, simulations, market prices, and weather.
-                </div>
-              </div>
-            </div>
-
-            {/* Arrow down */}
-            <div className="flex items-center justify-center text-[oklch(0.35_0.03_120)]">
-              <ArrowDown className="h-6 w-6" />
-            </div>
-
-            {/* Step 5 */}
-            <div className="flex-1">
-              <div className="h-full rounded-xl border border-neutral-200 bg-white p-4">
-                <div className="text-sm font-semibold text-[oklch(0.22_0.02_120)]">Actions & Insights</div>
-                <div className="mt-1 text-xs text-[oklch(0.45_0.03_120)]">
-                  Execute tasks, run simulations, get irrigation advice.
-                </div>
-              </div>
-            </div>
-
-            {/* Arrow down */}
-            <div className="flex items-center justify-center text-[oklch(0.35_0.03_120)]">
-              <ArrowDown className="h-6 w-6" />
-            </div>
-
-            {/* Step 6 */}
-            <div className="flex-1">
-              <div className="h-full rounded-xl border border-neutral-200 bg-white p-4">
-                <div className="text-sm font-semibold text-[oklch(0.22_0.02_120)]">Results & Feedback</div>
-                <div className="mt-1 text-xs text-[oklch(0.45_0.03_120)]">
-                  Clear UI updates, toast feedback, and optional voice reply.
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
 
           {/* Legend */}
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-3 text-xs text-[oklch(0.35_0.03_120)]">
+          <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-3 text-xs text-[oklch(0.35_0.03_120)]">
             <div className="rounded-xl border border-neutral-200 bg-white p-3">
               <div className="font-semibold text-[oklch(0.22_0.02_120)]">Simple & Clear</div>
-              <div className="mt-1">No gradients or shadows — plain white background for maximum clarity.</div>
+              <div className="mt-1">Clean white background with a central connector line and nodes.</div>
             </div>
             <div className="rounded-xl border border-neutral-200 bg-white p-3">
               <div className="font-semibold text-[oklch(0.22_0.02_120)]">Readable Text</div>
-              <div className="mt-1">All labels use dark text to ensure strong contrast and accessibility.</div>
+              <div className="mt-1">Dark labels and small descriptive text for clarity.</div>
             </div>
             <div className="rounded-xl border border-neutral-200 bg-white p-3">
               <div className="font-semibold text-[oklch(0.22_0.02_120)]">Responsive Layout</div>
-              <div className="mt-1">Horizontal on desktop; vertical with rotated arrows on mobile.</div>
+              <div className="mt-1">Centered flow that scales well on mobile and desktop.</div>
             </div>
           </div>
         </div>
