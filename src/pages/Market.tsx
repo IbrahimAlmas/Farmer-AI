@@ -142,7 +142,7 @@ export default function Market() {
         <div className="p-4 space-y-4">
           <Card className="bg-white ring-1 ring-black/5 border-emerald-200/50 shadow-sm overflow-hidden">
             <CardHeader className="pb-2">
-              <CardTitle className="flex items-center justify-between">
+              <CardTitle className="flex items-center justify-between text-black">
                 <span className="flex items-center gap-2">
                   {/* subtle icon shape using CSS only */}
                   <span className="inline-block h-2.5 w-2.5 rounded-full bg-emerald-500 mr-1" />
@@ -152,7 +152,7 @@ export default function Market() {
                   {tr("Region")}: {regionLabel}
                 </Badge>
               </CardTitle>
-              <div className="text-xs text-muted-foreground mt-1">
+              <div className="text-xs text-neutral-600 mt-1">
                 {tr("Indicative local retail estimates (₹/kg)")}
               </div>
             </CardHeader>
@@ -173,7 +173,7 @@ export default function Market() {
               )}
 
               {!loading && (!items || items.length === 0) && (
-                <div className="text-sm text-muted-foreground">
+                <div className="text-sm text-neutral-700">
                   {tr("No prices available. Please try again later.")}
                 </div>
               )}
@@ -230,7 +230,7 @@ export default function Market() {
                           </div>
                           <div className="text-right">
                             <div className="text-lg font-semibold tracking-tight text-emerald-700">₹{it.price}</div>
-                            <div className="text-[10px] text-muted-foreground">
+                            <div className="text-[10px] text-neutral-500">
                               {tr("Updated")}: {new Date(it.updatedAt).toLocaleDateString()}
                             </div>
                           </div>
@@ -242,7 +242,7 @@ export default function Market() {
               )}
 
               {!loading && items && (
-                <div className="mt-4 text-[11px] text-muted-foreground">
+                <div className="mt-4 text-[11px] text-neutral-600">
                   {tr("Source")}: {items[0]?.source}. {tr("Prices are indicative and adjusted for your region.")}
                 </div>
               )}
