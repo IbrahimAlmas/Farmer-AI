@@ -47,6 +47,39 @@ const nameHash = (s: string) => {
   return h;
 };
 
+const localVegImageFor = (name: string) => {
+  const key = String(name).trim().toLowerCase();
+
+  const map: Record<string, string> = {
+    // exact veggies present in /public/assets
+    "potato": "/assets/Potato.webp",
+    "onion": "/assets/Onion.webp",
+    "tomato": "/assets/Tomato..webp", // note: filename has two dots
+    "brinjal": "/assets/Brinjal.jpg",
+    "cauliflower": "/assets/Cauliflower..webp", // note: filename has two dots
+    "cabbage": "/assets/Cabbage.webp",
+    "okra": "/assets/Okra.webp",
+    "carrot": "/assets/Carrot.webp",
+    "capsicum": "/assets/Capsicum.jpeg",
+    "cucumber": "/assets/Cucumber.webp",
+    "green peas": "/assets/Green_peas.jpeg", // underscores in filename
+    "spinach": "/assets/Spinach.webp",
+    "coriander": "/assets/Coriander.webp",
+    "ginger": "/assets/Ginger.webp",
+    "garlic": "/assets/Garlic.webp",
+    // items not in assets will fall back online then to a generic local image
+  };
+
+  // prefer exact key
+  if (map[key]) return map[key];
+
+  // simple normalization variants
+  const normalized = key.replace(/\s+/g, "_");
+  if (map[normalized]) return map[normalized];
+
+  return ""; // signal no exact local match
+};
+
 const onlineImageFor = (name: string) => {
   const key = String(name).toLowerCase();
   const mapped = vegImages[key];
@@ -152,8 +185,12 @@ export default function Market() {
                   className="grid grid-cols-2 sm:grid-cols-3 gap-3"
                 >
                   {items.map((it) => {
-                    // Use online images (curated map first, then generic query)
-                    const img = onlineImageFor(it.name);
+                    // Resolve local-first, then online fallback, then a deterministic local fallback
+                    const local = localVegImageFor(it.name);
+                    const online = onlineImageFor(it.name);
+                    const finalLocalFallback =
+                      localImages[nameHash(it.name) % localImages.length];
+
                     return (
                       <div
                         key={it.name}
@@ -161,18 +198,24 @@ export default function Market() {
                       >
                         <div className="h-24 w-full overflow-hidden">
                           <img
-                            src={img}
+                            src={local || online}
                             alt={it.name}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                             loading="lazy"
                             onError={(e) => {
                               const target = e.currentTarget as HTMLImageElement;
-                              const fallback = "https://source.unsplash.com/600x400/?vegetables,market";
-                              if (target.src !== fallback) {
-                                target.src = fallback;
-                              } else {
-                                target.onerror = null;
+                              // Step 1: if started with local and it failed, switch to online
+                              if (local && target.src.endsWith(local)) {
+                                target.src = online;
+                                return;
                               }
+                              // Step 2: if online failed, use deterministic local fallback
+                              if (target.src === online) {
+                                target.src = finalLocalFallback;
+                                return;
+                              }
+                              // Step 3: stop error loop
+                              target.onerror = null;
                             }}
                           />
                         </div>
