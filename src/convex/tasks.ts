@@ -148,29 +148,47 @@ export const aiSuggestions = query({
       const now = Date.now();
       const day = 24 * 60 * 60 * 1000;
 
-      // Minimal demo schedule to derive suggestions
+      // Updated demo plan to target your exact farm names
       const demoPlan: Array<{ at: number; item: string; details: string; technique?: string }> = [
         {
           at: now + 0 * day,
-          item: "Plant wheat — Farm A",
+          item: "Plant wheat — Wheat farm",
           details: "Sow certified seeds at 3–5 cm depth; ensure fine tilth.",
           technique: "Direct seeding / seed drill",
         },
         {
           at: now + 1 * day,
-          item: "Irrigation — Farm B",
+          item: "Irrigation — Wheat farm",
           details: "Apply 8–12 mm depending on ET and rainfall.",
           technique: "Drip (preferred) or Sprinkler",
         },
         {
-          at: now + 2 * day,
-          item: "Pest scouting — Farm C",
-          details: "Inspect 10 plants per block; look for aphids and leaf miners.",
-          technique: "Visual scouting",
+          at: now + 0 * day,
+          item: "Plant barley — Barely",
+          details: "Sow barley at 3–4 cm; maintain uniform spacing.",
+          technique: "Direct seeding",
+        },
+        {
+          at: now + 1 * day,
+          item: "Irrigation — Barely",
+          details: "Apply 6–10 mm based on forecast and soil moisture.",
+          technique: "Sprinkler preferred",
+        },
+        {
+          at: now + 0 * day,
+          item: "Transplant rice — Rice",
+          details: "Transplant healthy seedlings; ensure puddled bed.",
+          technique: "Transplanting",
+        },
+        {
+          at: now + 1 * day,
+          item: "Irrigation — Rice",
+          details: "Maintain shallow standing water (2–3 cm).",
+          technique: "Flood (field leveling helps)",
         },
       ];
 
-      const suggestions = demoPlan.slice(0, 3).map((p, idx) => {
+      const suggestions = demoPlan.slice(0, 6).map((p, idx) => {
         const lower = p.item.toLowerCase();
         const priority: "high" | "medium" | "low" =
           lower.includes("plant") || lower.includes("irrigation") ? "high" : idx === 1 ? "medium" : "low";
@@ -291,10 +309,11 @@ export const schedule = query({
       const now = Date.now();
       const day = 24 * 60 * 60 * 1000;
 
+      // Updated to your exact farm names
       const demoFarms: Array<{ name: string; crop: string }> = [
-        { name: "Farm A", crop: "wheat" },
-        { name: "Farm B", crop: "rice" },
-        { name: "Farm C", crop: "maize" },
+        { name: "Wheat farm", crop: "wheat" },
+        { name: "Barely", crop: "barley" },
+        { name: "Rice", crop: "rice" },
       ];
 
       function planForFarm(farm: { name: string; crop: string }) {
