@@ -209,6 +209,157 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* NEW: Technical Approach - Flow Chart */}
+      <section id="architecture" className="mx-auto w-full max-w-6xl px-4 py-20">
+        <div className="text-center">
+          <h3 className="text-3xl md:text-4xl font-extrabold">Technical Approach — Flow</h3>
+          <p className="mt-2 text-[oklch(0.45_0.03_120)]">
+            High-level system flow for Root AI's end-to-end experience.
+          </p>
+        </div>
+
+        {/* Desktop: horizontal flow | Mobile: vertical flow */}
+        <div className="mt-10">
+          <div className="hidden md:grid grid-cols-7 items-center gap-4">
+            {/* Node 1 */}
+            <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-black/5">
+              <div className="text-xs text-[oklch(0.45_0.03_120)]">Step 1</div>
+              <div className="mt-1 font-semibold">User</div>
+              <div className="mt-1 text-sm text-[oklch(0.45_0.03_120)]">Voice & UI</div>
+            </div>
+
+            {/* Connector */}
+            <div className="flex items-center justify-center">
+              <div className="h-1 w-full rounded bg-black/10 relative">
+                <span className="absolute -right-1 -top-1.5 h-3 w-3 rotate-45 bg-black/15"></span>
+              </div>
+            </div>
+
+            {/* Node 2 */}
+            <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-black/5">
+              <div className="text-xs text-[oklch(0.45_0.03_120)]">Step 2</div>
+              <div className="mt-1 font-semibold">Frontend</div>
+              <div className="mt-1 text-sm text-[oklch(0.45_0.03_120)]">React + Vite + Tailwind</div>
+            </div>
+
+            {/* Connector */}
+            <div className="flex items-center justify-center">
+              <div className="h-1 w-full rounded bg-black/10 relative">
+                <span className="absolute -right-1 -top-1.5 h-3 w-3 rotate-45 bg-black/15"></span>
+              </div>
+            </div>
+
+            {/* Node 3 */}
+            <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-black/5">
+              <div className="text-xs text-[oklch(0.45_0.03_120)]">Step 3</div>
+              <div className="mt-1 font-semibold">AppShell & Assistant</div>
+              <div className="mt-1 text-sm text-[oklch(0.45_0.03_120)]">GlobalAssistant, Voice</div>
+            </div>
+
+            {/* Connector */}
+            <div className="flex items-center justify-center">
+              <div className="h-1 w-full rounded bg-black/10 relative">
+                <span className="absolute -right-1 -top-1.5 h-3 w-3 rotate-45 bg-black/15"></span>
+              </div>
+            </div>
+
+            {/* Node 4 */}
+            <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-black/5">
+              <div className="text-xs text-[oklch(0.45_0.03_120)]">Step 4</div>
+              <div className="mt-1 font-semibold">Convex Backend</div>
+              <div className="mt-1 text-sm text-[oklch(0.45_0.03_120)]">Real-time API & DB</div>
+            </div>
+          </div>
+
+          {/* Services & Data row */}
+          <div className="hidden md:grid grid-cols-7 items-center gap-4 mt-4">
+            {/* Spacer under Node 2 */}
+            <div></div>
+            {/* Down connector from Node 4 to services */}
+            <div className="col-span-5">
+              <div className="flex items-center justify-center">
+                <div className="h-8 w-1 bg-black/10 rounded"></div>
+              </div>
+            </div>
+            <div></div>
+
+            {/* Services */}
+            <div className="col-span-7 grid grid-cols-3 gap-4">
+              <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-black/5">
+                <div className="text-xs text-[oklch(0.45_0.03_120)]">Service</div>
+                <div className="mt-1 font-semibold">Soil Analysis</div>
+                <div className="mt-1 text-sm text-[oklch(0.45_0.03_120)]">Vision → Insights</div>
+              </div>
+              <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-black/5">
+                <div className="text-xs text-[oklch(0.45_0.03_120)]">Service</div>
+                <div className="mt-1 font-semibold">3D Modeling</div>
+                <div className="mt-1 text-sm text-[oklch(0.45_0.03_120)]">Image → Field Plane</div>
+              </div>
+              <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-black/5">
+                <div className="text-xs text-[oklch(0.45_0.03_120)]">Service</div>
+                <div className="mt-1 font-semibold">Weather + Advisor</div>
+                <div className="mt-1 text-sm text-[oklch(0.45_0.03_120)]">ET₀ → Irrigation</div>
+              </div>
+            </div>
+
+            {/* Down to DB */}
+            <div className="col-span-7 mt-4">
+              <div className="flex items-center justify-center">
+                <div className="h-8 w-1 bg-black/10 rounded"></div>
+              </div>
+              <div className="mt-4 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-black/5 mx-auto max-w-lg text-center">
+                <div className="text-xs text-[oklch(0.45_0.03_120)]">Data</div>
+                <div className="mt-1 font-semibold">Convex Database</div>
+                <div className="mt-1 text-sm text-[oklch(0.45_0.03_120)]">
+                  Tasks, Farms, Sims, Community, Reviews
+                </div>
+              </div>
+            </div>
+
+            {/* Up connector back to UI with lightning */}
+            <div className="col-span-7 mt-4">
+              <div className="flex items-center justify-center">
+                <div className="h-8 w-1 bg-black/10 rounded"></div>
+              </div>
+              <div className="mt-4 text-center text-sm text-[oklch(0.45_0.03_120)]">
+                <span className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 ring-1 ring-black/5 shadow-sm">
+                  <span className="text-[oklch(0.22_0.02_120)] font-medium">Realtime Updates</span>
+                  <span className="text-[oklch(0.69_0.17_145)]">⚡</span>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile: vertical flow */}
+          <div className="md:hidden space-y-4 mt-4">
+            {[
+              { title: "User", desc: "Voice & UI" },
+              { title: "Frontend", desc: "React + Vite + Tailwind" },
+              { title: "AppShell & Assistant", desc: "GlobalAssistant, Voice" },
+              { title: "Convex Backend", desc: "Real-time API & DB" },
+              { title: "Soil Analysis", desc: "Vision → Insights" },
+              { title: "3D Modeling", desc: "Image → Field Plane" },
+              { title: "Weather + Advisor", desc: "ET₀ → Irrigation" },
+              { title: "Convex Database", desc: "Tasks, Farms, Sims, Community, Reviews" },
+              { title: "Realtime Updates", desc: "UI auto-refreshes ⚡" },
+            ].map((n, i, arr) => (
+              <div key={n.title}>
+                <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-black/5">
+                  <div className="text-xs text-[oklch(0.45_0.03_120)]">Step {i + 1}</div>
+                  <div className="mt-1 font-semibold">{n.title}</div>
+                  <div className="mt-1 text-sm text-[oklch(0.45_0.03_120)]">{n.desc}</div>
+                </div>
+                {i < arr.length - 1 && (
+                  <div className="my-2 flex items-center justify-center">
+                    <div className="h-6 w-1 bg-black/10 rounded"></div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Testimonials */}
       <section className="mx-auto w-full max-w-6xl px-4 py-20">
         <div className="text-center">
