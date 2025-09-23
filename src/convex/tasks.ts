@@ -163,6 +163,13 @@ export const aiSuggestions = query({
           technique: "Drip (preferred) or Sprinkler",
         },
         {
+          at: now + 2 * day,
+          item: "Pest scouting — Wheat farm",
+          details: "Inspect 10 plants per block; monitor for aphids and rust.",
+          technique: "Visual scouting",
+        },
+
+        {
           at: now + 0 * day,
           item: "Plant barley — Barely",
           details: "Sow barley at 3–4 cm; maintain uniform spacing.",
@@ -175,6 +182,13 @@ export const aiSuggestions = query({
           technique: "Sprinkler preferred",
         },
         {
+          at: now + 2 * day,
+          item: "Pest scouting — Barely",
+          details: "Check edges for aphids; sample across rows.",
+          technique: "Visual scouting",
+        },
+
+        {
           at: now + 0 * day,
           item: "Transplant rice — Rice",
           details: "Transplant healthy seedlings; ensure puddled bed.",
@@ -186,12 +200,18 @@ export const aiSuggestions = query({
           details: "Maintain shallow standing water (2–3 cm).",
           technique: "Flood (field leveling helps)",
         },
+        {
+          at: now + 2 * day,
+          item: "Weed management — Rice",
+          details: "Light weeding between rows to reduce competition.",
+          technique: "Manual or mechanical",
+        },
       ];
 
-      const suggestions = demoPlan.slice(0, 6).map((p, idx) => {
+      const suggestions = demoPlan.slice(0, 9).map((p, idx) => {
         const lower = p.item.toLowerCase();
         const priority: "high" | "medium" | "low" =
-          lower.includes("plant") || lower.includes("irrigation") ? "high" : idx === 1 ? "medium" : "low";
+          lower.includes("plant") || lower.includes("irrigation") ? "high" : lower.includes("pest") || lower.includes("weed") ? "medium" : idx === 1 ? "medium" : "low";
         return {
           title: p.item,
           priority,
