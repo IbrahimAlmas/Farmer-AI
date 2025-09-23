@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { api } from "@/convex/_generated/api";
 import { useMutation, useQuery } from "convex/react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
@@ -55,6 +55,60 @@ export default function Tasks() {
       return (t.title as string)?.toLowerCase().includes(target);
     });
   }, [tasksByFarm, tasksAll, selectedFarmId, selectedForm]);
+
+  // Auto-seed baseline tasks if a farm has none
+  useEffect(() => {
+    // Only run when we have a selected farm and data is loaded (no undefined)
+    const loaded =
+      (selectedFarmId ? tasksByFarm !== undefined : tasksAll !== undefined) &&
+      suggestions !== undefined &&
+      schedule !== undefined;
+
+    if (!selectedForm || !loaded) return;
+
+    // If the selected farm currently shows no tasks, auto-create a few baseline ones
+    if ((visibleTasks?.length ?? 0) > 0) return;
+
+    const suffix = ` — ${selectedForm}`;
+    const base: Array<string> = [
+      "Irrigation",
+      "Fertilization",
+      "Pest scouting",
+      "Weed management",
+    ];
+
+    // Fire and forget: create a compact starter set for this farm
+    (async () => {
+      try {
+        await Promise.all(
+          base.map((label) => {
+            const title = `${label}${suffix}`;
+            return create({
+              title,
+              notes: undefined,
+              dueDate: undefined,
+              farmId: selectedFarmId as any,
+            });
+          }),
+        );
+        // A tiny delay helps the realtime subscription reflect immediately
+        setTimeout(() => {
+          toast.success(`Added starter tasks for ${selectedForm}`);
+        }, 50);
+      } catch {
+        // If seeding fails (e.g., race), silently ignore to avoid loops
+      }
+    })();
+  }, [
+    selectedForm,
+    selectedFarmId,
+    visibleTasks,
+    tasksByFarm,
+    tasksAll,
+    suggestions,
+    schedule,
+    create,
+  ]);
 
   const [title, setTitle] = useState("");
   const [open, setOpen] = useState(false);
