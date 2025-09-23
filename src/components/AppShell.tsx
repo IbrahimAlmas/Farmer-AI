@@ -21,6 +21,8 @@ import { MoreHorizontal } from "lucide-react";
 import LanguageSelect from "@/components/LanguageSelect";
 import { useEffect, useState } from "react";
 import GlobalAssistant from "@/components/GlobalAssistant";
+import { AppHeader } from "@/components/appshell/Header";
+import { AppDock } from "@/components/appshell/Dock";
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -136,302 +138,44 @@ export function AppShell({ children, title }: AppShellProps) {
 
   return (
     <div className={`min-h-screen flex flex-col ${isWhiteTheme ? "bg-[oklch(0.98_0.01_120)] text-[oklch(0.22_0.02_120)]" : "bg-background"}`}>
-      {/* Top Bar - hidden on dashboard */}
-      {!hideTopBar && (
-        <motion.header 
-          className="sticky top-0 z-40"
-          initial={{ y: -20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.5 }}
-        >
-          <div className="px-4 pt-[env(safe-area-inset-top)]" />
-          <div className="mx-auto w-full max-w-6xl">
-            {/* Enhanced glass header with animations */}
-            <motion.div 
-              className="mx-3 md:mx-0 rounded-2xl bg-white shadow-sm ring-1 ring-black/5 relative overflow-hidden"
-              whileHover={{ y: -2 }}
-              transition={{ duration: 0.2 }}
-            >
-              <div className="flex items-center justify-between px-4 py-3 relative">
-                <LogoDropdown />
-                {/* Replace title with contextual nav for Learn More section pages */}
-                {[ "/learn-more", "/our-team", "/our-mission", "/future-plan" ].includes(location.pathname) ? (
-                  <div className="flex-1 flex items-center justify-center gap-2">
-                    <Button
-                      variant={location.pathname === "/our-team" ? "secondary" : "ghost"}
-                      size="sm"
-                      className="rounded-xl px-3 py-2"
-                      onClick={() => navigate("/our-team")}
-                    >
-                      {ui(currentLang, "Our Team")}
-                    </Button>
-                    <Button
-                      variant={location.pathname === "/our-mission" ? "secondary" : "ghost"}
-                      size="sm"
-                      className="rounded-xl px-3 py-2"
-                      onClick={() => navigate("/our-mission")}
-                    >
-                      {ui(currentLang, "Our Mission")}
-                    </Button>
-                    <Button
-                      variant={location.pathname === "/future-plan" ? "secondary" : "ghost"}
-                      size="sm"
-                      className="rounded-xl px-3 py-2"
-                      onClick={() => navigate("/future-plan")}
-                    >
-                      {ui(currentLang, "Future Plan")}
-                    </Button>
-                  </div>
-                ) : (
-                  <motion.h1 
-                    className="text-[15px] sm:text-base font-semibold tracking-wide truncate flex-1 text-center"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.2 }}
-                  >
-                    {title || "KrishiMitra"}
-                  </motion.h1>
-                )}
-                <div className="w-auto">
-                  {/* Show Home button on Learn More pages; otherwise show language selector + optional community action */}
-                  {isLearnMoreSection ? (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="rounded-xl px-3 py-2"
-                      onClick={() => navigate("/dashboard")}
-                      aria-label="Home"
-                    >
-                      <Home className="h-4 w-4 mr-2" />
-                      {ui(currentLang, "Home")}
-                    </Button>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      {/* Added: current community chip in header on community page (and visible if membership exists) */}
-                      {isCommunity && myCommunity?.community && (
-                        <motion.button
-                          onClick={() => navigate("/community")}
-                          className="flex items-center gap-2 rounded-xl border bg-card/70 hover:bg-card/90 transition-colors px-2.5 py-1.5"
-                          aria-label="Current Community"
-                          title={myCommunity.community.name}
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                        >
-                          <img
-                            src={myCommunity.community.image ?? "/assets/Logo_.png"}
-                            alt={myCommunity.community.name}
-                            className="h-6 w-6 rounded-lg object-cover"
-                            onError={(e) => {
-                              const t = e.currentTarget as HTMLImageElement;
-                              if (t.src !== '/logo.png') t.src = '/logo.png';
-                              t.onerror = null;
-                            }}
-                          />
-                          <span className="text-xs font-medium truncate max-w-[120px]">
-                            {myCommunity.community.name}
-                          </span>
-                        </motion.button>
-                      )}
-                      {isCommunity && (
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          className="rounded-xl px-3 py-2"
-                          onClick={() => {
-                            navigate("/community/create");
-                          }}
-                          aria-label="Create Community"
-                        >
-                          {ui(currentLang, "Create Community")}
-                        </Button>
-                      )}
-                      {/* New: Show a back-to-community button on the Create page */}
-                      {isCommunityCreate && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="rounded-xl px-3 py-2"
-                          onClick={() => navigate("/community")}
-                          aria-label="Back to Community"
-                        >
-                          {ui(currentLang, "Community")}
-                        </Button>
-                      )}
-                      <LanguageSelect size="sm" />
-                    </div>
-                  )}
-                </div>
-              </div>
-              {/* Enhanced gradient bar with scroll progress (make slightly thicker) */}
-              <div className="relative h-[3px] w-full">
-                <div className="absolute inset-0 bg-muted/60" />
-                <motion.div
-                  className="h-full bg-[linear-gradient(90deg,theme(colors.primary/60),theme(colors.cyan.400/60),theme(colors.primary/60))] animate-gradient-shift"
-                  style={{ width: `${scrollProgress}%` }}
-                  transition={{ duration: 0.2 }}
-                  aria-hidden
-                />
-              </div>
-            </motion.div>
-          </div>
-        </motion.header>
-      )}
+      {/* Header extracted */}
+      <AppHeader
+        pathname={location.pathname}
+        title={title}
+        currentLang={currentLang}
+        myCommunity={myCommunity as any}
+        isCommunity={isCommunity}
+        isCommunityCreate={isCommunityCreate}
+        isLearnMoreSection={isLearnMoreSection}
+        hideTopBar={hideTopBar}
+        scrollProgress={scrollProgress}
+        onNavigate={(path) => navigate(path)}
+      />
 
       {/* Main Content */}
-      <main className="flex-1 pb-24">
-        {children}
-      </main>
+      <main className="flex-1 pb-24">{children}</main>
 
-      {/* Light backdrop under dock to fully cover bottom area on white theme */}
-      {isWhiteTheme && (
-        <div className="fixed inset-x-0 bottom-0 h-24 bg-[oklch(0.98_0.01_120)] z-10 pointer-events-none" />
-      )}
+      {/* Light backdrop under dock */}
+      {isWhiteTheme && <div className="fixed inset-x-0 bottom-0 h-24 bg-[oklch(0.98_0.01_120)] z-10 pointer-events-none" />}
 
-      {/* Enhanced Mac-style Dock (desktop) */}
+      {/* Dock extracted */}
       {!isOurTeam && (
-        <>
-          {/* Reveal zone to pop the dock when cursor hits bottom */}
-          <div
-            className="fixed inset-x-0 bottom-0 h-14 z-40 hidden md:block"
-            onMouseEnter={() => setDockVisible(true)}
-          />
-          <AnimatePresence>
-            {dockVisible && (
-              <motion.div
-                onMouseEnter={() => setDockVisible(true)}
-                onMouseLeave={() => setDockVisible(false)}
-                className="fixed left-1/2 -translate-x-1/2 z-40 hidden md:block bottom-12"
-                initial={{ opacity: 0, y: 20, scale: 0.9 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 20, scale: 0.9 }}
-                transition={{ duration: 0.3, ease: "easeOut" }}
-              >
-                {/* Ambient glow behind dock */}
-                <div className="absolute inset-0 bg-primary/5 rounded-[22px] blur-2xl scale-110 animate-glow-pulse" />
-                
-                <div className="relative flex items-end gap-5 rounded-[22px] border bg-white text-[oklch(0.35_0.03_120)] shadow-[0_28px_80px_-20px_rgba(0,0,0,0.25)] ring-1 ring-black/5 px-6 py-3">
-                  {/* Left side items */}
-                  {leftItems.map((item) => {
-                    const isActive = location.pathname === item.path;
-                    const Icon = item.icon;
-                    return (
-                      <motion.button
-                        key={item.path}
-                        onClick={() => navigate(item.path)}
-                        aria-label={ui(currentLang, item.label as any)}
-                        aria-current={isActive ? "page" : undefined}
-                        className="group relative grid place-items-center"
-                        whileHover={{ 
-                          scale: 1.25, 
-                          y: -8,
-                          rotate: isActive ? 0 : 5,
-                          transition: { duration: 0.2 }
-                        }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        <div
-                          className={`grid place-items-center size-16 rounded-3xl transition-all duration-150 glow-sweep
-                          ${isActive ? "bg-primary/20 text-primary shadow-[0_0_36px_-6px_theme(colors.primary/55)] ring-2 ring-primary/30" : "text-[oklch(0.45_0.03_120)] hover:text-[oklch(0.3_0.03_120)]"}
-                          hover:shadow-[0_16px_40px_-12px_rgba(0,0,0,0.12)] ring-0 active:ring-2 active:ring-primary/50`}
-                        >
-                          <Icon className="h-7 w-7" />
-                          {isActive && (
-                            <motion.span
-                              className="absolute -bottom-1 h-1.5 w-1.5 rounded-full bg-primary/90 shadow-[0_0_12px_theme(colors.primary/60)]"
-                              initial={{ scale: 0 }}
-                              animate={{ scale: 1 }}
-                              aria-hidden
-                            />
-                          )}
-                        </div>
-                        <span className="pointer-events-none absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black/70 px-2 py-0.5 text-[11px] text-white opacity-0 transition-opacity duration-150 group-hover:opacity-100">
-                          {ui(currentLang, item.label as any)}
-                        </span>
-                      </motion.button>
-                    );
-                  })}
-
-                  {/* Left Divider */}
-                  <div className="h-16 w-px bg-black/10 mx-2 shrink-0" aria-hidden />
-
-                  {/* Enhanced Embedded Voice Button centered */}
-                  <div
-                    className="group relative grid place-items-center shrink-0"
-                    aria-label={ui(currentLang, "Voice")}
-                    title={ui(currentLang, "Voice")}
-                  >
-                    <motion.div 
-                      className="grid place-items-center size-16 rounded-3xl transition-all duration-150 text-[oklch(0.45_0.03_120)] hover:text-[oklch(0.3_0.03_120)] hover:shadow-[0_16px_40px_-12px_rgba(0,0,0,0.12)]"
-                      whileHover={{ 
-                        scale: 1.25, 
-                        y: -8,
-                        transition: { duration: 0.2 }
-                      }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <VoiceButton
-                        embedInDock
-                        className="relative"
-                        onTranscript={handleVoiceCommand}
-                        transcribe={({ audio, language, contentType, filename }) =>
-                          transcribe({ audio, language: language ?? localeFromLang(currentLang), contentType, filename })
-                        }
-                        language={localeFromLang(currentLang)}
-                      />
-                    </motion.div>
-                    <span className="pointer-events-none absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black/70 px-2 py-0.5 text-[11px] text-white opacity-0 transition-opacity duration-150 group-hover:opacity-100">
-                      {ui(currentLang, "Voice")}
-                    </span>
-                  </div>
-
-                  {/* Right Divider */}
-                  <div className="h-16 w-px bg-black/10 mx-2 shrink-0" aria-hidden />
-
-                  {/* Right side items */}
-                  {rightItems.map((item) => {
-                    const isActive = location.pathname === item.path;
-                    const Icon = item.icon;
-                    return (
-                      <motion.button
-                        key={item.path}
-                        onClick={() => navigate(item.path)}
-                        aria-label={ui(currentLang, item.label as any)}
-                        aria-current={isActive ? "page" : undefined}
-                        className="group relative grid place-items-center"
-                        whileHover={{ 
-                          scale: 1.25, 
-                          y: -8,
-                          rotate: isActive ? 0 : -5,
-                          transition: { duration: 0.2 }
-                        }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        <div
-                          className={`grid place-items-center size-16 rounded-3xl transition-all duration-150 glow-sweep
-                          ${isActive ? "bg-primary/20 text-primary shadow-[0_0_36px_-6px_theme(colors.primary/55)] ring-2 ring-primary/30" : "text-[oklch(0.45_0.03_120)] hover:text-[oklch(0.3_0.03_120)]"}
-                          hover:shadow-[0_16px_40px_-12px_rgba(0,0,0,0.12)] ring-0 active:ring-2 active:ring-primary/50`}
-                        >
-                          <Icon className="h-7 w-7" />
-                          {isActive && (
-                            <motion.span
-                              className="absolute -bottom-1 h-1.5 w-1.5 rounded-full bg-primary/90 shadow-[0_0_12px_theme(colors.primary/60)]"
-                              initial={{ scale: 0 }}
-                              animate={{ scale: 1 }}
-                              aria-hidden
-                            />
-                          )}
-                        </div>
-                        <span className="pointer-events-none absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black/70 px-2 py-0.5 text-[11px] text-white opacity-0 transition-opacity duration-150 group-hover:opacity-100">
-                          {ui(currentLang, item.label as any)}
-                        </span>
-                      </motion.button>
-                    );
-                  })}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </>
+        <AppDock
+          visible={dockVisible}
+          setVisible={setDockVisible}
+          leftItems={leftItems}
+          rightItems={rightItems}
+          currentPath={location.pathname}
+          onNavigate={(path) => navigate(path)}
+          currentLang={currentLang}
+          isWhiteTheme={isWhiteTheme}
+          onTranscript={handleVoiceCommand}
+          transcribe={({ audio, language, contentType, filename }) =>
+            transcribe({ audio, language: language ?? localeFromLang(currentLang), contentType, filename })
+          }
+          language={localeFromLang(currentLang)}
+          hide={false}
+        />
       )}
 
       {/* Global Assistant */}
