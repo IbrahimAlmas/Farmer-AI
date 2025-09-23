@@ -9,7 +9,7 @@ export function SoilIntro({ onStart }: { onStart: () => void }) {
         <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight">
           Revolutionize Your Farming with AI‑Powered Soil Analysis
         </h1>
-        <p className="mt-3 text-sm sm:text-base text-muted-foreground">
+        <p className="mt-3 text-sm sm:text-base text-[oklch(0.4_0.03_120)]">
           Get instant, accurate soil health insights from a single photo. No expensive lab tests, no waiting. Just smarter farming decisions.
         </p>
       </div>
@@ -29,21 +29,21 @@ export function SoilIntro({ onStart }: { onStart: () => void }) {
                   <CameraIcon className="h-5 w-5" />
                 </div>
                 <div className="font-medium text-sm">1. Snap a Photo</div>
-                <div className="text-xs text-muted-foreground">Take a clear picture of your soil.</div>
+                <div className="text-xs text-[oklch(0.4_0.03_120)]">Take a clear picture of your soil.</div>
               </div>
               <div className="rounded-xl border p-4 bg-muted/30 text-center">
                 <div className="mx-auto mb-2 grid place-items-center size-10 rounded-full bg-emerald-100 text-emerald-700">
                   <Upload className="h-5 w-5" />
                 </div>
                 <div className="font-medium text-sm">2. Upload & Analyze</div>
-                <div className="text-xs text-muted-foreground">Our AI will analyze it in seconds.</div>
+                <div className="text-xs text-[oklch(0.4_0.03_120)]">Our AI will analyze it in seconds.</div>
               </div>
               <div className="rounded-xl border p-4 bg-muted/30 text-center">
                 <div className="mx-auto mb-2 grid place-items-center size-10 rounded-full bg-emerald-100 text-emerald-700">
                   <Wand2 className="h-5 w-5" />
                 </div>
                 <div className="font-medium text-sm">3. Get Insights</div>
-                <div className="text-xs text-muted-foreground">Receive a detailed report.</div>
+                <div className="text-xs text-[oklch(0.4_0.03_120)]">Receive a detailed report.</div>
               </div>
             </div>
 
@@ -76,8 +76,7 @@ export function SoilIntro({ onStart }: { onStart: () => void }) {
                 }}
               />
             </div>
-            {/* Keep visual preview minimal; actual progress bars are on page already */}
-            <div className="text-[11px] text-muted-foreground">
+            <div className="text-[11px] text-[oklch(0.45_0.03_120)]">
               *Estimates from photo analysis. Confirm with lab tests if needed.
             </div>
           </CardContent>
@@ -95,28 +94,28 @@ export function SoilIntro({ onStart }: { onStart: () => void }) {
                 <CheckCircle2 className="mt-0.5 h-4 w-4 text-emerald-600" />
                 <div>
                   <div className="font-semibold">Boost Yields</div>
-                  <div className="text-muted-foreground">Optimize conditions for maximum crop production.</div>
+                  <div className="text-[oklch(0.4_0.03_120)]">Optimize conditions for maximum crop production.</div>
                 </div>
               </div>
               <div className="flex items-start gap-2">
                 <CheckCircle2 className="mt-0.5 h-4 w-4 text-emerald-600" />
                 <div>
                   <div className="font-semibold">Save Money</div>
-                  <div className="text-muted-foreground">Apply only the necessary nutrients and fertilizers.</div>
+                  <div className="text-[oklch(0.4_0.03_120)]">Apply only the necessary nutrients and fertilizers.</div>
                 </div>
               </div>
               <div className="flex items-start gap-2">
                 <CheckCircle2 className="mt-0.5 h-4 w-4 text-emerald-600" />
                 <div>
                   <div className="font-semibold">Enhance Sustainability</div>
-                  <div className="text-muted-foreground">Prevent nutrient runoff and improve water retention.</div>
+                  <div className="text-[oklch(0.4_0.03_120)]">Prevent nutrient runoff and improve water retention.</div>
                 </div>
               </div>
               <div className="flex items-start gap-2">
                 <CheckCircle2 className="mt-0.5 h-4 w-4 text-emerald-600" />
                 <div>
                   <div className="font-semibold">Detect Problems Early</div>
-                  <div className="text-muted-foreground">Identify pH imbalances and other issues.</div>
+                  <div className="text-[oklch(0.4_0.03_120)]">Identify pH imbalances and other issues.</div>
                 </div>
               </div>
             </div>
