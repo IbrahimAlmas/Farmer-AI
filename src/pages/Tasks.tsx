@@ -227,7 +227,7 @@ export default function Tasks() {
               <div className="text-xs font-medium text-emerald-500">Analysis Complete ✨</div>
             </CardHeader>
             <CardContent className="space-y-3">
-              {filteredSuggestions.map((s, idx) => (
+              {filteredSuggestions.slice(0, 3).map((s, idx) => (
                 <div
                   key={idx}
                   className="flex items-center justify-between gap-3 rounded-xl ring-1 ring-black/10 bg-[oklch(0.98_0.01_120)] px-3 py-3"
@@ -325,7 +325,7 @@ export default function Tasks() {
               </CardHeader>
               <CardContent className="space-y-2">
                 {visibleTasks?.length ? (
-                  visibleTasks.map((t: any) => (
+                  visibleTasks.slice(0, 3).map((t: any) => (
                     <div
                       key={t._id}
                       className="flex items-center justify-between border rounded-md p-2"
