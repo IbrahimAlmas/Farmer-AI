@@ -52,6 +52,10 @@ import FarmNew from "@/pages/FarmNew.tsx";
 function RouteSyncer() {
   const location = useLocation();
   useEffect(() => {
+    // Only post to parent if inside an iframe
+    const isEmbedded = window.self !== window.top;
+    if (!isEmbedded) return;
+
     window.parent.postMessage(
       { type: "iframe-route-change", path: location.pathname },
       "*",
@@ -59,6 +63,10 @@ function RouteSyncer() {
   }, [location.pathname]);
 
   useEffect(() => {
+    // Only listen to parent navigation messages if inside an iframe
+    const isEmbedded = window.self !== window.top;
+    if (!isEmbedded) return;
+
     function handleMessage(event: MessageEvent) {
       if (event.data?.type === "navigate") {
         if (event.data.direction === "back") window.history.back();
