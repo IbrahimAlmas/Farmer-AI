@@ -1,7 +1,7 @@
 import { motion, useScroll, useTransform, useInView } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowRight, Mic, Sprout, Camera, ShoppingCart, Languages, ShieldCheck, Loader2, Cloud, Sparkles, MapPin, Leaf, BarChart3, Shield, Users2, Zap, Droplets, Sun, Cpu, Globe, TrendingUp, CheckCircle, FlaskConical } from "lucide-react";
+import { ArrowRight, Mic, Sprout, Camera, ShoppingCart, Languages, ShieldCheck, Loader2, Cloud, Sparkles, MapPin, Leaf, BarChart3, Shield, Users2, Zap, Droplets, Sun, Cpu, Globe, TrendingUp, CheckCircle, FlaskConical, ArrowDown } from "lucide-react";
 import { useNavigate } from "react-router";
 import { useMemo, useEffect, useState, useRef } from "react";
 import { api } from "@/convex/_generated/api";
@@ -221,9 +221,9 @@ export default function Landing() {
           </div>
 
           {/* Horizontal flow on desktop, vertical on mobile */}
-          <div className="flex flex-col md:flex-row items-center md:items-stretch justify-center gap-4 md:gap-3">
-            {/* Step */}
-            <div className="flex-1 min-w-[180px]">
+          <div className="flex flex-col items-stretch justify-center gap-3">
+            {/* Step 1 */}
+            <div className="flex-1">
               <div className="h-full rounded-xl border border-neutral-200 bg-white p-4">
                 <div className="text-sm font-semibold text-[oklch(0.22_0.02_120)]">Voice/Text Input</div>
                 <div className="mt-1 text-xs text-[oklch(0.45_0.03_120)]">
@@ -232,12 +232,13 @@ export default function Landing() {
               </div>
             </div>
 
-            {/* Arrow */}
-            <div className="md:rotate-0 rotate-90 text-[oklch(0.35_0.03_120)]">
-              <ArrowRight className="h-6 w-6" />
+            {/* Arrow down */}
+            <div className="flex items-center justify-center text-[oklch(0.35_0.03_120)]">
+              <ArrowDown className="h-6 w-6" />
             </div>
 
-            <div className="flex-1 min-w-[180px]">
+            {/* Step 2 */}
+            <div className="flex-1">
               <div className="h-full rounded-xl border border-neutral-200 bg-white p-4">
                 <div className="text-sm font-semibold text-[oklch(0.22_0.02_120)]">AI Processing</div>
                 <div className="mt-1 text-xs text-[oklch(0.45_0.03_120)]">
@@ -246,11 +247,13 @@ export default function Landing() {
               </div>
             </div>
 
-            <div className="md:rotate-0 rotate-90 text-[oklch(0.35_0.03_120)]">
-              <ArrowRight className="h-6 w-6" />
+            {/* Arrow down */}
+            <div className="flex items-center justify-center text-[oklch(0.35_0.03_120)]">
+              <ArrowDown className="h-6 w-6" />
             </div>
 
-            <div className="flex-1 min-w-[180px]">
+            {/* Step 3 */}
+            <div className="flex-1">
               <div className="h-full rounded-xl border border-neutral-200 bg-white p-4">
                 <div className="text-sm font-semibold text-[oklch(0.22_0.02_120)]">Convex Backend</div>
                 <div className="mt-1 text-xs text-[oklch(0.45_0.03_120)]">
@@ -259,11 +262,13 @@ export default function Landing() {
               </div>
             </div>
 
-            <div className="md:rotate-0 rotate-90 text-[oklch(0.35_0.03_120)]">
-              <ArrowRight className="h-6 w-6" />
+            {/* Arrow down */}
+            <div className="flex items-center justify-center text-[oklch(0.35_0.03_120)]">
+              <ArrowDown className="h-6 w-6" />
             </div>
 
-            <div className="flex-1 min-w-[180px]">
+            {/* Step 4 */}
+            <div className="flex-1">
               <div className="h-full rounded-xl border border-neutral-200 bg-white p-4">
                 <div className="text-sm font-semibold text-[oklch(0.22_0.02_120)]">Farm & Weather Data</div>
                 <div className="mt-1 text-xs text-[oklch(0.45_0.03_120)]">
@@ -272,11 +277,13 @@ export default function Landing() {
               </div>
             </div>
 
-            <div className="md:rotate-0 rotate-90 text-[oklch(0.35_0.03_120)]">
-              <ArrowRight className="h-6 w-6" />
+            {/* Arrow down */}
+            <div className="flex items-center justify-center text-[oklch(0.35_0.03_120)]">
+              <ArrowDown className="h-6 w-6" />
             </div>
 
-            <div className="flex-1 min-w-[180px]">
+            {/* Step 5 */}
+            <div className="flex-1">
               <div className="h-full rounded-xl border border-neutral-200 bg-white p-4">
                 <div className="text-sm font-semibold text-[oklch(0.22_0.02_120)]">Actions & Insights</div>
                 <div className="mt-1 text-xs text-[oklch(0.45_0.03_120)]">
@@ -285,11 +292,13 @@ export default function Landing() {
               </div>
             </div>
 
-            <div className="md:rotate-0 rotate-90 text-[oklch(0.35_0.03_120)]">
-              <ArrowRight className="h-6 w-6" />
+            {/* Arrow down */}
+            <div className="flex items-center justify-center text-[oklch(0.35_0.03_120)]">
+              <ArrowDown className="h-6 w-6" />
             </div>
 
-            <div className="flex-1 min-w-[180px]">
+            {/* Step 6 */}
+            <div className="flex-1">
               <div className="h-full rounded-xl border border-neutral-200 bg-white p-4">
                 <div className="text-sm font-semibold text-[oklch(0.22_0.02_120)]">Results & Feedback</div>
                 <div className="mt-1 text-xs text-[oklch(0.45_0.03_120)]">
