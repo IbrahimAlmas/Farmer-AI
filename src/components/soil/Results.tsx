@@ -1,5 +1,4 @@
 import type React from "react";
-import { RefObject } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
