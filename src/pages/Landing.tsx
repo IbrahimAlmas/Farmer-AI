@@ -39,6 +39,7 @@ export default function Landing() {
             <nav className="hidden md:flex items-center gap-6 text-sm">
               <a href="#features" className="text-[oklch(0.4_0.02_120)] hover:text-[oklch(0.3_0.03_120)]">Features</a>
               <a href="#stack" className="text-[oklch(0.4_0.02_120)] hover:text-[oklch(0.3_0.03_120)]">Tech Stack</a>
+              <a href="#flow" className="text-[oklch(0.4_0.02_120)] hover:text-[oklch(0.3_0.03_120)]">Tech Flow</a>
               <a href="/reviews" className="text-[oklch(0.4_0.02_120)] hover:text-[oklch(0.3_0.03_120)]">Reviews</a>
             </nav>
 
@@ -209,7 +210,112 @@ export default function Landing() {
         </div>
       </section>
 
-      
+      {/* Technical Approach — Flow (Plain White) */}
+      <section id="flow" className="py-20 bg-white">
+        <div className="mx-auto w-full max-w-6xl px-4">
+          <div className="text-center mb-10">
+            <h3 className="text-3xl md:text-4xl font-extrabold text-[oklch(0.22_0.02_120)]">Technical Approach — Flow</h3>
+            <p className="mt-2 text-[oklch(0.35_0.03_120)]">
+              High-level system flow for Root AI. Clean, simple, and easy to follow.
+            </p>
+          </div>
+
+          {/* Horizontal flow on desktop, vertical on mobile */}
+          <div className="flex flex-col md:flex-row items-center md:items-stretch justify-center gap-4 md:gap-3">
+            {/* Step */}
+            <div className="flex-1 min-w-[180px]">
+              <div className="h-full rounded-xl border border-neutral-200 bg-white p-4">
+                <div className="text-sm font-semibold text-[oklch(0.22_0.02_120)]">Voice/Text Input</div>
+                <div className="mt-1 text-xs text-[oklch(0.45_0.03_120)]">
+                  User speaks or types commands in any supported language.
+                </div>
+              </div>
+            </div>
+
+            {/* Arrow */}
+            <div className="md:rotate-0 rotate-90 text-[oklch(0.35_0.03_120)]">
+              <ArrowRight className="h-6 w-6" />
+            </div>
+
+            <div className="flex-1 min-w-[180px]">
+              <div className="h-full rounded-xl border border-neutral-200 bg-white p-4">
+                <div className="text-sm font-semibold text-[oklch(0.22_0.02_120)]">AI Processing</div>
+                <div className="mt-1 text-xs text-[oklch(0.45_0.03_120)]">
+                  Natural language understanding, intent detection, and routing.
+                </div>
+              </div>
+            </div>
+
+            <div className="md:rotate-0 rotate-90 text-[oklch(0.35_0.03_120)]">
+              <ArrowRight className="h-6 w-6" />
+            </div>
+
+            <div className="flex-1 min-w-[180px]">
+              <div className="h-full rounded-xl border border-neutral-200 bg-white p-4">
+                <div className="text-sm font-semibold text-[oklch(0.22_0.02_120)]">Convex Backend</div>
+                <div className="mt-1 text-xs text-[oklch(0.45_0.03_120)]">
+                  Secure server functions, real-time data, and storage.
+                </div>
+              </div>
+            </div>
+
+            <div className="md:rotate-0 rotate-90 text-[oklch(0.35_0.03_120)]">
+              <ArrowRight className="h-6 w-6" />
+            </div>
+
+            <div className="flex-1 min-w-[180px]">
+              <div className="h-full rounded-xl border border-neutral-200 bg-white p-4">
+                <div className="text-sm font-semibold text-[oklch(0.22_0.02_120)]">Farm & Weather Data</div>
+                <div className="mt-1 text-xs text-[oklch(0.45_0.03_120)]">
+                  Farms, soil tests, simulations, market prices, and weather.
+                </div>
+              </div>
+            </div>
+
+            <div className="md:rotate-0 rotate-90 text-[oklch(0.35_0.03_120)]">
+              <ArrowRight className="h-6 w-6" />
+            </div>
+
+            <div className="flex-1 min-w-[180px]">
+              <div className="h-full rounded-xl border border-neutral-200 bg-white p-4">
+                <div className="text-sm font-semibold text-[oklch(0.22_0.02_120)]">Actions & Insights</div>
+                <div className="mt-1 text-xs text-[oklch(0.45_0.03_120)]">
+                  Execute tasks, run simulations, get irrigation advice.
+                </div>
+              </div>
+            </div>
+
+            <div className="md:rotate-0 rotate-90 text-[oklch(0.35_0.03_120)]">
+              <ArrowRight className="h-6 w-6" />
+            </div>
+
+            <div className="flex-1 min-w-[180px]">
+              <div className="h-full rounded-xl border border-neutral-200 bg-white p-4">
+                <div className="text-sm font-semibold text-[oklch(0.22_0.02_120)]">Results & Feedback</div>
+                <div className="mt-1 text-xs text-[oklch(0.45_0.03_120)]">
+                  Clear UI updates, toast feedback, and optional voice reply.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Legend */}
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-3 text-xs text-[oklch(0.35_0.03_120)]">
+            <div className="rounded-xl border border-neutral-200 bg-white p-3">
+              <div className="font-semibold text-[oklch(0.22_0.02_120)]">Simple & Clear</div>
+              <div className="mt-1">No gradients or shadows — plain white background for maximum clarity.</div>
+            </div>
+            <div className="rounded-xl border border-neutral-200 bg-white p-3">
+              <div className="font-semibold text-[oklch(0.22_0.02_120)]">Readable Text</div>
+              <div className="mt-1">All labels use dark text to ensure strong contrast and accessibility.</div>
+            </div>
+            <div className="rounded-xl border border-neutral-200 bg-white p-3">
+              <div className="font-semibold text-[oklch(0.22_0.02_120)]">Responsive Layout</div>
+              <div className="mt-1">Horizontal on desktop; vertical with rotated arrows on mobile.</div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Testimonials */}
       <section className="mx-auto w-full max-w-6xl px-4 py-20">
