@@ -16,6 +16,7 @@ export function SoilCapture({
   stopCamera,
   capturePhoto,
   fileInputRef,
+  onRetryPlay,
 }: {
   cameraOn: boolean;
   cameraReady: boolean;
@@ -27,6 +28,7 @@ export function SoilCapture({
   stopCamera: () => void;
   capturePhoto: () => Promise<void>;
   fileInputRef: React.MutableRefObject<HTMLInputElement | null>;
+  onRetryPlay: () => Promise<void>;
 }) {
   return (
     <div className="">
@@ -39,6 +41,19 @@ export function SoilCapture({
             <CardContent className="space-y-4">
               {cameraOn ? (
                 <div className="relative rounded-xl border overflow-hidden bg-muted">
+                  {cameraError && cameraError.toLowerCase().includes("autoplay") && (
+                    <div className="absolute z-10 top-3 right-3 flex items-center gap-2 rounded-full bg-black/60 text-white px-3 py-1 text-xs">
+                      <span>Preview paused</span>
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        className="h-7 px-2 py-0 text-xs bg-white text-black hover:bg-white/90"
+                        onClick={onRetryPlay}
+                      >
+                        Play Preview
+                      </Button>
+                    </div>
+                  )}
                   <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/10 via-transparent to-transparent" />
                   <div className="aspect-[4/3] w-full">
                     <video ref={videoRef} className="h-full w-full object-cover" playsInline muted autoPlay />

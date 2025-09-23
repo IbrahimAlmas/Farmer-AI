@@ -188,6 +188,11 @@ export default function SoilTest() {
       if (videoRef.current) {
         const v = videoRef.current;
         v.srcObject = stream;
+        // Ensure inline playback for iOS/Safari and mute for autoplay policies
+        v.setAttribute("playsinline", "true");
+        v.playsInline = true;
+        v.muted = true;
+
         // Wait metadata for correct dimensions
         await new Promise<void>((resolve) => {
           const onLoaded = () => {
@@ -202,15 +207,17 @@ export default function SoilTest() {
         } catch (playErr: any) {
           // Autoplay sometimes requires a user gesture
           setCameraError(
-            "Tap 'Enable Camera' again to start preview (autoplay blocked). Or use 'Upload Photo'."
+            "Autoplay blocked. Tap 'Play Preview' to start or use 'Upload Photo'."
           );
-          // We still consider camera on; user can press capture or retry
+          // Consider camera on; user can press Play Preview
         }
       }
 
       setCameraOn(true);
       setCameraReady(true);
-      setCameraError(null);
+      // Do not clear cameraError here if autoplay was blocked
+      // Only clear if there is no error
+      if (!cameraError) setCameraError(null);
     } catch (e: any) {
       const msg =
         e?.name === "NotAllowedError"
@@ -221,6 +228,22 @@ export default function SoilTest() {
       setCameraError(msg);
       setCameraOn(false);
       setCameraReady(false);
+    }
+  };
+
+  // Add: explicit retry for autoplay-blocked previews
+  const retryVideoPlay = async () => {
+    try {
+      const v = videoRef.current;
+      if (!v) return;
+      v.setAttribute("playsinline", "true");
+      v.playsInline = true;
+      v.muted = true;
+      await v.play();
+      setCameraError(null);
+      setCameraReady(true);
+    } catch {
+      setCameraError("Autoplay still blocked. Try clicking 'Play Preview' again or use 'Upload Photo'.");
     }
   };
 
@@ -347,6 +370,7 @@ export default function SoilTest() {
                   stopCamera={stopCamera}
                   capturePhoto={capturePhoto}
                   fileInputRef={fileInputRef}
+                  onRetryPlay={retryVideoPlay}
                 />
               </motion.div>
             )}
