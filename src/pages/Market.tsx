@@ -47,6 +47,14 @@ const nameHash = (s: string) => {
   return h;
 };
 
+const onlineImageFor = (name: string) => {
+  const key = String(name).toLowerCase();
+  const mapped = vegImages[key];
+  if (mapped) return mapped;
+  // Generic online fallback using Unsplash source with query based on the vegetable name
+  return `https://source.unsplash.com/600x400/?${encodeURIComponent(key)},vegetable`;
+};
+
 export default function Market() {
   const profile = useQuery(api.profiles.get);
   const items = useQuery(api.market_prices.getVegetablePrices);
@@ -144,9 +152,8 @@ export default function Market() {
                   className="grid grid-cols-2 sm:grid-cols-3 gap-3"
                 >
                   {items.map((it) => {
-                    // Use local assets deterministically so images always load and vary by item
-                    const idx = nameHash(it.name) % localImages.length;
-                    const img = localImages[idx];
+                    // Use online images (curated map first, then generic query)
+                    const img = onlineImageFor(it.name);
                     return (
                       <div
                         key={it.name}
@@ -160,10 +167,12 @@ export default function Market() {
                             loading="lazy"
                             onError={(e) => {
                               const target = e.currentTarget as HTMLImageElement;
-                              if (target.src !== "/logo_bg.svg") {
-                                target.src = "/logo_bg.svg";
+                              const fallback = "https://source.unsplash.com/600x400/?vegetables,market";
+                              if (target.src !== fallback) {
+                                target.src = fallback;
+                              } else {
+                                target.onerror = null;
                               }
-                              target.onerror = null;
                             }}
                           />
                         </div>
