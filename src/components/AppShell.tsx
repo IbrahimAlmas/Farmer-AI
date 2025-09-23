@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { LogoDropdown } from "@/components/LogoDropdown";
-import VoiceButton from "@/components/VoiceButton";
 import { useAction, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { 
@@ -17,7 +16,6 @@ import { useLocation, useNavigate } from "react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import { localeFromLang, type LangKey, ui } from "@/lib/i18n";
 import { toast } from "sonner";
-import { MoreHorizontal } from "lucide-react";
 import LanguageSelect from "@/components/LanguageSelect";
 import { useEffect, useState } from "react";
 import GlobalAssistant from "@/components/GlobalAssistant";
