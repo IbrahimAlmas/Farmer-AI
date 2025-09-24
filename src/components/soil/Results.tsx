@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Image as ImageIcon, RefreshCw, Upload, Wand2 } from "lucide-react";
 import type { Analysis } from "@/types/soil";
+import { type LangKey } from "@/lib/i18n";
 
 export function SoilResults({
   preview,
@@ -16,6 +17,8 @@ export function SoilResults({
   runCameraAnalysis,
   onRetake,
   fileInputRef,
+  lang,
+  tr,
 }: {
   preview: string | null;
   loading: boolean;
@@ -25,6 +28,8 @@ export function SoilResults({
   runCameraAnalysis: () => Promise<void>;
   onRetake: () => void;
   fileInputRef: React.MutableRefObject<HTMLInputElement | null>;
+  lang: LangKey;
+  tr: (k: string, f: string) => string;
 }) {
   return (
     <div className="max-w-5xl mx-auto space-y-6">
@@ -33,32 +38,32 @@ export function SoilResults({
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-base text-foreground">
               <ImageIcon className="h-4 w-4" />
-              Photo
+              {tr("soil.results.photo", "Photo")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="relative rounded-xl border overflow-hidden bg-background">
-              {preview && <img src={preview} alt="Soil preview" className="w-full object-cover max-h-[480px]" />}
+              {preview && <img src={preview} alt={tr("soil.review.preview_alt", "Soil preview")} className="w-full object-cover max-h-[480px]" />}
               <div className="absolute bottom-3 left-3 right-3 flex flex-wrap gap-2 justify-center">
                 <Button onClick={runCameraAnalysis} disabled={loading || !file} className="gap-2">
                   {loading ? (
                     <>
                       <RefreshCw className="h-4 w-4 animate-spin" />
-                      Re-Analyzing…
+                      {tr("soil.results.reanalyzing", "Re-Analyzing…")}
                     </>
                   ) : (
                     <>
                       <Wand2 className="h-4 w-4" />
-                      Analyze Again
+                      {tr("soil.results.analyze_again", "Analyze Again")}
                     </>
                   )}
                 </Button>
                 <Button variant="secondary" onClick={onRetake}>
-                  Retake
+                  {tr("soil.retake", "Retake")}
                 </Button>
                 <Button variant="outline" className="gap-2" onClick={() => fileInputRef.current?.click()}>
                   <Upload className="h-4 w-4" />
-                  Add More
+                  {tr("soil.add_more", "Add More")}
                 </Button>
               </div>
             </div>
@@ -69,27 +74,27 @@ export function SoilResults({
       <div>
         <Card className="overflow-hidden border-emerald-200 bg-emerald-50/70 dark:bg-emerald-900/10">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base text-black">Analysis Results</CardTitle>
+            <CardTitle className="text-base text-black">{tr("soil.results.title", "Analysis Results")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {errorMsg && (
               <Alert variant="destructive" className="rounded-lg">
-                <AlertTitle>Error</AlertTitle>
+                <AlertTitle>{tr("common.error", "Error")}</AlertTitle>
                 <AlertDescription>{errorMsg}</AlertDescription>
               </Alert>
             )}
 
-            {!result && <div className="text-sm text-muted-foreground">No results available. Analyze the photo to see results here.</div>}
+            {!result && <div className="text-sm text-muted-foreground">{tr("soil.results.empty", "No results available. Analyze the photo to see results here.")}</div>}
 
             {result && (
               <div className="space-y-6">
                 <div className="grid gap-3 sm:grid-cols-2">
                   <div className="rounded-lg border border-emerald-200 p-4 bg-emerald-50/60 dark:bg-emerald-900/20">
-                    <div className="text-xs text-black mb-1 font-medium">pH</div>
+                    <div className="text-xs text-black mb-1 font-medium">{tr("soil.metrics.ph", "pH")}</div>
                     <div className="flex items-baseline justify-between">
                       <div className="text-2xl font-semibold text-black">{result.ph}</div>
                       <Badge variant="outline" className="border-emerald-400 text-black bg-emerald-100 dark:bg-emerald-800">
-                        Ideal: 6.0–7.5
+                        {tr("soil.metrics.ph.ideal", "Ideal: 6.0–7.5")}
                       </Badge>
                     </div>
                     <div className="mt-3">
@@ -98,11 +103,11 @@ export function SoilResults({
                   </div>
 
                   <div className="rounded-lg border border-emerald-200 p-4 bg-emerald-50/60 dark:bg-emerald-900/20">
-                    <div className="text-xs text-black mb-1 font-medium">Moisture</div>
+                    <div className="text-xs text-black mb-1 font-medium">{tr("soil.metrics.moisture", "Moisture")}</div>
                     <div className="flex items-baseline justify-between">
                       <div className="text-2xl font-semibold text-black">{result.moisture}%</div>
                       <Badge variant="outline" className="border-emerald-400 text-black bg-emerald-100 dark:bg-emerald-800">
-                        Target: 20–40%
+                        {tr("soil.metrics.moisture.target", "Target: 20–40%")}
                       </Badge>
                     </div>
                     <div className="mt-3">
@@ -113,25 +118,25 @@ export function SoilResults({
 
                 <div className="grid gap-3 sm:grid-cols-3">
                   <div className="rounded-lg border border-emerald-200 p-4 bg-white dark:bg-emerald-900/10">
-                    <div className="text-xs text-black mb-1 font-medium">Nitrogen</div>
-                    <div className="text-xl font-semibold text-black">{result.nitrogen} mg/kg</div>
+                    <div className="text-xs text-black mb-1 font-medium">{tr("soil.metrics.nitrogen", "Nitrogen")}</div>
+                    <div className="text-xl font-semibold text-black">{result.nitrogen} {tr("soil.units.mgkg", "mg/kg")}</div>
                   </div>
                   <div className="rounded-lg border border-emerald-200 p-4 bg-white dark:bg-emerald-900/10">
-                    <div className="text-xs text-black mb-1 font-medium">Phosphorus</div>
-                    <div className="text-xl font-semibold text-black">{result.phosphorus} mg/kg</div>
+                    <div className="text-xs text-black mb-1 font-medium">{tr("soil.metrics.phosphorus", "Phosphorus")}</div>
+                    <div className="text-xl font-semibold text-black">{result.phosphorus} {tr("soil.units.mgkg", "mg/kg")}</div>
                   </div>
                   <div className="rounded-lg border border-emerald-200 p-4 bg-white dark:bg-emerald-900/10">
-                    <div className="text-xs text-black mb-1 font-medium">Potassium</div>
-                    <div className="text-xl font-semibold text-black">{result.potassium} mg/kg</div>
+                    <div className="text-xs text-black mb-1 font-medium">{tr("soil.metrics.potassium", "Potassium")}</div>
+                    <div className="text-xl font-semibold text-black">{result.potassium} {tr("soil.units.mgkg", "mg/kg")}</div>
                   </div>
                 </div>
 
                 <div className="rounded-lg border border-emerald-200 p-4 bg-emerald-50/60 dark:bg-emerald-900/20">
-                  <div className="text-xs text-black mb-2 font-medium">Organic Matter</div>
+                  <div className="text-xs text-black mb-2 font-medium">{tr("soil.metrics.organic_matter", "Organic Matter")}</div>
                   <div className="flex items-baseline justify-between">
                     <div className="text-2xl font-semibold text-black">{result.organicMatter}%</div>
                     <Badge variant="outline" className="border-emerald-400 text-black bg-emerald-100 dark:bg-emerald-800">
-                      Healthy: 3–6%
+                      {tr("soil.metrics.organic_matter.healthy", "Healthy: 3–6%")}
                     </Badge>
                   </div>
                   <div className="mt-3">
@@ -140,7 +145,7 @@ export function SoilResults({
                 </div>
 
                 <div>
-                  <div className="text-xs text-black mb-2 font-medium">Recommendations</div>
+                  <div className="text-xs text-black mb-2 font-medium">{tr("soil.results.recommendations", "Recommendations")}</div>
                   <ul className="list-disc pl-5 space-y-1 text-sm text-black">
                     {result.recommendations.map((r, i) => (
                       <li key={i}>{r}</li>

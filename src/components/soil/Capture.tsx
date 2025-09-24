@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Camera as CameraIcon, Play, RefreshCw, Upload } from "lucide-react";
+import { type LangKey } from "@/lib/i18n";
 
 export function SoilCapture({
   cameraOn,
@@ -17,6 +18,8 @@ export function SoilCapture({
   capturePhoto,
   fileInputRef,
   onRetryPlay,
+  lang,
+  tr,
 }: {
   cameraOn: boolean;
   cameraReady: boolean;
@@ -29,6 +32,8 @@ export function SoilCapture({
   capturePhoto: () => Promise<void>;
   fileInputRef: React.MutableRefObject<HTMLInputElement | null>;
   onRetryPlay: () => Promise<void>;
+  lang: LangKey;
+  tr: (k: string, f: string) => string;
 }) {
   return (
     <div className="">
@@ -36,21 +41,23 @@ export function SoilCapture({
         <div className="">
           <Card className="overflow-hidden backdrop-blur supports-[backdrop-filter]:bg-card/70">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xl sm:text-2xl font-semibold">Soil Test</CardTitle>
+              <CardTitle className="text-xl sm:text-2xl font-semibold">
+                {tr("soil.capture.title", "Soil Test")}
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {cameraOn ? (
                 <div className="relative rounded-xl border overflow-hidden bg-muted">
                   {cameraError && cameraError.toLowerCase().includes("autoplay") && (
                     <div className="absolute z-10 top-3 right-3 flex items-center gap-2 rounded-full bg-black/60 text-white px-3 py-1 text-xs">
-                      <span>Preview paused</span>
+                      <span>{tr("soil.capture.preview_paused", "Preview paused")}</span>
                       <Button
                         size="sm"
                         variant="secondary"
                         className="h-7 px-2 py-0 text-xs bg-white text-black hover:bg-white/90"
                         onClick={onRetryPlay}
                       >
-                        Play Preview
+                        {tr("soil.capture.play_preview", "Play Preview")}
                       </Button>
                     </div>
                   )}
@@ -63,7 +70,7 @@ export function SoilCapture({
                     <div className="h-[55%] w-[70%] max-w-[520px] rounded-2xl border border-white/30 shadow-[0_0_0_9999px_rgba(0,0,0,0.08)]" />
                   </div>
                   <div className="pointer-events-none absolute top-3 left-3 text-[11px] font-medium px-2 py-0.5 rounded-full bg-black/40 text-white">
-                    Aim at bare soil, avoid leaves/tools
+                    {tr("soil.capture.frame_hint", "Aim at bare soil, avoid leaves/tools")}
                   </div>
 
                   <div className="absolute bottom-3 left-3 right-3 flex items-center justify-center">
@@ -72,18 +79,18 @@ export function SoilCapture({
                         {loading ? (
                           <>
                             <RefreshCw className="h-4 w-4 animate-spin" />
-                            Processing…
+                            {tr("soil.capture.processing", "Processing…")}
                           </>
                         ) : (
                           <>
                             <CameraIcon className="h-4 w-4" />
-                            Click Photo
+                            {tr("soil.capture.click_photo", "Click Photo")}
                           </>
                         )}
                       </Button>
                       <Button variant="outline" onClick={stopCamera} className="gap-2">
                         <RefreshCw className="h-4 w-4" />
-                        Stop
+                        {tr("soil.capture.stop", "Stop")}
                       </Button>
                     </div>
                   </div>
@@ -104,10 +111,10 @@ export function SoilCapture({
                     />
                     <div className="grid gap-2 text-sm text-muted-foreground">
                       <div className="flex items-center justify-center gap-2">
-                        <Badge variant="outline">Tip</Badge>
-                        Use natural light • Focus on bare soil • Keep phone steady
+                        <Badge variant="outline">{tr("soil.capture.tip", "Tip")}</Badge>
+                        {tr("soil.capture.tips_line", "Use natural light • Focus on bare soil • Keep phone steady")}
                       </div>
-                      <div>Or upload a clear close-up if your camera isn't available.</div>
+                      <div>{tr("soil.capture.upload_alt", "Or upload a clear close-up if your camera isn't available.")}</div>
                     </div>
                     <div className="flex flex-wrap items-center justify-center gap-3">
                       <Button
@@ -116,7 +123,7 @@ export function SoilCapture({
                         className="gap-2 px-6 py-6 text-base sm:text-lg rounded-xl w-full sm:w-auto min-w-[200px] bg-amber-600 hover:bg-amber-500 text-white shadow-md"
                       >
                         <Play className="h-5 w-5" />
-                        Enable Camera
+                        {tr("soil.enable_camera", "Enable Camera")}
                       </Button>
                       <Button
                         variant="default"
@@ -124,16 +131,18 @@ export function SoilCapture({
                         onClick={() => fileInputRef.current?.click()}
                       >
                         <Upload className="h-5 w-5" />
-                        Upload Photo
+                        {tr("soil.upload_photo", "Upload Photo")}
                       </Button>
                     </div>
 
                     <details className="w-full max-w-xl mx-auto text-left mt-1">
-                      <summary className="text-xs text-muted-foreground cursor-pointer">Having trouble enabling camera?</summary>
+                      <summary className="text-xs text-muted-foreground cursor-pointer">
+                        {tr("soil.capture.trouble_title", "Having trouble enabling camera?")}
+                      </summary>
                       <div className="text-xs text-muted-foreground mt-2 space-y-1">
-                        <p>1) Allow camera permission in your browser settings.</p>
-                        <p>2) Switch to a browser like Chrome, Safari, or Edge.</p>
-                        <p>3) If still blocked, use Upload Photo.</p>
+                        <p>{tr("soil.capture.trouble.1", "1) Allow camera permission in your browser settings.")}</p>
+                        <p>{tr("soil.capture.trouble.2", "2) Switch to a browser like Chrome, Safari, or Edge.")}</p>
+                        <p>{tr("soil.capture.trouble.3", "3) If still blocked, use Upload Photo.")}</p>
                       </div>
                     </details>
                   </div>
@@ -141,7 +150,9 @@ export function SoilCapture({
               )}
 
               {cameraError && !cameraReady && (
-                <div className="text-xs text-red-600 text-center">{cameraError} — You can still upload a photo.</div>
+                <div className="text-xs text-red-600 text-center">
+                  {cameraError} — {tr("soil.capture.can_upload", "You can still upload a photo.")}
+                </div>
               )}
 
               <canvas ref={canvasRef} className="hidden" />
@@ -152,35 +163,37 @@ export function SoilCapture({
         <div className="flex flex-col gap-4">
           <Card className="overflow-hidden backdrop-blur supports-[backdrop-filter]:bg-card/70">
             <CardHeader className="pb-2">
-              <CardTitle className="text-base">Pro tips</CardTitle>
+              <CardTitle className="text-base">{tr("soil.capture.pro_tips", "Pro tips")}</CardTitle>
             </CardHeader>
             <CardContent className="text-xs text-muted-foreground space-y-2">
               <ul className="list-disc pl-5 space-y-1">
-                <li>Frame only the soil surface</li>
-                <li>Avoid shadows; use daylight</li>
-                <li>Hold steady for sharp focus</li>
+                <li>{tr("soil.capture.tip.1", "Frame only the soil surface")}</li>
+                <li>{tr("soil.capture.tip.2", "Avoid shadows; use daylight")}</li>
+                <li>{tr("soil.capture.tip.3", "Hold steady for sharp focus")}</li>
               </ul>
             </CardContent>
           </Card>
 
           <Card className="overflow-hidden backdrop-blur supports-[backdrop-filter]:bg-card/70">
             <CardHeader className="pb-2">
-              <CardTitle className="text-base">Sample result preview</CardTitle>
+              <CardTitle className="text-base">{tr("soil.capture.sample_preview", "Sample result preview")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="rounded-lg border p-3 bg-muted/30">
-                <div className="text-[11px] text-muted-foreground mb-1">pH</div>
+                <div className="text-[11px] text-muted-foreground mb-1">{tr("soil.metrics.ph", "pH")}</div>
                 <Progress value={68} className="h-3" />
               </div>
               <div className="rounded-lg border p-3 bg-muted/30">
-                <div className="text-[11px] text-muted-foreground mb-1">Moisture</div>
+                <div className="text-[11px] text-muted-foreground mb-1">{tr("soil.metrics.moisture", "Moisture")}</div>
                 <Progress value={35} className="h-3" />
               </div>
               <div className="rounded-lg border p-3">
-                <div className="text-[11px] text-muted-foreground mb-1">Organic Matter</div>
+                <div className="text-[11px] text-muted-foreground mb-1">{tr("soil.metrics.organic_matter", "Organic Matter")}</div>
                 <Progress value={50} className="h-3" />
               </div>
-              <div className="text-[11px] text-muted-foreground">Upload a photo of soil to get your actual analysis.</div>
+              <div className="text-[11px] text-muted-foreground">
+                {tr("soil.capture.preview_hint", "Upload a photo of soil to get your actual analysis.")}
+              </div>
             </CardContent>
           </Card>
         </div>

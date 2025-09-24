@@ -1,14 +1,6 @@
-import { motion, useScroll, useTransform, useInView } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { ArrowRight, Mic, Sprout, Camera, ShoppingCart, Languages, ShieldCheck, Loader2, Cloud, Sparkles, MapPin, Leaf, BarChart3, Shield, Users2, Zap, Droplets, Sun, Cpu, Globe, TrendingUp, CheckCircle, FlaskConical, ArrowDown } from "lucide-react";
+import { Mic, Sprout, CheckCircle, FlaskConical } from "lucide-react";
 import { useNavigate } from "react-router";
-import { useMemo, useEffect, useState, useRef } from "react";
-import { api } from "@/convex/_generated/api";
-import LanguageSelect from "@/components/LanguageSelect";
-import { useAction, useMutation, useQuery } from "convex/react";
-import { toast } from "sonner";
-import { ui, type LangKey } from "@/lib/i18n";
 import GlobalAssistant from "@/components/GlobalAssistant";
 
 export default function Landing() {

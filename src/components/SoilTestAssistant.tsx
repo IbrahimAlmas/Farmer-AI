@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { MessageSquare, Send } from "lucide-react";
+import { type LangKey } from "@/lib/i18n";
 
 type ChatMessage = { role: "user" | "assistant"; text: string };
 
@@ -9,16 +10,22 @@ export type SoilAssistantSuggestion = { id: string; label: string };
 export function SoilTestAssistant({
   suggestions,
   onAction,
+  lang,
+  tr,
 }: {
   suggestions: SoilAssistantSuggestion[];
   onAction: (actionId: string) => Promise<string>;
+  lang: LangKey;
+  tr: (k: string, f: string) => string;
 }) {
   const [chatOpen, setChatOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: "assistant",
-      text:
-        'Hi! I can control this page for you. Try: "Enable Camera", "Upload Photo", "Click Photo", "Analyze Photo", "Retake", "Stop Camera", "Go to Intro", or "Status".',
+      text: tr(
+        "soil.assistant.welcome",
+        'Hi! I can control this page for you. Try: "Enable Camera", "Upload Photo", "Click Photo", "Analyze Photo", "Retake", "Stop Camera", "Go to Intro", or "Status".'
+      ),
     },
   ]);
   const [chatInput, setChatInput] = useState("");
@@ -31,7 +38,6 @@ export function SoilTestAssistant({
     setChatInput("");
     pushMessage({ role: "user", text });
 
-    // very simple parser for known actions
     const t = text.toLowerCase();
     let actionId = "";
     if ((t.includes("enable") || t.includes("start")) && t.includes("camera")) actionId = "enable_camera";
@@ -40,7 +46,6 @@ export function SoilTestAssistant({
     else if (t.includes("analyze")) actionId = "analyze_photo";
     else if (t.includes("retake")) actionId = "retake";
     else if (t.includes("stop") && t.includes("camera")) actionId = "stop_camera";
-    // Add: go to intro and status intents
     else if (t.includes("intro") || (t.includes("go") && t.includes("back"))) actionId = "go_intro";
     else if (t.includes("status")) actionId = "status";
 
@@ -52,8 +57,10 @@ export function SoilTestAssistant({
 
     pushMessage({
       role: "assistant",
-      text:
-        'I can help with camera and analysis actions. Try: "Enable Camera", "Upload Photo", "Click Photo", "Analyze Photo", "Retake", "Stop Camera", "Go to Intro", or "Status".',
+      text: tr(
+        "soil.assistant.help",
+        'I can help with camera and analysis actions. Try: "Enable Camera", "Upload Photo", "Click Photo", "Analyze Photo", "Retake", "Stop Camera", "Go to Intro", or "Status".'
+      ),
     });
   };
 
@@ -63,7 +70,7 @@ export function SoilTestAssistant({
         <Button
           className="rounded-full size-12 p-0 shadow-lg bg-emerald-600 hover:bg-emerald-500 text-white"
           onClick={() => setChatOpen(true)}
-          aria-label="Open Assistant"
+          aria-label={tr("soil.assistant.open", "Open Assistant")}
         >
           <MessageSquare className="h-5 w-5" />
         </Button>
@@ -72,9 +79,9 @@ export function SoilTestAssistant({
       {chatOpen && (
         <div className="w-[320px] sm:w-[360px] rounded-2xl bg-white shadow-xl ring-1 ring-black/10 overflow-hidden">
           <div className="flex items-center justify-between px-3 py-2 bg-[oklch(0.98_0.01_120)]">
-            <div className="text-sm font-semibold">Soil Test Assistant</div>
+            <div className="text-sm font-semibold">{tr("soil.assistant.title", "Soil Test Assistant")}</div>
             <Button variant="ghost" size="sm" onClick={() => setChatOpen(false)}>
-              Close
+              {tr("common.close", "Close")}
             </Button>
           </div>
 
@@ -115,7 +122,7 @@ export function SoilTestAssistant({
           <div className="flex items-center gap-2 p-2 border-t bg-white">
             <input
               className="flex-1 h-9 px-3 rounded-md border ring-0 outline-none text-sm"
-              placeholder="Type a command…"
+              placeholder={tr("soil.assistant.input_placeholder", "Type a command…")}
               value={chatInput}
               onChange={(e) => setChatInput(e.target.value)}
               onKeyDown={(e) => {

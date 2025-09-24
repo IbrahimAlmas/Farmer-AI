@@ -10,6 +10,7 @@ import { SoilReview } from "@/components/soil/Review";
 import { SoilResults } from "@/components/soil/Results";
 import type { Analysis } from "@/types/soil";
 import { SoilTestAssistant, type SoilAssistantSuggestion } from "@/components/SoilTestAssistant";
+import { ui, type LangKey } from "@/lib/i18n";
 
 export default function SoilTest() {
   const getUploadUrl = useMutation(api.soil_upload.getUploadUrl);
@@ -29,6 +30,26 @@ export default function SoilTest() {
   const [step, setStep] = useState<"intro" | "capture" | "review" | "results">("intro");
   const startedRef = useRef(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [lang, setLang] = useState<LangKey>(() => {
+    const saved = (localStorage.getItem("lang") || "en") as LangKey;
+    return saved;
+  });
+
+  // Simple translate with fallback
+  const tr = (key: string, fallback: string) => {
+    try {
+      const val = ui(lang as LangKey, key as any) as unknown as string;
+      // if ui returns key itself or empty, use fallback
+      if (!val || val === key) return fallback;
+      return val;
+    } catch {
+      return fallback;
+    }
+  };
+
+  useEffect(() => {
+    localStorage.setItem("lang", lang);
+  }, [lang]);
 
   // Inline chat removed (using SoilTestAssistant)
 
@@ -81,14 +102,14 @@ export default function SoilTest() {
   // (removed inline chat submit handler)
 
   const suggestionActions: Array<{ id: string; label: string }> = [
-    { id: "enable_camera", label: "Enable Camera" },
-    { id: "upload_photo", label: "Upload Photo" },
-    { id: "click_photo", label: "Click Photo" },
-    { id: "analyze_photo", label: "Analyze Photo" },
-    { id: "retake", label: "Retake" },
-    { id: "stop_camera", label: "Stop Camera" },
-    { id: "go_intro", label: "Back to Intro" },
-    { id: "status", label: "Status" },
+    { id: "enable_camera", label: tr("soil.enable_camera", "Enable Camera") },
+    { id: "upload_photo", label: tr("soil.upload_photo", "Upload Photo") },
+    { id: "click_photo", label: tr("soil.click_photo", "Click Photo") },
+    { id: "analyze_photo", label: tr("soil.analyze_photo", "Analyze Photo") },
+    { id: "retake", label: tr("soil.retake", "Retake") },
+    { id: "stop_camera", label: tr("soil.stop_camera", "Stop Camera") },
+    { id: "go_intro", label: tr("soil.back_to_intro", "Back to Intro") },
+    { id: "status", label: tr("soil.status", "Status") },
   ];
 
   // Listen for global assistant actions
@@ -323,8 +344,30 @@ export default function SoilTest() {
   };
 
   return (
-    <AppShell title="Soil Test">
+    <AppShell title={tr("soil.title", "Soil Test")}>
       <div className="relative">
+        {/* Language selector */}
+        <div className="mx-auto max-w-5xl px-4 pt-4 flex justify-end">
+          <select
+            className="rounded-md border px-2 py-1 text-sm bg-white text-[oklch(0.22_0.02_120)]"
+            value={lang}
+            onChange={(e) => setLang(e.target.value as LangKey)}
+            aria-label={tr("common.language", "Language")}
+          >
+            {/* Keep concise common set; full list resides in global i18n */}
+            <option value="en">English</option>
+            <option value="hi">हिंदी</option>
+            <option value="ur">اردو</option>
+            <option value="te">తెలుగు</option>
+            <option value="ta">தமிழ்</option>
+            <option value="bn">বাংলা</option>
+            <option value="ar">العربية</option>
+            <option value="es">Español</option>
+            <option value="fr">Français</option>
+            <option value="de">Deutsch</option>
+          </select>
+        </div>
+
         {/* Decorative background */}
         <div className="hidden pointer-events-none absolute inset-0 -z-10 overflow-hidden">
           <div className="absolute -top-24 -left-24 h-72 w-72 rounded-full bg-gradient-to-br from-emerald-400/20 to-teal-400/10 blur-3xl" />
@@ -334,7 +377,7 @@ export default function SoilTest() {
         {/* Tighter, centered container */}
         <div className="p-4 mx-auto max-w-5xl">
           <div className="p-5 mx-auto max-w-6xl">
-            {/* Add: hidden global file input to trigger programmatically */}
+            {/* Hidden global file input to trigger programmatically */}
             <input
               ref={fileInputRef}
               type="file"
@@ -343,10 +386,11 @@ export default function SoilTest() {
               className="hidden"
             />
 
-            {/* NEW: Intro step redesigned to match reference (hero + two cards + why section) */}
             {step === "intro" && (
               <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
                 <SoilIntro
+                  lang={lang}
+                  tr={tr}
                   onStart={() => {
                     setErrorMsg(null);
                     setResult(null);
@@ -356,10 +400,11 @@ export default function SoilTest() {
               </motion.div>
             )}
 
-            {/* Centered capture step with side panels */}
             {step === "capture" && (
               <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
                 <SoilCapture
+                  lang={lang}
+                  tr={tr}
                   cameraOn={cameraOn}
                   cameraReady={cameraReady}
                   cameraError={cameraError}
@@ -375,10 +420,11 @@ export default function SoilTest() {
               </motion.div>
             )}
 
-            {/* Review step */}
             {step === "review" && (
               <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
                 <SoilReview
+                  lang={lang}
+                  tr={tr}
                   preview={preview}
                   loading={loading}
                   file={file}
@@ -396,9 +442,10 @@ export default function SoilTest() {
               </motion.div>
             )}
 
-            {/* Results step */}
             {step === "results" && (
               <SoilResults
+                lang={lang}
+                tr={tr}
                 preview={preview}
                 loading={loading}
                 file={file}
@@ -418,8 +465,10 @@ export default function SoilTest() {
           </div>
         </div>
 
-        {/* Floating Assistant (extracted component) */}
+        {/* Floating Assistant */}
         <SoilTestAssistant
+          lang={lang}
+          tr={tr}
           suggestions={suggestionActions as SoilAssistantSuggestion[]}
           onAction={doAction}
         />
