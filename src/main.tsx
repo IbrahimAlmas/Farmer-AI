@@ -13,6 +13,7 @@ import "./index.css";
 import Landing from "./pages/Landing.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import "./types/global.d.ts";
+import LanguagePicker from "@/pages/LanguagePicker.tsx";
 
 const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
 
@@ -104,6 +105,7 @@ createRoot(document.getElementById("root")!).render(
             <Route path="/soil-test" element={<SoilTest />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/farms/new" element={<FarmNew />} />
+            <Route path="/language" element={<LanguagePicker />} />
             <Route path="/farm/:id/model" element={<FarmModelViewer />} />
             <Route path="/reviews" element={<Reviews />} />
             <Route path="*" element={<NotFound />} />

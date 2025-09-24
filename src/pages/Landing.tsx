@@ -90,7 +90,7 @@ export default function Landing() {
               <Button
                 variant="secondary"
                 className="rounded-xl bg-white/90 text-[oklch(0.3_0.03_120)] hover:bg-white"
-                onClick={() => navigate("/settings")}
+                onClick={() => navigate("/language")}
               >
                 {ui(lang, "Change Language")}
               </Button>

@@ -18,7 +18,12 @@ export type LangKey =
   | "mai"
   | "kok"
   | "sd"
-  | "ks";
+  | "ks"
+  | "sa"   // Sanskrit
+  | "sat"  // Santali
+  | "doi"  // Dogri
+  | "mni"  // Manipuri/Meitei
+  | "brx"; // Bodo
 
 export type Locale = `${LangKey}-IN` | "en-IN";
 
@@ -34,7 +39,27 @@ export const SupportedLanguages: Array<{ key: LangKey; locale: Locale; label: st
   { key: "pa", locale: "pa-IN", label: "ਪੰਜਾਬੀ" },
   { key: "or", locale: "or-IN", label: "ଓଡ଼ିଆ" },
   { key: "as", locale: "as-IN", label: "অসমীয়া" },
-  // Fallback locales for some regional languages
+  { key: "bn", locale: "bn-IN", label: "বাংলা" },
+  { key: "gu", locale: "gu-IN", label: "ગુજરાતી" },
+  { key: "hi", locale: "hi-IN", label: "हिन्दी" },
+  { key: "kn", locale: "kn-IN", label: "ಕನ್ನಡ" },
+  { key: "ks", locale: "hi-IN", label: "کٲشُر" },
+  { key: "kok", locale: "mr-IN", label: "कोंकणी" },
+  { key: "mai", locale: "hi-IN", label: "मैथिली" },
+  { key: "ml", locale: "ml-IN", label: "മലയാളം" },
+  { key: "mr", locale: "mr-IN", label: "मराठी" },
+  { key: "ne", locale: "hi-IN", label: "नेपाली" },
+  { key: "or", locale: "or-IN", label: "ଓଡ଼ିଆ" },
+  { key: "pa", locale: "pa-IN", label: "ਪੰਜਾਬੀ" },
+  { key: "sd", locale: "hi-IN", label: "سنڌي" },
+  { key: "ta", locale: "ta-IN", label: "தமிழ்" },
+  { key: "te", locale: "te-IN", label: "తెలుగు" },
+  { key: "ur", locale: "hi-IN", label: "اردو" },
+  { key: "sa", locale: "hi-IN", label: "संस्कृतम्" }, // Sanskrit
+  { key: "sat", locale: "hi-IN", label: "Santali" }, // (Ol Chiki not guaranteed)
+  { key: "doi", locale: "hi-IN", label: "डोगरी" },  // Dogri
+  { key: "mni", locale: "hi-IN", label: "Manipuri (Meitei)" }, // Manipuri
+  { key: "brx", locale: "hi-IN", label: "Bodo" },
   { key: "bho", locale: "hi-IN", label: "भोजपुरी" },
   { key: "ur", locale: "hi-IN", label: "اردو" },
   { key: "ne", locale: "hi-IN", label: "नेपाली" },
@@ -192,7 +217,7 @@ export function ui(lang: LangKey, key: UIKey): string {
 const UI_DICTIONARY: Partial<Record<LangKey, Partial<Record<UIKey, string>>>> = {
   en: {
     "Farming Companion": "Farming Companion",
-    AppTitle: "Root Assistant — Farming, Simplified.",
+    AppTitle: "Root Assistants — the only thing of Arman.",
     AppTagline:
       "Speak in your language, manage farms, test soil with camera, and track market prices — all in a simple, fast experience.",
     "Change Language": "Change Language",
@@ -369,4 +394,9 @@ const UI_DICTIONARY: Partial<Record<LangKey, Partial<Record<UIKey, string>>>> = 
   kok: {},
   sd: {},
   ks: {},
+  sa: {},
+  sat: {},
+  doi: {},
+  mni: {},
+  brx: {},
 };
