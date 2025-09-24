@@ -11,39 +11,39 @@ type Member = {
 const members: Array<Member> = [
   {
     name: "Lokesh",
-    role: "Team Member", 
+    role: "FullStack",
     img: "https://harmless-tapir-303.convex.cloud/api/storage/6e63d252-0e0f-4f17-8ed8-aa0aa8f3754e",
-    bio: "Contributes to building practical, farmer‑first features.",
+    bio: "Full‑stack contributor building reliable, farmer‑first features.",
   },
   {
-    name: "Venket Sai",
-    role: "Team Member",
+    name: "Venkat Sai",
+    role: "Debugger",
     img: "https://harmless-tapir-303.convex.cloud/api/storage/04a4d9bb-1782-485d-83c7-c00498b8e2a2",
-    bio: "Focuses on user experience and reliability.",
+    bio: "Debugging specialist focused on stability and performance.",
   },
   {
-    name: "Aarav Verma",
-    role: "Agronomy Lead",
-    img: "https://images.unsplash.com/photo-1519751138087-5a3c9c3c7683?q=80&w=800&auto=format&fit=crop",
-    bio: "Field trials, crop advisories, and on‑ground validation with smallholder farmers.",
-  },
-  {
-    name: "Neha Singh",
-    role: "Product & UX",
-    img: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=800&auto=format&fit=crop",
-    bio: "Designs simple, local‑language experiences focused on clarity and trust.",
-  },
-  {
-    name: "Rohit Sharma",
-    role: "ML & Sims",
+    name: "Aarush",
+    role: "BackEnd",
     img: "https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?q=80&w=800&auto=format&fit=crop",
-    bio: "Soil/photo inference and lightweight on‑device models for guidance.",
+    bio: "Back‑end engineer crafting scalable APIs and data pipelines.",
   },
   {
-    name: "Priya Iyer",
-    role: "Full‑Stack Engineer",
+    name: "Ananya",
+    role: "FrontEnd",
+    img: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=800&auto=format&fit=crop",
+    bio: "Frontend engineer designing clear, fast, multilingual UI.",
+  },
+  {
+    name: "Rishi",
+    role: "Researcher",
     img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=800&auto=format&fit=crop",
-    bio: "Delivers fast, reliable app flows — offline friendly and secure.",
+    bio: "Research lead exploring practical AI for soil and crop insights.",
+  },
+  {
+    name: "Almas",
+    role: "Team Lead",
+    img: "/assets/Logo_.png",
+    bio: "Team lead aligning vision, execution, and farmer value.",
   },
 ];
 
