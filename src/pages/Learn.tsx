@@ -27,12 +27,12 @@ export default function Learn() {
           </Select>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <Card className="overflow-hidden">
             <CardHeader>
               <CardTitle>Video Tutorials</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="space-y-2 p-3">
               <div className="aspect-video w-full overflow-hidden rounded-lg ring-1 ring-border">
                 <img
                   src="/assets/Farm_6.webp"
@@ -71,7 +71,7 @@ export default function Learn() {
             <CardHeader>
               <CardTitle>Voice Consultancy</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="space-y-2 p-3">
               <div className="text-sm text-muted-foreground">
                 Get quick guidance using your voice. Ask about irrigation, crop schedules, or soil insights in your language.
               </div>
@@ -90,7 +90,7 @@ export default function Learn() {
             <CardHeader>
               <CardTitle>How to use our app</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="space-y-2 p-3">
               <div className="aspect-video w-full overflow-hidden rounded-lg ring-1 ring-border">
                 <img
                   src="/assets/Farm_3.jpg"
