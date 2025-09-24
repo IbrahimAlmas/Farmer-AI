@@ -217,7 +217,7 @@ export function ui(lang: LangKey, key: UIKey): string {
 const UI_DICTIONARY: Partial<Record<LangKey, Partial<Record<UIKey, string>>>> = {
   en: {
     "Farming Companion": "Farming Companion",
-    AppTitle: "Root Assistants — the only thing of Arman.",
+    AppTitle: "Root Assistant. Only thing a farmer needs.",
     AppTagline:
       "Speak in your language, manage farms, test soil with camera, and track market prices — all in a simple, fast experience.",
     "Change Language": "Change Language",
