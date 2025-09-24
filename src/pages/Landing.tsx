@@ -39,7 +39,6 @@ export default function Landing() {
             <nav className="hidden md:flex items-center gap-6 text-sm">
               <a href="#features" className="text-[oklch(0.4_0.02_120)] hover:text-[oklch(0.3_0.03_120)]">Features</a>
               <a href="#stack" className="text-[oklch(0.4_0.02_120)] hover:text-[oklch(0.3_0.03_120)]">Tech Stack</a>
-              <a href="#flow" className="text-[oklch(0.4_0.02_120)] hover:text-[oklch(0.3_0.03_120)]">Tech Flow</a>
               <a href="/reviews" className="text-[oklch(0.4_0.02_120)] hover:text-[oklch(0.3_0.03_120)]">Reviews</a>
             </nav>
 
