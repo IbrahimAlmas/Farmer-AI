@@ -148,7 +148,37 @@ type UIKey =
   | "Market Feature Desc"
   | "Choose Language"
   | "Select Preferred Language"
-  | "Language Change Note";
+  | "Language Change Note"
+  | "Core Tools Hub"
+  | "Under the Hood"
+  | "What Farmers Say"
+  | "Features"
+  | "Tech Stack"
+  | "Reviews"
+  | "Frontend"
+  | "Backend"
+  | "Product"
+  | "Company"
+  | "Resources"
+  | "Welcome Message"
+  | "Voice Commands"
+  | "Voice Commands Desc"
+  | "Soil Test"
+  | "Soil Test Desc"
+  | "My Farm"
+  | "My Farm Desc"
+  | "Subscribe"
+  | "Dashboard"
+  | "Careers"
+  | "Contact Us"
+  | "Blog"
+  | "FAQs"
+  | "Support"
+  | "Privacy Policy"
+  | "Terms of Service"
+  | "All rights reserved"
+  | "Account"
+  | "Sign out";
 
 /**
  * UI helper for localized strings with sensible fallbacks.
@@ -162,7 +192,7 @@ export function ui(lang: LangKey, key: UIKey): string {
 const UI_DICTIONARY: Partial<Record<LangKey, Partial<Record<UIKey, string>>>> = {
   en: {
     "Farming Companion": "Farming Companion",
-    AppTitle: "Root AI — Farming, Simplified.",
+    AppTitle: "Root Assistant — Farming, Simplified.",
     AppTagline:
       "Speak in your language, manage farms, test soil with camera, and track market prices — all in a simple, fast experience.",
     "Change Language": "Change Language",
@@ -209,10 +239,40 @@ const UI_DICTIONARY: Partial<Record<LangKey, Partial<Record<UIKey, string>>>> = 
     "Choose Language": "Choose your language",
     "Select Preferred Language": "Select your preferred language",
     "Language Change Note": "You can change this anytime from Settings.",
+    "Core Tools Hub": "Core Tools Hub",
+    "Under the Hood": "Under the Hood",
+    "What Farmers Say": "What Farmers Say",
+    Features: "Features",
+    "Tech Stack": "Tech Stack",
+    Reviews: "Reviews",
+    Frontend: "Frontend",
+    Backend: "Backend",
+    Product: "Product",
+    Company: "Company",
+    Resources: "Resources",
+    "Welcome Message": "Welcome to the future of farming!",
+    "Voice Commands": "Voice Commands",
+    "Voice Commands Desc": "Get answers to commands in your language. Works in over 20 languages seamlessly.",
+    "Soil Test": "Soil Test",
+    "Soil Test Desc": "Simply use your camera to capture soil photos for instant insights.",
+    "My Farm": "My Farm",
+    "My Farm Desc": "Manage your farm and run simulations with real-time weather data.",
+    Subscribe: "Subscribe",
+    Dashboard: "Dashboard",
+    Careers: "Careers",
+    "Contact Us": "Contact Us",
+    Blog: "Blog",
+    FAQs: "FAQs",
+    Support: "Support",
+    "Privacy Policy": "Privacy Policy",
+    "Terms of Service": "Terms of Service",
+    "All rights reserved": "All rights reserved",
+    Account: "Account",
+    "Sign out": "Sign out",
   },
   hi: {
     "Farming Companion": "कृषि सहायक",
-    AppTitle: "Root AI — खेती, आसान.",
+    AppTitle: "Root Assistant — खेती, आसान.",
     AppTagline:
       "अपनी भाषा में बोलें, खेत प्रबंधित करें, कैमरे से मिट्टी जाँचें और बाज़ार कीमतें देखें — सब कुछ सरल और तेज़ अनुभव में।",
     "Change Language": "भाषा बदलें",
@@ -240,7 +300,7 @@ const UI_DICTIONARY: Partial<Record<LangKey, Partial<Record<UIKey, string>>>> = 
       "सेटिंग्स से अपनी भाषा चुनें। नेविगेशन स्वतः अनुकूलित होगा।",
     "Set Language": "भाषा सेट करें",
     "Start with your voice": "अपनी आवाज़ से शुरू करें",
-    "Voice CTA": `“ओपन मार्केट”, "एड टास्क", या "टेस्ट सॉइल" कहें — बस इतना ही।`,
+    "Voice CTA": `"ओपन मार्केट", \"एड टास्क\", या \"टेस्ट सॉइल\" कहें — बस इतना ही।`,
     "Get Started": "शुरू करें",
     "Try Soil Test": "मिट्टी परीक्षण आज़माएँ",
     "Our Team": "हमारी टीम",
@@ -258,6 +318,36 @@ const UI_DICTIONARY: Partial<Record<LangKey, Partial<Record<UIKey, string>>>> = 
     "Choose Language": "अपनी भाषा चुनें",
     "Select Preferred Language": "अपनी पसंदीदा भाषा चुनें",
     "Language Change Note": "आप इसे किसी भी समय सेटिंग्स से बदल सकते हैं।",
+    "Core Tools Hub": "मुख्य उपकरण केंद्र",
+    "Under the Hood": "तकनीकी विवरण",
+    "What Farmers Say": "किसान क्या कहते हैं",
+    Features: "विशेषताएं",
+    "Tech Stack": "तकनीकी स्टैक",
+    Reviews: "समीक्षाएं",
+    Frontend: "फ्रंटएंड",
+    Backend: "बैकएंड",
+    Product: "उत्पाद",
+    Company: "कंपनी",
+    Resources: "संसाधन",
+    "Welcome Message": "खेती के भविष्य में आपका स्वागत है!",
+    "Voice Commands": "वॉइस कमांड",
+    "Voice Commands Desc": "अपनी भाषा में कमांड के जवाब पाएं। 20+ भाषाओं में काम करता है।",
+    "Soil Test": "मिट्टी परीक्षण",
+    "Soil Test Desc": "तुरंत जानकारी के लिए अपने कैमरे से मिट्टी की फोटो लें।",
+    "My Farm": "मेरा खेत",
+    "My Farm Desc": "रियल-टाइम मौसम डेटा के साथ अपने खेत का प्रबंधन करें।",
+    Subscribe: "सब्सक्राइब करें",
+    Dashboard: "डैशबोर्ड",
+    Careers: "करियर",
+    "Contact Us": "संपर्क करें",
+    Blog: "ब्लॉग",
+    FAQs: "सामान्य प्रश्न",
+    Support: "सहायता",
+    "Privacy Policy": "गोपनीयता नीति",
+    "Terms of Service": "सेवा की शर्तें",
+    "All rights reserved": "सभी अधिकार सुरक्षित",
+    Account: "खाता",
+    "Sign out": "साइन आउट",
   },
 
   // Other languages will fall back to English until translations are provided
