@@ -1,5 +1,4 @@
 import { useAuth } from "@/hooks/use-auth";
-import { Navigate } from "react-router";
 import { Loader2 } from "lucide-react";
 
 interface ProtectedRouteProps {
@@ -17,8 +16,9 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     );
   }
 
+  // Temporarily allow unauthenticated access for testing ("Test User" mode)
   if (!isAuthenticated) {
-    return <Navigate to="/auth" replace />;
+    return <>{children}</>;
   }
 
   return <>{children}</>;

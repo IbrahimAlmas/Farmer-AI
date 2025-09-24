@@ -86,35 +86,35 @@ export function SoilIntro({ onStart }: { onStart: () => void }) {
       <div className="mt-6">
         <Card className="overflow-hidden bg-white shadow-sm ring-1 ring-black/5">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base sm:text-lg">Why Test Soil?</CardTitle>
+            <CardTitle className="text-base sm:text-lg text-emerald-700">Why Test Soil?</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 text-sm">
               <div className="flex items-start gap-2">
                 <CheckCircle2 className="mt-0.5 h-4 w-4 text-emerald-600" />
                 <div>
-                  <div className="font-semibold">Boost Yields</div>
+                  <div className="font-semibold text-emerald-700">Boost Yields</div>
                   <div className="text-[oklch(0.4_0.03_120)]">Optimize conditions for maximum crop production.</div>
                 </div>
               </div>
               <div className="flex items-start gap-2">
                 <CheckCircle2 className="mt-0.5 h-4 w-4 text-emerald-600" />
                 <div>
-                  <div className="font-semibold">Save Money</div>
+                  <div className="font-semibold text-emerald-700">Save Money</div>
                   <div className="text-[oklch(0.4_0.03_120)]">Apply only the necessary nutrients and fertilizers.</div>
                 </div>
               </div>
               <div className="flex items-start gap-2">
                 <CheckCircle2 className="mt-0.5 h-4 w-4 text-emerald-600" />
                 <div>
-                  <div className="font-semibold">Enhance Sustainability</div>
+                  <div className="font-semibold text-emerald-700">Enhance Sustainability</div>
                   <div className="text-[oklch(0.4_0.03_120)]">Prevent nutrient runoff and improve water retention.</div>
                 </div>
               </div>
               <div className="flex items-start gap-2">
                 <CheckCircle2 className="mt-0.5 h-4 w-4 text-emerald-600" />
                 <div>
-                  <div className="font-semibold">Detect Problems Early</div>
+                  <div className="font-semibold text-emerald-700">Detect Problems Early</div>
                   <div className="text-[oklch(0.4_0.03_120)]">Identify pH imbalances and other issues.</div>
                 </div>
               </div>
