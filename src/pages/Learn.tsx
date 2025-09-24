@@ -85,6 +85,41 @@ export default function Learn() {
               </div>
             </CardContent>
           </Card>
+
+          <Card className="overflow-hidden">
+            <CardHeader>
+              <CardTitle>How to use our app</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="aspect-video w-full overflow-hidden rounded-lg ring-1 ring-border">
+                <img
+                  src="/assets/Farm_3.jpg"
+                  alt="App tutorial preview"
+                  className="h-full w-full object-cover"
+                  onError={(e) => {
+                    const t = e.currentTarget as HTMLImageElement;
+                    t.src = "/assets/Farm_2.webp";
+                    t.onerror = null;
+                  }}
+                />
+              </div>
+              <div className="text-sm text-muted-foreground">
+                A quick walkthrough of Root Assistant: voice commands, soil test, managing farms, tasks, and market prices.
+              </div>
+              <div className="flex gap-2">
+                <a
+                  href="https://www.youtube.com/results?search_query=how+to+use+root+assistant+app"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <Button>Open Tutorial</Button>
+                </a>
+                <a href="/dashboard">
+                  <Button variant="outline">Try it now</Button>
+                </a>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         <div className="space-y-3">
